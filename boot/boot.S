@@ -21,7 +21,6 @@ stack_top:
 	# Kernel entry point
 	.section .text
 	.global _start
-	.type _start, @function
 _start:
 	movl $stack_top, %esp
 	call kernel_main
