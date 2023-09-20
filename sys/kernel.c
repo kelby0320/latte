@@ -1,7 +1,7 @@
 #include "config.h"
-#include "gdt.h"
 #include "kernel.h"
-#include "string.h"
+#include "gdt/gdt.h"
+#include "libk/memory.h"
 
 #include <stddef.h>
 #include <stdint.h>

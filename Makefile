@@ -1,40 +1,68 @@
-FILES = ./build/boot/boot.o \
-	./build/sys/kernel.o \
+CC = i686-elf-gcc
+AS = i686-elf-as
+
+CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
+
+OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/gdt/gdt.o \
 	./build/sys/gdt/gdt.S.o \
+	./build/sys/kernel.o \
+	./build/sys/libk/memory.o \
 	./build/sys/libk/string.o
 
-INCLUDES = -I./sys \
-	-I./sys/gdt \
-	-I ./sys/libk
+TEST_OBJECTS = ./build/test/test.o \
+	./build/test/sys/libk/memory.o \
+	./build/test/sys/libk/test_memory.o
 
-FLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
+TEST_EXECUTABLES = ./build/test/sys/libk/test_memory
+
+INCLUDES = -I./sys
+
+TEST_INCLUDES = -I./sys -I./test
 
 all: ./build/boot/latte.elf
 
-./build/boot/latte.elf: $(FILES)
+build_dirs:
 	mkdir -p ./build/boot
-	i686-elf-gcc -T ./sys/linker.ld -o ./build/boot/latte.elf -ffreestanding -O0 -nostdlib $(FILES) -lgcc
+	mkdir -p ./build/sys/gdt
+	mkdir -p ./build/sys/libk
+	mkdir -p ./build/test/sys/libk
 
-./build/boot/boot.o: ./boot/boot.S
-	mkdir -p ./build/boot
-	i686-elf-as ./boot/boot.S -o ./build/boot/boot.o
+./build/boot/latte.elf: build_dirs $(OBJECTS)
+	$(CC) -T ./sys/linker.ld -o ./build/boot/latte.elf -ffreestanding -O0 -nostdlib $(OBJECTS) -lgcc
 
-./build/sys/kernel.o: ./sys/kernel.c
-	mkdir -p ./build/sys
-	i686-elf-gcc $(FLAGS) $(INCLUDES) -c ./sys/kernel.c -o ./build/sys/kernel.o
+./build/boot/boot.S.o: ./boot/boot.S
+	$(AS) ./boot/boot.S -o ./build/boot/boot.S.o
 
 ./build/sys/gdt/gdt.o: ./sys/gdt/gdt.c
-	mkdir -p ./build/sys/gdt
-	i686-elf-gcc $(FLAGS) $(INCLUDES) -c ./sys/gdt/gdt.c -o ./build/sys/gdt/gdt.o
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/gdt/gdt.c -o ./build/sys/gdt/gdt.o
 
 ./build/sys/gdt/gdt.S.o: ./sys/gdt/gdt.S
-	mkdir -p ./build/sys/gdt
-	i686-elf-as ./sys/gdt/gdt.S -o ./build/sys/gdt/gdt.S.o
+	$(AS) ./sys/gdt/gdt.S -o ./build/sys/gdt/gdt.S.o
+
+./build/sys/kernel.o: ./sys/kernel.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/kernel.c -o ./build/sys/kernel.o
+
+./build/sys/libk/memory.o: ./sys/libk/memory.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/libk/memory.c -o ./build/sys/libk/memory.o
 
 ./build/sys/libk/string.o: ./sys/libk/string.c
-	mkdir -p ./build/sys/libk
-	i686-elf-gcc $(FLAGS) $(INCLUDES) -c ./sys/libk/string.c -o ./build/sys/libk/string.o
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/libk/string.c -o ./build/sys/libk/string.o
+
+test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
+	./build/test/sys/libk/test_memory
+
+./build/test/test.o: ./test/test.c
+	gcc -g $(TEST_INCLUDES) -c ./test/test.c -o ./build/test/test.o
+
+./build/test/sys/libk/memory.o: ./sys/libk/memory.c
+	gcc -g $(TEST_INCLUDES) -c ./sys/libk/memory.c -o ./build/test/sys/libk/memory.o
+
+./build/test/sys/libk/test_memory.o: ./test/sys/libk/test_memory.c
+	gcc -g $(TEST_INCLUDES) -c ./test/sys/libk/test_memory.c -o ./build/test/sys/libk/test_memory.o
+
+./build/test/sys/libk/test_memory: $(TEST_OBJECTS)
+	gcc -g ./build/test/test.o ./build/test/sys/libk/memory.o ./build/test/sys/libk/test_memory.o -o ./build/test/sys/libk/test_memory
 
 clean:
 	rm -r ./build
