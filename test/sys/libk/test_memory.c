@@ -85,7 +85,7 @@ struct test_case test_cases[] = {
 	.setup_fixture = 0,
 	.teardown_fixture = 0
     },
-    /* Sentinal Test Case  */
+/* Sentinal Test Case  */
     {
 	.name = 0,
 	.test_function = 0,

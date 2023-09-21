@@ -78,6 +78,6 @@ void
 test_init();
 
 void
-run_tests(const struct test_case *test_cases);
+run_tests(const struct test_case *tests);
 
 #endif

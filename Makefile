@@ -12,9 +12,12 @@ OBJECTS = ./build/boot/boot.S.o \
 
 TEST_OBJECTS = ./build/test/test.o \
 	./build/test/sys/libk/memory.o \
-	./build/test/sys/libk/test_memory.o
+	./build/test/sys/libk/test_memory.o \
+	./build/test/sys/libk/string.o \
+	./build/test/sys/libk/test_string.o
 
-TEST_EXECUTABLES = ./build/test/sys/libk/test_memory
+TEST_EXECUTABLES = ./build/test/sys/libk/test_memory \
+	./build/test/sys/libk/test_string
 
 INCLUDES = -I./sys
 
@@ -51,6 +54,7 @@ build_dirs:
 
 test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 	./build/test/sys/libk/test_memory
+	./build/test/sys/libk/test_string
 
 ./build/test/test.o: ./test/test.c
 	gcc -g $(TEST_INCLUDES) -c ./test/test.c -o ./build/test/test.o
@@ -63,6 +67,15 @@ test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 
 ./build/test/sys/libk/test_memory: $(TEST_OBJECTS)
 	gcc -g ./build/test/test.o ./build/test/sys/libk/memory.o ./build/test/sys/libk/test_memory.o -o ./build/test/sys/libk/test_memory
+
+./build/test/sys/libk/string.o: ./sys/libk/string.c
+	gcc -g $(TEST_INCLUDES) -c ./sys/libk/string.c -o ./build/test/sys/libk/string.o
+
+./build/test/sys/libk/test_string.o: ./test/sys/libk/test_string.c
+	gcc -g $(TEST_INCLUDES) -c ./test/sys/libk/test_string.c -o ./build/test/sys/libk/test_string.o
+
+./build/test/sys/libk/test_string: $(TEST_OBJECTS)
+	gcc -g ./build/test/test.o ./build/test/sys/libk/string.o ./build/test/sys/libk/test_string.o -o ./build/test/sys/libk/test_string
 
 clean:
 	rm -r ./build

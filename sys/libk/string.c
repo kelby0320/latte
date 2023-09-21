@@ -19,7 +19,7 @@ strcat(char *dest, const char* src)
 int
 strcmp(const char *str1, const char *str2)
 {
-    int str1_idx, str2_idx = 0;
+    int str1_idx = 0, str2_idx = 0;
 
     /* Loop through both strings comparing each character */
     while (str1[str1_idx] != 0 && str2[str2_idx] != 0) {
@@ -52,7 +52,7 @@ strcmp(const char *str1, const char *str2)
 char*
 strcpy(char *dest, const char *src)
 {
-    size_t srclen = strlen(src);
+    size_t srclen = strlen(src) + 1; // Include null terminator
 
     for (size_t i = 0; i < srclen; i++) {
 	dest[i] = src[i];
@@ -128,9 +128,18 @@ strncpy(char *dest, const char *src, size_t n)
 {
     size_t srclen = strlen(src);
     size_t limit = srclen < n ? srclen : n;
+    size_t i;
 
-    for (size_t i = 0; i < limit; i++) {
+    /* Copy src to dest */
+    for (i = 0; i < limit; i++) {
 	dest[i] = src[i];
+    }
+
+    /* Add padding if necessary */
+    if (limit < n) {
+	for (; i < n; i++) {
+	    dest[i] = 0;
+	}
     }
 
     return dest;
