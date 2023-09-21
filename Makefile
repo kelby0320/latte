@@ -8,16 +8,20 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/gdt/gdt.S.o \
 	./build/sys/kernel.o \
 	./build/sys/libk/memory.o \
-	./build/sys/libk/string.o
+	./build/sys/libk/string.o \
+	./build/sys/mem/heap.o
 
 TEST_OBJECTS = ./build/test/test.o \
 	./build/test/sys/libk/memory.o \
 	./build/test/sys/libk/test_memory.o \
 	./build/test/sys/libk/string.o \
-	./build/test/sys/libk/test_string.o
+	./build/test/sys/libk/test_string.o \
+	./build/test/sys/mem/heap.o \
+	./build/test/sys/mem/test_heap.o
 
 TEST_EXECUTABLES = ./build/test/sys/libk/test_memory \
-	./build/test/sys/libk/test_string
+	./build/test/sys/libk/test_string \
+	./build/test/sys/mem/test_heap
 
 INCLUDES = -I./sys
 
@@ -29,7 +33,9 @@ build_dirs:
 	mkdir -p ./build/boot
 	mkdir -p ./build/sys/gdt
 	mkdir -p ./build/sys/libk
+	mkdir -p ./build/sys/mem
 	mkdir -p ./build/test/sys/libk
+	mkdir -p ./build/test/sys/mem
 
 ./build/boot/latte.elf: build_dirs $(OBJECTS)
 	$(CC) -T ./sys/linker.ld -o ./build/boot/latte.elf -ffreestanding -O0 -nostdlib $(OBJECTS) -lgcc
@@ -52,9 +58,13 @@ build_dirs:
 ./build/sys/libk/string.o: ./sys/libk/string.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/libk/string.c -o ./build/sys/libk/string.o
 
+./build/sys/mem/heap.o: ./sys/mem/heap.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/mem/heap.c -o ./build/sys/mem/heap.o
+
 test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 	./build/test/sys/libk/test_memory
 	./build/test/sys/libk/test_string
+	./build/test/sys/mem/test_heap
 
 ./build/test/test.o: ./test/test.c
 	gcc -g $(TEST_INCLUDES) -c ./test/test.c -o ./build/test/test.o
@@ -76,6 +86,15 @@ test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 
 ./build/test/sys/libk/test_string: $(TEST_OBJECTS)
 	gcc -g ./build/test/test.o ./build/test/sys/libk/string.o ./build/test/sys/libk/test_string.o -o ./build/test/sys/libk/test_string
+
+./build/test/sys/mem/heap.o: ./sys/mem/heap.c
+	gcc -g $(TEST_INCLUDES) -c ./sys/mem/heap.c -o ./build/test/sys/mem/heap.o
+
+./build/test/sys/mem/test_heap.o: ./test/sys/mem/test_heap.c
+	gcc -g $(TEST_INCLUDES) -c ./test/sys/mem/test_heap.c -o ./build/test/sys/mem/test_heap.o
+
+./build/test/sys/mem/test_heap: $(TEST_OBJECTS)
+	gcc -g ./build/test/test.o ./build/test/sys/mem/heap.o ./build/test/sys/mem/test_heap.o -o ./build/test/sys/mem/test_heap
 
 clean:
 	rm -r ./build

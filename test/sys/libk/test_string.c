@@ -1,8 +1,6 @@
 #include "libk/string.h"
 #include "test.h"
 
-#include <stdio.h>
-
 int
 test_strcat(void *state)
 {
@@ -77,7 +75,7 @@ test_strncat(void *state)
     memset(dest, 0, sizeof(dest));
 
     /* dest = "Hello"  */
-    strncat(dest, "Hello", 5);
+    strncat(dest, "Hello", 6);
     int ret = strcmp(dest, "Hello");
     assert_true(ret == 0);
 
