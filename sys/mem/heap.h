@@ -8,19 +8,21 @@
 #define block_list_size(order)						\
     ((1 << (LATTE_HEAP_MAX_ORDER - order)) * LATTE_HEAP_BLOCK_MULTIPLIER)
 
-typedef unsigned int HEAP_BLOCK_FLAG;
+typedef unsigned int HEAP_BLOCK_FLAGS;
 
-#define HEAP_BLOCK_AVAILABLE 0
-#define HEAP_BLOCK_ALLOCATED 1
+#define HEAP_BLOCK_UNINITALIZED 0b00000000
+#define HEAP_BLOCK_AVAILABLE 0b00000001
+#define HEAP_BLOCK_ALLOCATED 0b00000010
 
 struct block_item {
     void *addr;
-    HEAP_BLOCK_FLAG flag;
+    HEAP_BLOCK_FLAGS flags;
 };
 
 struct block_list {
     struct block_item *list;
-    int cur;
+    int len;			/* Number of blocks allocated or available */
+    int num_alloc;		/* Number of blocks allocated */
     size_t size;
 };
 
