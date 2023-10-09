@@ -6,13 +6,14 @@
 #include <stddef.h>
 
 #define block_list_size(order)						\
-    ((1 << (LATTE_HEAP_MAX_ORDER - order)) * LATTE_HEAP_BLOCK_MULTIPLIER)
+    (1 << (LATTE_HEAP_MAX_ORDER - order))
 
-typedef unsigned int HEAP_BLOCK_FLAGS;
+typedef unsigned char HEAP_BLOCK_FLAGS;
 
 #define HEAP_BLOCK_UNINITALIZED 0b00000000
 #define HEAP_BLOCK_AVAILABLE 0b00000001
 #define HEAP_BLOCK_ALLOCATED 0b00000010
+#define HEAP_BLOCK_MULTI_BLOCK 0b00000100
 
 struct block_item {
     void *addr;
@@ -21,12 +22,12 @@ struct block_item {
 
 struct block_list {
     struct block_item *list;
-    int len;			/* Number of blocks allocated or available */
+    int num_alloc_or_avail;	/* Number of blocks allocated or available */
     int num_alloc;		/* Number of blocks allocated */
     size_t size;
 };
 
-struct heap {
+struct block_tree {
     struct block_item _order_0_list[block_list_size(0)];
     struct block_item _order_1_list[block_list_size(1)];
     struct block_item _order_2_list[block_list_size(2)];
@@ -40,7 +41,11 @@ struct heap {
     struct block_item _order_10_list[block_list_size(10)];
 
     struct block_list block_lists[11];
+    void *saddr;
+};
 
+struct heap {
+    struct block_tree block_trees[LATTE_HEAP_LARGE_BLOCKS];
     void *saddr;
 };
 
