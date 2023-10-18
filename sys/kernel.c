@@ -1,6 +1,7 @@
 #include "config.h"
 #include "kernel.h"
 #include "gdt/gdt.h"
+#include "libk/libk.h"
 #include "libk/memory.h"
 
 #include <stddef.h>
@@ -127,6 +128,9 @@ kernel_main()
 
     // Load the GDT
     gdt_load(gdt, sizeof(gdt));
+
+    // Initialize libk
+    libk_init();
     
     print("Latte OS v0.1");
 

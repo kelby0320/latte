@@ -7,6 +7,8 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/gdt/gdt.o \
 	./build/sys/gdt/gdt.S.o \
 	./build/sys/kernel.o \
+	./build/sys/libk/kheap.o \
+	./build/sys/libk/libk.o \
 	./build/sys/libk/memory.o \
 	./build/sys/libk/string.o \
 	./build/sys/mem/heap.o
@@ -51,6 +53,12 @@ build_dirs:
 
 ./build/sys/kernel.o: ./sys/kernel.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/kernel.c -o ./build/sys/kernel.o
+
+./build/sys/libk/kheap.o: ./sys/libk/kheap.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/libk/kheap.c -o ./build/sys/libk/kheap.o
+
+./build/sys/libk/libk.o: ./sys/libk/libk.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/libk/libk.c -o ./build/sys/libk/libk.o
 
 ./build/sys/libk/memory.o: ./sys/libk/memory.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/libk/memory.c -o ./build/sys/libk/memory.o
