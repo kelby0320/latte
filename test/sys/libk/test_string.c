@@ -145,71 +145,71 @@ test_strncpy_padding(void *state)
 
 struct test_case test_cases[] = {
     {
-	.name = "strcat",
-	.test_function = test_strcat,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strcat",
+        .test_function = test_strcat,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strcmp - equal",
-	.test_function = test_strcmp_equal,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strcmp - equal",
+        .test_function = test_strcmp_equal,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strcmp - not equal",
-	.test_function = test_strcmp_not_equal,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strcmp - not equal",
+        .test_function = test_strcmp_not_equal,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strcpy",
-	.test_function = test_strcpy,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strcpy",
+        .test_function = test_strcpy,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strlen",
-	.test_function = test_strlen,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strlen",
+        .test_function = test_strlen,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strncat",
-	.test_function = test_strncat,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strncat",
+        .test_function = test_strncat,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strncmp - equal",
-	.test_function = test_strncmp_equal,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strncmp - equal",
+        .test_function = test_strncmp_equal,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strncmp - not equal",
-	.test_function = test_strncmp_not_equal,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strncmp - not equal",
+        .test_function = test_strncmp_not_equal,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strncpy - short src",
-	.test_function = test_strncpy_short_src,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strncpy - short src",
+        .test_function = test_strncpy_short_src,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "strncpy - padding",
-	.test_function = test_strncpy_padding,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "strncpy - padding",
+        .test_function = test_strncpy_padding,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
 /* Sentinal Test Case  */
     {
-	.name = 0,
-	.test_function = 0,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = 0,
+        .test_function = 0,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     }
 };
 

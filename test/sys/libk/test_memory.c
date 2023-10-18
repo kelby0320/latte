@@ -62,35 +62,35 @@ test_memset(void *state)
 
 struct test_case test_cases[] = {
     {
-	.name = "memcmp - vals equal",
-	.test_function = test_memcmp_vals_equal,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "memcmp - vals equal",
+        .test_function = test_memcmp_vals_equal,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "memcmp - vals not equal",
-	.test_function = test_memcmp_vals_not_equal,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "memcmp - vals not equal",
+        .test_function = test_memcmp_vals_not_equal,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "memcpy",
-	.test_function = test_memcpy,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "memcpy",
+        .test_function = test_memcpy,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
     {
-	.name = "memset",
-	.test_function = test_memset,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = "memset",
+        .test_function = test_memset,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     },
 /* Sentinal Test Case  */
     {
-	.name = 0,
-	.test_function = 0,
-	.setup_fixture = 0,
-	.teardown_fixture = 0
+        .name = 0,
+        .test_function = 0,
+        .setup_fixture = 0,
+        .teardown_fixture = 0
     }
 };
 

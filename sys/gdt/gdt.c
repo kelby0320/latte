@@ -5,7 +5,7 @@ static void
 encode_gdt_structured(struct gdt* gdt, const struct gdt_structured *gdt_structured)
 {
     if (gdt_structured->limit > 0xFFFFF) {
-	panic("GDT cannot encode limits greater than 0xFFFFF\n");
+	    panic("GDT cannot encode limits greater than 0xFFFFF\n");
     }
 
     // Encode the limit
@@ -27,11 +27,9 @@ encode_gdt_structured(struct gdt* gdt, const struct gdt_structured *gdt_structur
 }
 
 void
-gdt_structured_to_gdt(struct gdt* gdt,
-		      struct gdt_structured* structured_gdt,
-		      int total_entries)
+gdt_structured_to_gdt(struct gdt* gdt, struct gdt_structured* structured_gdt, int total_entries)
 {
     for (int i = 0; i < total_entries; i++) {
-	encode_gdt_structured(&gdt[i], &structured_gdt[i]);
+	    encode_gdt_structured(&gdt[i], &structured_gdt[i]);
     }
 }

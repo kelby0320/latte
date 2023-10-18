@@ -17,20 +17,19 @@ run_tests(const struct test_case *tests)
     const struct test_case *test = tests;
     
     for (test; memcmp(test, &sentinal, sizeof(struct test_case)) != 0; test++) {
+		/* Call Setup Fixture */
+		void *state = NULL;
+		if (test->setup_fixture != NULL) {
+			state = test->setup_fixture();
+		}
+		
+		/* Run Test */
+		int ret = test->test_function(state);
+		printf("%s: %s\n", test->name, ret == 0 ? "PASSED" : "FAILED");
 
-	/* Call Setup Fixture */
-	void *state = NULL;
-	if (test->setup_fixture != NULL) {
-	    state = test->setup_fixture();
-	}
-	
-	/* Run Test */
-	int ret = test->test_function(state);
-	printf("%s: %s\n", test->name, ret == 0 ? "PASSED" : "FAILED");
-
-	/* Call Teardown Fixture */
-	if (test->teardown_fixture != NULL) {
-	    test->teardown_fixture();
-	}
+		/* Call Teardown Fixture */
+		if (test->teardown_fixture != NULL) {
+			test->teardown_fixture();
+		}
     }
 }

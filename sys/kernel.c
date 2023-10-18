@@ -58,8 +58,8 @@ terminal_writechar(char c)
     terminal_putchar(terminal_col, terminal_row, c);
     terminal_col++;
     if (terminal_col >= VGA_WIDTH) {
-	terminal_col = 0;
-	terminal_row++;
+        terminal_col = 0;
+        terminal_row++;
     }
 }
 
@@ -72,9 +72,9 @@ terminal_initialize()
     terminal_color = vga_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
     for (size_t y = 0; y < VGA_HEIGHT; y++) {
-	for (size_t x = 0; x < VGA_WIDTH; x++) {
-	    terminal_putchar(x, y, ' ');
-	}
+        for (size_t x = 0; x < VGA_WIDTH; x++) {
+            terminal_putchar(x, y, ' ');
+        }
     }
 }
 
@@ -84,8 +84,8 @@ strlen(const char *str)
     size_t count = 0;
     
     while (*str) {
-	count++;
-	str++;
+        count++;
+        str++;
     }
 
     return count;
@@ -96,24 +96,24 @@ print(const char *str)
 {
     size_t len = strlen(str);
     for (size_t i = 0; i < len; i++) {
-	terminal_writechar(str[i]);
+	    terminal_writechar(str[i]);
     }
 }
 
 void
 panic(const char *str)
 {
-  print(str);
-  while (1);
+    print(str);
+    while (1);
 }
 
 struct gdt gdt[LATTE_TOTAL_GDT_SEGMENTS];
 struct gdt_structured gdt_structured[LATTE_TOTAL_GDT_SEGMENTS] = {
-  {.base = 0x00, .limit = 0x00, .type = 0x00}, /* Null Segment */
-  {.base = 0x00, .limit = 0xFFFFF, .type = 0x9A}, /* Kernel Code Segment */
-  {.base = 0x00, .limit = 0xFFFFF, .type = 0x92}, /* Kernel Data Segment */
-  {.base = 0x00, .limit = 0xFFFFF, .type = 0xF8}, /* User Code Segment */
-  {.base = 0x00, .limit = 0xFFFFF, .type = 0xF2}, /* User Data Segment */
+    {.base = 0x00, .limit = 0x00, .type = 0x00}, /* Null Segment */
+    {.base = 0x00, .limit = 0xFFFFF, .type = 0x9A}, /* Kernel Code Segment */
+    {.base = 0x00, .limit = 0xFFFFF, .type = 0x92}, /* Kernel Data Segment */
+    {.base = 0x00, .limit = 0xFFFFF, .type = 0xF8}, /* User Code Segment */
+    {.base = 0x00, .limit = 0xFFFFF, .type = 0xF2}, /* User Data Segment */
 };
 
 void
