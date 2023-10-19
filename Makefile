@@ -4,6 +4,7 @@ AS = i686-elf-as
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
 
 OBJECTS = ./build/boot/boot.S.o \
+	./build/sys/dev/term/term.o \
 	./build/sys/gdt/gdt.o \
 	./build/sys/gdt/gdt.S.o \
 	./build/sys/kernel.o \
@@ -33,6 +34,7 @@ all: ./build/boot/latte.elf
 
 build_dirs:
 	mkdir -p ./build/boot
+	mkdir -p ./build/sys/dev/term
 	mkdir -p ./build/sys/gdt
 	mkdir -p ./build/sys/libk
 	mkdir -p ./build/sys/mem
@@ -44,6 +46,9 @@ build_dirs:
 
 ./build/boot/boot.S.o: ./boot/boot.S
 	$(AS) ./boot/boot.S -o ./build/boot/boot.S.o
+
+./build/sys/dev/term/term.o: ./sys/dev/term/term.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/dev/term/term.c -o ./build/sys/dev/term/term.o
 
 ./build/sys/gdt/gdt.o: ./sys/gdt/gdt.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/gdt/gdt.c -o ./build/sys/gdt/gdt.o
