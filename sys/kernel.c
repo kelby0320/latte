@@ -1,13 +1,11 @@
 #include "config.h"
+#include "dev/disk/disk.h"
 #include "dev/term/term.h"
 #include "kernel.h"
 #include "gdt/gdt.h"
 #include "libk/libk.h"
 #include "libk/memory.h"
 #include "libk/string.h"
-
-#include <stddef.h>
-#include <stdint.h>
 
 void
 print(const char *str)
@@ -48,6 +46,9 @@ kernel_main()
 
     // Initialize libk
     libk_init();
+
+    // Find and Initialize Disks
+    disk_probe_and_init();
     
     print("Latte OS v0.1");
 

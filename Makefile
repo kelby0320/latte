@@ -4,7 +4,10 @@ AS = i686-elf-as
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
 
 OBJECTS = ./build/boot/boot.S.o \
+	./build/sys/dev/disk/ata/ata.o \
+	./build/sys/dev/disk/disk.o \
 	./build/sys/dev/term/term.o \
+	./build/sys/fs/fs.o \
 	./build/sys/gdt/gdt.o \
 	./build/sys/gdt/gdt.S.o \
 	./build/sys/kernel.o \
@@ -12,7 +15,8 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/libk/libk.o \
 	./build/sys/libk/memory.o \
 	./build/sys/libk/string.o \
-	./build/sys/mem/heap.o
+	./build/sys/mem/heap.o \
+	./build/sys/port/io.S.o
 
 TEST_OBJECTS = ./build/test/test.o \
 	./build/test/sys/libk/memory.o \
@@ -34,10 +38,13 @@ all: ./build/boot/latte.elf
 
 build_dirs:
 	mkdir -p ./build/boot
+	mkdir -p ./build/sys/dev/disk/ata
 	mkdir -p ./build/sys/dev/term
+	mkdir -p ./build/sys/fs
 	mkdir -p ./build/sys/gdt
 	mkdir -p ./build/sys/libk
 	mkdir -p ./build/sys/mem
+	mkdir -p ./build/sys/port
 	mkdir -p ./build/test/sys/libk
 	mkdir -p ./build/test/sys/mem
 
@@ -47,8 +54,17 @@ build_dirs:
 ./build/boot/boot.S.o: ./boot/boot.S
 	$(AS) ./boot/boot.S -o ./build/boot/boot.S.o
 
+./build/sys/dev/disk/ata/ata.o: ./sys/dev/disk/ata/ata.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/dev/disk/ata/ata.c -o ./build/sys/dev/disk/ata/ata.o
+
+./build/sys/dev/disk/disk.o: ./sys/dev/disk/disk.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/dev/disk/disk.c -o ./build/sys/dev/disk/disk.o
+
 ./build/sys/dev/term/term.o: ./sys/dev/term/term.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/dev/term/term.c -o ./build/sys/dev/term/term.o
+
+./build/sys/fs/fs.o: ./sys/fs/fs.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/fs.c -o ./build/sys/fs/fs.o
 
 ./build/sys/gdt/gdt.o: ./sys/gdt/gdt.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/gdt/gdt.c -o ./build/sys/gdt/gdt.o
@@ -73,6 +89,9 @@ build_dirs:
 
 ./build/sys/mem/heap.o: ./sys/mem/heap.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/mem/heap.c -o ./build/sys/mem/heap.o
+
+./build/sys/port/io.S.o: ./sys/port/io.S
+	$(AS) ./sys/port/io.S -o ./build/sys/port/io.S.o
 
 test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 	./build/test/sys/libk/test_memory
