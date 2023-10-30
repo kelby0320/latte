@@ -2,6 +2,7 @@
 
 #include "dev/disk/disk.h"
 #include "errno.h"
+#include "fs/fs.h"
 #include "port/io.h"
 #include "libk/kheap.h"
 #include "libk/string.h"
@@ -62,6 +63,8 @@ ata_probe_and_init()
     strncpy(disk->id, "hdd0", DISK_ID_STR_SIZE);
     disk->private = ata;
     disk->read_block = ata_read_block;
+
+    disk->fs = fs_resolve(disk);
 
     return 0;
 }

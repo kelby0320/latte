@@ -8,6 +8,8 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/dev/disk/disk.o \
 	./build/sys/dev/term/term.o \
 	./build/sys/fs/fs.o \
+	./build/sys/fs/ext2/ext2.o \
+	./build/sys/fs/fat32/fat32.o \
 	./build/sys/gdt/gdt.o \
 	./build/sys/gdt/gdt.S.o \
 	./build/sys/kernel.o \
@@ -41,6 +43,8 @@ build_dirs:
 	mkdir -p ./build/sys/dev/disk/ata
 	mkdir -p ./build/sys/dev/term
 	mkdir -p ./build/sys/fs
+	mkdir -p ./build/sys/fs/ext2
+	mkdir -p ./build/sys/fs/fat32
 	mkdir -p ./build/sys/gdt
 	mkdir -p ./build/sys/libk
 	mkdir -p ./build/sys/mem
@@ -65,6 +69,12 @@ build_dirs:
 
 ./build/sys/fs/fs.o: ./sys/fs/fs.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/fs.c -o ./build/sys/fs/fs.o
+
+./build/sys/fs/ext2/ext2.o: ./sys/fs/ext2/ext2.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/ext2/ext2.c -o ./build/sys/fs/ext2/ext2.o
+
+./build/sys/fs/fat32/fat32.o: ./sys/fs/fat32/fat32.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/fat32/fat32.c -o ./build/sys/fs/fat32/fat32.o
 
 ./build/sys/gdt/gdt.o: ./sys/gdt/gdt.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/gdt/gdt.c -o ./build/sys/gdt/gdt.o
