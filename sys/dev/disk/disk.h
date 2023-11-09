@@ -11,7 +11,7 @@ typedef unsigned int DISK_TYPE;
 
 struct disk;
 
-typedef int (*DISK_READ_BLOCK_FUNCTION)(struct disk *disk, unsigned int lba, int total, void *buf);
+typedef int (*DISK_READ_SECTORS_FUNCTION)(struct disk *disk, unsigned int lba, int total, void *buf);
 
 struct disk {
     DISK_TYPE type;
@@ -19,7 +19,7 @@ struct disk {
     void *private;
     struct filesystem *fs;
 
-    DISK_READ_BLOCK_FUNCTION read_block;
+    DISK_READ_SECTORS_FUNCTION read_sectors;
 };
 
 void

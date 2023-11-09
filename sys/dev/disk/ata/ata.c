@@ -8,7 +8,7 @@
 #include "libk/string.h"
 
 int
-ata_read_block(struct disk *disk, unsigned int lba, int total, void *buf)
+ata_read_sectors(struct disk *disk, unsigned int lba, int total, void *buf)
 {
     unsigned int register_base = ((struct ata*)disk->private)->bus_base_addr;
     unsigned int drive_no = ((struct ata*)disk->private)->drive_no;
@@ -62,7 +62,7 @@ ata_probe_and_init()
     disk->type = DISK_TYPE_ATA;
     strncpy(disk->id, "hdd0", DISK_ID_STR_SIZE);
     disk->private = ata;
-    disk->read_block = ata_read_block;
+    disk->read_sectors = ata_read_sectors;
 
     disk->fs = fs_resolve(disk);
 
