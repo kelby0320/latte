@@ -8,6 +8,7 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/dev/disk/disk.o \
 	./build/sys/dev/term/term.o \
 	./build/sys/fs/fs.o \
+	./build/sys/fs/path.o \
 	./build/sys/fs/ext2/ext2.o \
 	./build/sys/fs/fat32/fat32.o \
 	./build/sys/gdt/gdt.o \
@@ -21,6 +22,8 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/port/io.S.o
 
 TEST_OBJECTS = ./build/test/test.o \
+	./build/test/sys/fs/path.o \
+	./build/test/sys/fs/test_path.o \
 	./build/test/sys/libk/memory.o \
 	./build/test/sys/libk/test_memory.o \
 	./build/test/sys/libk/string.o \
@@ -28,7 +31,8 @@ TEST_OBJECTS = ./build/test/test.o \
 	./build/test/sys/mem/heap.o \
 	./build/test/sys/mem/test_heap.o
 
-TEST_EXECUTABLES = ./build/test/sys/libk/test_memory \
+TEST_EXECUTABLES = ./build/test/sys/fs/test_path \
+	./build/test/sys/libk/test_memory \
 	./build/test/sys/libk/test_string \
 	./build/test/sys/mem/test_heap
 
@@ -49,6 +53,7 @@ build_dirs:
 	mkdir -p ./build/sys/libk
 	mkdir -p ./build/sys/mem
 	mkdir -p ./build/sys/port
+	mkdir -p ./build/test/sys/fs
 	mkdir -p ./build/test/sys/libk
 	mkdir -p ./build/test/sys/mem
 
@@ -69,6 +74,9 @@ build_dirs:
 
 ./build/sys/fs/fs.o: ./sys/fs/fs.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/fs.c -o ./build/sys/fs/fs.o
+
+./build/sys/fs/path.o: ./sys/fs/path.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/path.c -o ./build/sys/fs/path.o
 
 ./build/sys/fs/ext2/ext2.o: ./sys/fs/ext2/ext2.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/ext2/ext2.c -o ./build/sys/fs/ext2/ext2.o
@@ -104,12 +112,25 @@ build_dirs:
 	$(AS) ./sys/port/io.S -o ./build/sys/port/io.S.o
 
 test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
+	./build/test/sys/fs/test_path
 	./build/test/sys/libk/test_memory
 	./build/test/sys/libk/test_string
 	./build/test/sys/mem/test_heap
 
 ./build/test/test.o: ./test/test.c
 	gcc -g $(TEST_INCLUDES) -c ./test/test.c -o ./build/test/test.o
+	
+./build/test/sys/fs/path.o: ./sys/fs/path.c
+	gcc -g $(TEST_INCLUDES) -c ./sys/fs/path.c -o ./build/test/sys/fs/path.o
+
+./build/test/sys/fs/test_path.o: ./test/sys/fs/test_path.c
+	gcc -g $(TEST_INCLUDES) -c ./test/sys/fs/test_path.c -o ./build/test/sys/fs/test_path.o
+
+./build/test/sys/fs/test_path: $(TEST_OBJECTS)
+	gcc -g ./build/test/test.o  ./build/test/sys/fs/path.o ./build/test/sys/fs/test_path.o -o ./build/test/sys/fs/test_path
+
+./build/test/sys/libk/kheap.o: ./sys/libk/kheap.c
+	gcc -g $(TEST_INCLUDES) -c ./sys/libk/kheap.c -o ./build/test/sys/libk/kheap.o
 
 ./build/test/sys/libk/memory.o: ./sys/libk/memory.c
 	gcc -g $(TEST_INCLUDES) -c ./sys/libk/memory.c -o ./build/test/sys/libk/memory.o

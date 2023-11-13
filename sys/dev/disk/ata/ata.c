@@ -1,5 +1,6 @@
 #include "dev/disk/ata/ata.h"
 
+#include "config.h"
 #include "dev/disk/disk.h"
 #include "errno.h"
 #include "fs/fs.h"
@@ -60,7 +61,7 @@ ata_probe_and_init()
     ata->drive_no = ATA_PIO_DRIVE_MASTER;
 
     disk->type = DISK_TYPE_ATA;
-    strncpy(disk->id, "hdd0", DISK_ID_STR_SIZE);
+    strncpy(disk->id, "hdd0", LATTE_DISK_ID_MAX_SIZE);
     disk->private = ata;
     disk->read_sectors = ata_read_sectors;
 

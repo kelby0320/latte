@@ -33,8 +33,9 @@ struct file_stat {
 };
 
 struct disk;
+struct path;
 
-typedef void*(*FS_OPEN_FUNCTION)(struct disk *disk, struct path_part *part, FILE_MODE mode);
+typedef void*(*FS_OPEN_FUNCTION)(struct disk *disk, struct path *path, FILE_MODE mode);
 typedef int (*FS_CLOSE_FUNCTION)(void *private);
 typedef int (*FS_READ_FUNCTION)(struct disk *disk, void *private, uint32_t size, uint32_t count, char *buf);
 typedef int (*FS_WRITE_FUNCTION)(struct disk *disk, void *private, uint32_t size, uint32_t count, const char *buf);
