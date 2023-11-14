@@ -14,11 +14,15 @@ typedef int (*DISK_READ_SECTORS_FUNCTION)(struct disk *disk, unsigned int lba, i
 
 struct disk {
     DISK_TYPE type;
-    char id[LATTE_DISK_ID_MAX_SIZE];
-    void *private;
-    struct filesystem *fs;
 
     DISK_READ_SECTORS_FUNCTION read_sectors;
+
+    char id[LATTE_DISK_ID_MAX_SIZE];
+
+    void *disk_private;
+
+    struct filesystem *fs;
+    void *fs_private;
 };
 
 void

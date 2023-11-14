@@ -52,13 +52,13 @@ struct filesystem {
     FS_WRITE_FUNCTION   write;
     FS_STAT_FUNCTION    stat;
 
+    void *private;
     char name[128];
 };
 
 struct file_descriptor {
     struct disk *disk;
     struct filesystem *filesystem;
-    void *private;
 };
 
 void

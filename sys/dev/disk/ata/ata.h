@@ -1,8 +1,6 @@
 #ifndef ATA_H
 #define ATA_H
 
-#define ATA_SECTOR_SIZE 512
-
 #define ATA_PIO_PRIMARY_BUS_BASE_ADDR 0x1F0
 #define ATA_PIO_SECONDARY_BUS_BASE_ADDR 0x170
 
@@ -41,8 +39,7 @@
     (unsigned char)(lba >> 16)      \
 
 #define lba_drive(lba, drive_no)    \
-    (lba >> 24) | 0b00000111 | (drive_no << 3)  \
-
+    (lba >> 24) | 0b11100000 | (drive_no << 4)  \
 
 struct ata {
     unsigned int bus_base_addr;

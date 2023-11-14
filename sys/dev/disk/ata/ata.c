@@ -11,8 +11,9 @@
 int
 ata_read_sectors(struct disk *disk, unsigned int lba, int total, void *buf)
 {
-    unsigned int register_base = ((struct ata*)disk->private)->bus_base_addr;
-    unsigned int drive_no = ((struct ata*)disk->private)->drive_no;
+
+    unsigned int register_base = ((struct ata*)disk->disk_private)->bus_base_addr;
+    unsigned int drive_no = ((struct ata*)disk->disk_private)->drive_no;
 
     unsigned int data_reg = register_base + ATA_PIO_DATA_REG_OFFSET;
     unsigned int sector_count_reg = register_base + ATA_PIO_SECTOR_COUNT_REG_OFFSET;
@@ -62,7 +63,7 @@ ata_probe_and_init()
 
     disk->type = DISK_TYPE_ATA;
     strncpy(disk->id, "hdd0", LATTE_DISK_ID_MAX_SIZE);
-    disk->private = ata;
+    disk->disk_private = ata;
     disk->read_sectors = ata_read_sectors;
 
     disk->fs = fs_resolve(disk);

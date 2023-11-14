@@ -1,6 +1,19 @@
 #include "fs/ext2/ext2.h"
 
+#include "config.h"
+#include "dev/disk/disk.h"
+#include "errno.h"
+#include "kernel.h"
+#include "libk/kheap.h"
+
 #include <stdint.h>
+
+#define EXT2_MAGIC_NUMBER 0xEF53
+#define EXT2_SUPERBLOCK_LBA_START (2048 + 2) // 100MB offset + 2 sectors
+#define EXT2_SUPERBLOCK_SECTOR_SIZE 2
+
+#define bytes_to_sectors(bytes) (bytes / LATTE_SECTOR_SIZE)
+
 
 struct superblock {
     uint32_t    s_inodes_count;             /* Inodes count */
@@ -90,9 +103,85 @@ struct inode_table {
     uint32_t    i_osd2[3];                  /* OS dependent 2 */
 } __attribute((packed));
 
+struct ext2_private {
+    struct superblock superblock;
+};
+
+int
+ext2_resolve(struct disk *disk)
+{
+    struct ext2_private *private = kzalloc(sizeof(struct ext2_private));
+    if (!private) {
+        return -ENOMEM;
+    }
+
+    int res = disk->read_sectors(disk, EXT2_SUPERBLOCK_LBA_START, EXT2_SUPERBLOCK_SECTOR_SIZE, &private->superblock);
+    if (res < 0) {
+        kfree(private);
+        return -EIO;
+    }
+
+    if (private->superblock.s_magic != EXT2_MAGIC_NUMBER) {
+        kfree(private);
+        return -EIO;
+    }
+
+    disk->fs_private = private;
+
+    return 0;
+}
+
+void*
+ext2_open(struct disk *disk, struct path *path, FILE_MODE mode)
+{
+    return 0;
+}
+
+int
+ext2_close(void *private)
+{
+    return 0;
+}
+
+int
+ext2_read(struct disk *disk, void *private, uint32_t size, uint32_t count, char *buf)
+{
+    return 0;
+}
+
+int
+ext2_write(struct disk *disk, void *private, uint32_t size, uint32_t count, const char *buf)
+{
+    return 0;
+}
+
+int
+ext2_seek(void *private, uint32_t offset, FILE_SEEK_MODE seek_mode)
+{
+    return 0;
+}
+
+int
+ext2_stat(struct disk *disk, void *private, struct file_stat *stat)
+{
+    return 0;
+}
+
 struct filesystem*
 ext2_init()
 {
-    //TODO
-    return 0;
+    struct filesystem *fs = kzalloc(sizeof(struct filesystem));
+    if (!fs) {
+        panic("Unable to initialize ext2 filesystem");
+    }
+
+    fs->open = ext2_open;
+    fs->close = ext2_close;
+    fs->read = ext2_read;
+    fs->write = ext2_write;
+    fs->stat = ext2_stat;
+    fs->seek = ext2_seek;
+    fs->resolve = ext2_resolve;
+
+    return fs;
 }

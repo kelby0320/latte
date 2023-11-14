@@ -41,7 +41,7 @@ validate_disk_id(const char *str)
     size_t len = strlen(str);
     for (size_t i = 0; i < len; i++) {
         if (!is_path_char(str[i])) {
-            return -EINVARG;
+            return -EINVAL;
         }
     }
 
@@ -52,11 +52,11 @@ static int
 validate_disk_id_sep(const char *str)
 {
     if (str[0] != ':') {
-        return -EINVARG;
+        return -EINVAL;
     }
 
     if (str[1] != '/') {
-        return -EINVARG;
+        return -EINVAL;
     }
 
     return 0;
@@ -71,7 +71,7 @@ disk_id_end_idx(char *path_str)
         }
     }
 
-    return -EINVARG;
+    return -EINVAL;
 }
 
 static int
@@ -79,7 +79,7 @@ parse_disk_id(char *buf, char **path_str)
 {
     int end_disk_id = disk_id_end_idx(*path_str);
     if (end_disk_id < 0) {
-        return -EINVARG;
+        return -EINVAL;
     }
 
     int disk_id_strlen = end_disk_id + 1;
@@ -88,14 +88,14 @@ parse_disk_id(char *buf, char **path_str)
 
     int res = validate_disk_id(buf);
     if (res < 0) {
-        return -EINVARG;
+        return -EINVAL;
     }
     
 
     *path_str += end_disk_id + 1; // point to drive_id separator ":/"
     res = validate_disk_id_sep(*path_str);
     if (res < 0) {
-        return -EINVARG;
+        return -EINVAL;
     }
 
     *path_str += 2; // point to next character after the drive_id separator
@@ -166,7 +166,7 @@ path_from_str(struct path *path, const char *path_str)
 
 err_out:
     path_free(path);
-    return -EINVARG;
+    return -EINVAL;
 }
 
 void

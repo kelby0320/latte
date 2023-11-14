@@ -37,7 +37,7 @@ fs_insert_filesystem(struct filesystem *filesystem)
 static void
 fs_load()
 {
-    fs_insert_filesystem(fat32_init());
+    // fs_insert_filesystem(fat32_init());
     fs_insert_filesystem(ext2_init());
 }
 
