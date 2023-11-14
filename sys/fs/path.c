@@ -121,52 +121,62 @@ get_element_from_path(char *path_buf, char **path_str)
     return i; // Return element length
 }
 
-static struct path_element*
-parse_next_element(struct path_element *prev_element, char **path_str)
+static int
+parse_next_element(struct path_element **next_element, struct path_element *prev_element, char **path_str)
 {
-    struct path_element *path_element = kzalloc(sizeof(struct path_element));
-    if (!path_element) {
+    struct path_element *element = kzalloc(sizeof(struct path_element));
+    if (!element) {
         return -ENOMEM;
     }
 
-    int res = get_element_from_path(&path_element->element, path_str);
+    int res = get_element_from_path(&element->element, path_str);
     if (res == 0) {
-        kfree(path_element);
-        return 0;
+        // No more elements in path
+        kfree(element);
+        return res;
     }
 
     // Link previous path element
     if (prev_element) {
-        prev_element->next = path_element;
+        prev_element->next = element;
     }
 
-    return path_element;
+    *next_element = element;
+    return res;
 }
 
 int
-path_from_str(struct path *path, const char *path_str)
+path_from_str(struct path **path_out, const char *path_str)
 {
+    struct path *path = kzalloc(sizeof(struct path));
+    if (!path) {
+        return -ENOMEM;
+    }
+
     int res = parse_disk_id(path->disk_id, &path_str);
     if (res < 0) {
         goto err_out;
     }
 
-    struct path_element *root_element = parse_next_element(NULL, &path_str);
-    if (!root_element) {
+    struct path_element *root_element;
+    res = parse_next_element(&root_element, NULL, &path_str);
+    if (res < 0) {
         goto err_out;
     }
 
     path->root = root_element;
-    struct path_element *next_element = parse_next_element(root_element, &path_str);
-    while (next_element) {
-        next_element = parse_next_element(next_element, &path_str);
+    struct path_element *next_element;
+    res = parse_next_element(&next_element, root_element, &path_str);
+    while (res > 0) {
+        res = parse_next_element(&next_element, next_element, &path_str);
     }
 
-    return path;
+    *path_out = path;
+    return 0;
 
 err_out:
     path_free(path);
-    return -EINVAL;
+    return res;
 }
 
 void

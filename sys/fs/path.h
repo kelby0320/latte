@@ -17,7 +17,7 @@ struct path {
 };
 
 int
-path_from_str(struct path *path, const char *path_str);
+path_from_str(struct path **path_out, const char *path_str);
 
 void
 path_free(struct path *path);
