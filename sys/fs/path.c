@@ -63,7 +63,7 @@ validate_disk_id_sep(const char *str)
 }
 
 static int
-disk_id_end_idx(char *path_str)
+disk_id_end_idx(const char *path_str)
 {
     for (int idx = 0; idx < LATTE_DISK_ID_MAX_SIZE; idx++) {
         if (path_str[idx] == DISK_ID_SEPARATOR) {
@@ -75,7 +75,7 @@ disk_id_end_idx(char *path_str)
 }
 
 static int
-parse_disk_id(char *buf, char **path_str)
+parse_disk_id(char *buf, const char **path_str)
 {
     int end_disk_id = disk_id_end_idx(*path_str);
     if (end_disk_id < 0) {

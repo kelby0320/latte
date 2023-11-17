@@ -35,10 +35,10 @@ struct file_stat {
 struct disk;
 struct path;
 
-typedef void*(*FS_OPEN_FUNCTION)(struct disk *disk, struct path *path, FILE_MODE mode);
+typedef int (*FS_OPEN_FUNCTION)(struct disk *disk, struct path *path, FILE_MODE mode, void **out);
 typedef int (*FS_CLOSE_FUNCTION)(void *private);
-typedef int (*FS_READ_FUNCTION)(struct disk *disk, void *private, uint32_t size, uint32_t count, char *buf);
-typedef int (*FS_WRITE_FUNCTION)(struct disk *disk, void *private, uint32_t size, uint32_t count, const char *buf);
+typedef int (*FS_READ_FUNCTION)(struct disk *disk, void *private, char *buf, uint32_t count);
+typedef int (*FS_WRITE_FUNCTION)(struct disk *disk, void *private, const char *buf, uint32_t count);
 typedef int (*FS_SEEK_FUNCTION)(void *private, uint32_t offset, FILE_SEEK_MODE seek_mode);
 typedef int (*FS_STAT_FUNCTION)(struct disk *disk, void *private, struct file_stat *stat);
 typedef int (*FS_RESOLVE_FUNCTION)(struct disk *disk);
@@ -59,6 +59,8 @@ struct filesystem {
 struct file_descriptor {
     struct disk *disk;
     struct filesystem *filesystem;
+    void *private;
+    int index;
 };
 
 void
@@ -74,10 +76,10 @@ int
 fseek(int fd, int offset, FILE_SEEK_MODE whence);
 
 int
-fread(int fd, void* ptr, size_t size, size_t count);
+fread(int fd, char* ptr, size_t count);
 
 int
-fwrite(int fd, const void *ptr, size_t size, size_t count);
+fwrite(int fd, const char *ptr, size_t count);
 
 int
 fstat(int fd, struct file_stat* stat);

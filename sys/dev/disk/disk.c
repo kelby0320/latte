@@ -6,6 +6,7 @@
 #include "kernel.h"
 #include "libk/kheap.h"
 #include "libk/memory.h"
+#include "libk/string.h"
 
 struct disk* disks[LATTE_MAX_DISKS];
 
@@ -26,6 +27,22 @@ disk_get_free_disk()
     for (int i = 0; i < LATTE_MAX_DISKS; i++) {
         if (disks[i] == 0) {
             disks[i] = kzalloc(sizeof(struct disk));
+            return disks[i];
+        }
+    }
+
+    return 0;
+}
+
+struct disk*
+disk_get_disk(const char *disk_id)
+{
+    for (int i = 0; i < LATTE_MAX_DISKS; i++) {
+        if (disks[i] == 0) {
+            break;
+        }
+
+        if (strcmp(disks[i]->id, disk_id) == 0) {
             return disks[i];
         }
     }

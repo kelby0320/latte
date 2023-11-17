@@ -33,7 +33,14 @@ terminal_putchar(size_t col, size_t row, char c)
 void
 terminal_writechar(char c)
 {
+    if (c == '\n') {
+        terminal_row++;
+        terminal_col = 0;
+        return;
+    }
+
     terminal_putchar(terminal_col, terminal_row, c);
+    
     terminal_col++;
     if (terminal_col >= VGA_WIDTH) {
         terminal_col = 0;

@@ -168,7 +168,7 @@ isdigit(char c)
 bool
 isalnum(char c)
 {
-    if (isalnum(c) || isdigit(c)) {
+    if (isalpha(c) || isdigit(c)) {
         return true;
     }
 

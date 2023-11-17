@@ -5,11 +5,14 @@ CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
 
 OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/dev/disk/ata/ata.o \
+	./build/sys/dev/disk/buffer/bufferedreader.o \
 	./build/sys/dev/disk/disk.o \
 	./build/sys/dev/term/term.o \
 	./build/sys/fs/fs.o \
 	./build/sys/fs/path.o \
+	./build/sys/fs/ext2/dir.o \
 	./build/sys/fs/ext2/ext2.o \
+	./build/sys/fs/ext2/inode.o \
 	./build/sys/fs/fat32/fat32.o \
 	./build/sys/gdt/gdt.o \
 	./build/sys/gdt/gdt.S.o \
@@ -45,6 +48,7 @@ all: ./build/boot/latte.elf
 build_dirs:
 	mkdir -p ./build/boot
 	mkdir -p ./build/sys/dev/disk/ata
+	mkdir -p ./build/sys/dev/disk/buffer
 	mkdir -p ./build/sys/dev/term
 	mkdir -p ./build/sys/fs
 	mkdir -p ./build/sys/fs/ext2
@@ -66,6 +70,9 @@ build_dirs:
 ./build/sys/dev/disk/ata/ata.o: ./sys/dev/disk/ata/ata.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/dev/disk/ata/ata.c -o ./build/sys/dev/disk/ata/ata.o
 
+./build/sys/dev/disk/buffer/bufferedreader.o: ./sys/dev/disk/buffer/bufferedreader.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/dev/disk/buffer/bufferedreader.c -o ./build/sys/dev/disk/buffer/bufferedreader.o
+
 ./build/sys/dev/disk/disk.o: ./sys/dev/disk/disk.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/dev/disk/disk.c -o ./build/sys/dev/disk/disk.o
 
@@ -78,8 +85,14 @@ build_dirs:
 ./build/sys/fs/path.o: ./sys/fs/path.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/path.c -o ./build/sys/fs/path.o
 
+./build/sys/fs/ext2/dir.o: ./sys/fs/ext2/dir.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/ext2/dir.c -o ./build/sys/fs/ext2/dir.o
+
 ./build/sys/fs/ext2/ext2.o: ./sys/fs/ext2/ext2.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/ext2/ext2.c -o ./build/sys/fs/ext2/ext2.o
+
+./build/sys/fs/ext2/inode.o: ./sys/fs/ext2/inode.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/ext2/inode.c -o ./build/sys/fs/ext2/inode.o
 
 ./build/sys/fs/fat32/fat32.o: ./sys/fs/fat32/fat32.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/fat32/fat32.c -o ./build/sys/fs/fat32/fat32.o
