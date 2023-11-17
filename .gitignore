@@ -5,3 +5,4 @@ iso/
 *.bin
 *.o
 *.img
+settings.json

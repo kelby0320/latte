@@ -55,10 +55,8 @@ kernel_main()
     disk_probe_and_init();
 
     char buf[1024];
-    int fd = fopen("hdd0:/test.txt", "r");
+    int fd = fopen("hdd0:/latte.txt", "r");
     fread(fd, buf, 32);
-    
-    print("Latte OS v0.1\n");
     print(buf);
 
     while (1);
