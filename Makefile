@@ -22,6 +22,8 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/libk/memory.o \
 	./build/sys/libk/string.o \
 	./build/sys/mem/heap.o \
+	./build/sys/mem/vm.o \
+	./build/sys/mem/vm.S.o \
 	./build/sys/port/io.S.o
 
 TEST_OBJECTS = ./build/test/test.o \
@@ -120,6 +122,12 @@ build_dirs:
 
 ./build/sys/mem/heap.o: ./sys/mem/heap.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/mem/heap.c -o ./build/sys/mem/heap.o
+
+./build/sys/mem/vm.o: ./sys/mem/vm.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/mem/vm.c -o ./build/sys/mem/vm.o
+
+./build/sys/mem/vm.S.o: ./sys/mem/vm.S
+	$(AS) ./sys/mem/vm.S -o ./build/sys/mem/vm.S.o
 
 ./build/sys/port/io.S.o: ./sys/port/io.S
 	$(AS) ./sys/port/io.S -o ./build/sys/port/io.S.o
