@@ -1,6 +1,7 @@
 #include "mem/vm.h"
 
 #include "errno.h"
+#include "libk/kheap.h"
 
 static void
 free_page_dir_entries(uint32_t *page_dir)
@@ -59,6 +60,8 @@ get_page_indices(uint32_t *page_dir, void *virt, uint32_t *dir_idx_out, uint32_t
 
     *dir_idx_out = ((uint32_t)virt / (VM_PAGE_DIR_ENTRIES * VM_PAGE_SIZE));
     *tbl_idx_out = ((uint32_t)virt % (VM_PAGE_DIR_ENTRIES * VM_PAGE_SIZE) / VM_PAGE_SIZE);
+
+    return 0;
 }
 
 static int
@@ -83,7 +86,7 @@ set_page_entry(uint32_t *page_dir, void *virt, uint32_t val)
 }
 
 void
-load_page_directory(page_dir_t);
+load_page_directory(uint32_t *page_dir);
 
 int
 vm_area_init(struct vm_area* vm_area, uint8_t flags)

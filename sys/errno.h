@@ -8,5 +8,6 @@
 #define EACCES 5 
 #define EEXIST 6
 #define ENFILE 7
+#define EAGAIN 8
 
 #endif

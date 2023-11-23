@@ -24,7 +24,10 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/mem/heap.o \
 	./build/sys/mem/vm.o \
 	./build/sys/mem/vm.S.o \
-	./build/sys/port/io.S.o
+	./build/sys/port/io.S.o \
+	./build/sys/task/process.o \
+	./build/sys/task/sched.o \
+	./build/sys/task/task.o
 
 TEST_OBJECTS = ./build/test/test.o \
 	./build/test/sys/fs/path.o \
@@ -59,6 +62,7 @@ build_dirs:
 	mkdir -p ./build/sys/libk
 	mkdir -p ./build/sys/mem
 	mkdir -p ./build/sys/port
+	mkdir -p ./build/sys/task
 	mkdir -p ./build/test/sys/fs
 	mkdir -p ./build/test/sys/libk
 	mkdir -p ./build/test/sys/mem
@@ -131,6 +135,15 @@ build_dirs:
 
 ./build/sys/port/io.S.o: ./sys/port/io.S
 	$(AS) ./sys/port/io.S -o ./build/sys/port/io.S.o
+
+./build/sys/task/process.o: ./sys/task/process.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/process.c -o ./build/sys/task/process.o
+
+./build/sys/task/sched.o: ./sys/task/sched.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/sched.c -o ./build/sys/task/sched.o
+
+./build/sys/task/task.o: ./sys/task/task.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/task.c -o ./build/sys/task/task.o
 
 test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 	./build/test/sys/fs/test_path
