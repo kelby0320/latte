@@ -7,6 +7,7 @@
 #define TASK_STATE_READY 1
 #define TASK_STATE_BLOCKED 2
 #define TASK_STATE_NEW 3
+#define TASK_STATE_COMPLETE 4
 
 typedef uint8_t TASK_STATE;
 

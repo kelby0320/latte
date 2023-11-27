@@ -103,7 +103,12 @@ err_out1:
 int
 process_add_task(struct process *process, struct task *task)
 {
-    return 0;
+    if (process->num_tasks == LATTE_PROCESS_MAX_TASKS) {
+        return -EAGAIN;
+    }
+
+    process->tasks[process->num_tasks] = task;
+    process->num_tasks++;
 }
 
 int
@@ -113,7 +118,7 @@ process_remove_task(struct process *process, uint16_t task_id)
 }
 
 int
-process_load_exe(struct process *process)
+process_load_exec(struct process *process)
 {
     return 0;
 }

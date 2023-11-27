@@ -19,6 +19,7 @@ struct process {
     char filename[LATTE_MAX_PATH_LEN];
     struct vm_area *vm_area;
     struct task* tasks[LATTE_PROCESS_MAX_TASKS];
+    int num_tasks;
     struct process_allocation allocations[LATTE_PROCESS_MAX_ALLOCATIONS];
 };
 
@@ -32,7 +33,7 @@ int
 process_remove_task(struct process *process, uint16_t task_id);
 
 int
-process_load_exe(struct process *process);
+process_load_exec(struct process *process);
 
 void
 process_free(struct process *process);
