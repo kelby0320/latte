@@ -41,11 +41,23 @@
 #define lba_drive(lba, drive_no)    \
     (lba >> 24) | 0b11100000 | (drive_no << 4)  \
 
+/**
+ * @brief ATA device structure
+ * 
+ */
 struct ata {
+    // Base address of ATA bus
     unsigned int bus_base_addr;
+
+    // Drive number of the ATA device
     unsigned int drive_no;
 };
 
+/**
+ * @brief Initialize a new ATA device
+ * 
+ * @return int Status code
+ */
 int
 ata_probe_and_init();
 

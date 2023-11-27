@@ -8,6 +8,15 @@
 #include "libk/kheap.h"
 #include "libk/string.h"
 
+/**
+ * @brief Read sectors from an ATA device.
+ * 
+ * @param disk  Pointer to the disk
+ * @param lba   Logical Block Address to read from
+ * @param total Number of sectors to read
+ * @param buf   Output buffer to write data to
+ * @return int  Status code
+ */
 int
 ata_read_sectors(struct disk *disk, unsigned int lba, int total, void *buf)
 {

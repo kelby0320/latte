@@ -8,6 +8,13 @@
 
 #include <stdbool.h>
 
+/**
+ * @brief Predicate for path characters
+ * 
+ * @param c     Character to test
+ * @return true 
+ * @return false 
+ */
 static bool
 is_path_char(char c)
 {
@@ -34,7 +41,12 @@ is_path_char(char c)
     return false;
 }
 
-
+/**
+ * @brief Ensures disk id is valid
+ * 
+ * @param str   Disk id string
+ * @return int  Status code
+ */
 static int
 validate_disk_id(const char *str)
 {
@@ -48,6 +60,12 @@ validate_disk_id(const char *str)
     return 0;
 }
 
+/**
+ * @brief Ensure disk id separator is valid
+ * 
+ * @param str   Separator string
+ * @return int  Status code
+ */
 static int
 validate_disk_id_sep(const char *str)
 {
@@ -62,6 +80,12 @@ validate_disk_id_sep(const char *str)
     return 0;
 }
 
+/**
+ * @brief Get the index just past the end of the disk id
+ * 
+ * @param path_str  Path string
+ * @return int      Status code
+ */
 static int
 disk_id_end_idx(const char *path_str)
 {
@@ -74,6 +98,13 @@ disk_id_end_idx(const char *path_str)
     return -EINVAL;
 }
 
+/**
+ * @brief Read and validate the disk id from a path string
+ * 
+ * @param buf       Output buffer to store the disk id
+ * @param path_str  Path string
+ * @return int      Status code
+ */
 static int
 parse_disk_id(char *buf, const char **path_str)
 {
@@ -103,6 +134,13 @@ parse_disk_id(char *buf, const char **path_str)
     return 0;
 }
 
+/**
+ * @brief Get the element from path object
+ * 
+ * @param path_buf  Output buffer
+ * @param path_str  Path string
+ * @return int      Element length
+ */
 static int
 get_element_from_path(char *path_buf, char **path_str)
 {
@@ -121,6 +159,14 @@ get_element_from_path(char *path_buf, char **path_str)
     return i; // Return element length
 }
 
+/**
+ * @brief Parse the next element in the path
+ *
+ * @param next_element  Output pointer to the next path element structure
+ * @param prev_element  Pointer to the prevous element
+ * @param path_str      Path string
+ * @return int          Element length
+ */
 static int
 parse_next_element(struct path_element **next_element, struct path_element *prev_element, char **path_str)
 {

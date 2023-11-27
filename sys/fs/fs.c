@@ -12,6 +12,11 @@
 struct filesystem *filesystems[LATTE_MAX_FILESYSTEMS];
 struct file_descriptor *file_descriptors[LATTE_MAX_FILE_DESCRIPTORS];
 
+/**
+ * @brief Get a pointer to an open filesystem slot
+ * 
+ * @return struct filesystem* Pointer to the filesystem
+ */
 static struct filesystem*
 fs_get_free_filesystem()
 {
@@ -24,6 +29,11 @@ fs_get_free_filesystem()
     return 0;
 }
 
+/**
+ * @brief Add a filesystem to the filesystems list
+ * 
+ * @param filesystem    The filesystem
+ */
 static void
 fs_insert_filesystem(struct filesystem *filesystem)
 {
@@ -35,6 +45,12 @@ fs_insert_filesystem(struct filesystem *filesystem)
     *fs = filesystem;
 }
 
+/**
+ * @brief Retrieve a file descriptor
+ *
+ * @param fd    The file descritpor index
+ * @return struct file_descriptor* Pointer to the associated descriptor or 0
+ */
 static struct file_descriptor*
 fs_get_descriptor(int fd)
 {
@@ -45,6 +61,12 @@ fs_get_descriptor(int fd)
     return file_descriptors[fd];
 }
 
+/**
+ * @brief Allocate a new file descriptor
+ * 
+ * @param desc_out  Pointer to the descriptor
+ * @return int      Status code
+ */
 static int
 fs_get_new_descriptor(struct file_descriptor **desc_out)
 {
@@ -65,6 +87,11 @@ fs_get_new_descriptor(struct file_descriptor **desc_out)
     return -ENFILE;
 }
 
+/**
+ * @brief Deallocate a file_descriptor
+ * 
+ * @param descriptor The file descriptor
+ */
 static void
 fs_free_descriptor(struct file_descriptor *descriptor)
 {
@@ -72,7 +99,10 @@ fs_free_descriptor(struct file_descriptor *descriptor)
     kfree(descriptor);
 }
 
-
+/**
+ * @brief Load filesystem drivers
+ * 
+ */
 static void
 fs_load()
 {
@@ -80,14 +110,12 @@ fs_load()
     fs_insert_filesystem(ext2_init());
 }
 
-void
-fs_init()
-{
-    memset(filesystems, 0, sizeof(filesystems));
-    memset(file_descriptors, 0, sizeof(file_descriptors));
-    fs_load();
-}
-
+/**
+ * @brief Convert string to FILE_MODE
+ * 
+ * @param str   The string to parse
+ * @return FILE_MODE File mode identifier
+ */
 static FILE_MODE 
 fs_get_mode_from_string(const char* str)
 {
@@ -102,6 +130,14 @@ fs_get_mode_from_string(const char* str)
     }
 
     return mode;
+}
+
+void
+fs_init()
+{
+    memset(filesystems, 0, sizeof(filesystems));
+    memset(file_descriptors, 0, sizeof(file_descriptors));
+    fs_load();
 }
 
 int

@@ -7,14 +7,35 @@
 #include "libk/kheap.h"
 #include "libk/memory.h"
 
+/**
+ * @brief Block iterator
+ * 
+ * This object is used to iterate through an inode's data blocks
+ * 
+ */
 struct block_iterator {
+    // Pointer to inode
     const struct inode *inode;
+
+    // Block size
     uint32_t block_size;
+
+    // Block index
     int block_idx;
+
+    // Double indirect block index
     int dbl_block_idx;
+
+    // Triple indirect block index
     int tpl_block_idx;
+
+    // Indirect blocks list
     uint32_t *indirect_blocks;
+
+    // Double indirect blocks lisk
     uint32_t *dbl_indirect_blocks;
+
+    // Triple indirect blocks list
     uint32_t *tpl_indirect_blocks;
 };
 
@@ -33,6 +54,13 @@ block_iterator_init(struct block_iterator *iter, struct ext2_private *fs_private
     return 0;
 }
 
+/**
+ * @brief Skip reading a number of block
+ * 
+ * @param iter      Pointer to block iterator
+ * @param offset    Number of blocks to skip
+ * @return int      Status code
+ */
 static int
 block_iterator_skip_blocks(struct block_iterator *iter, uint32_t offset)
 {
@@ -44,6 +72,13 @@ block_iterator_skip_blocks(struct block_iterator *iter, uint32_t offset)
     return 0;
 }
 
+/**
+ * @brief Iterate triple indirect blocks
+ *
+ * @param iter          Pointer to block iterator
+ * @param fs_private    Pointer to private fs data
+ * @return int          Status code
+ */
 static int
 block_iterator_iterate_tpl(struct block_iterator *iter, struct ext2_private *fs_private)
 {
@@ -51,6 +86,13 @@ block_iterator_iterate_tpl(struct block_iterator *iter, struct ext2_private *fs_
     return 0;
 }
 
+/**
+ * @brief Iterate doulble indirect blocks
+ * 
+ * @param iter          Pointer to block iterator
+ * @param fs_private    Pointer to private fs data
+ * @return int          Status code
+ */
 static int
 block_iterator_iterate_dbl(struct block_iterator *iter, struct ext2_private *fs_private)
 {
@@ -58,7 +100,13 @@ block_iterator_iterate_dbl(struct block_iterator *iter, struct ext2_private *fs_
     return 0;
 }
 
-
+/**
+ * @brief Iterator indirect blocks
+ * 
+ * @param iter          Pointer to block iterator
+ * @param fs_private    Pointer to private fs data
+ * @return int          Status code
+ */
 static int
 block_iterator_iterate_indirect(struct block_iterator *iter, struct ext2_private *fs_private)
 {
@@ -66,6 +114,13 @@ block_iterator_iterate_indirect(struct block_iterator *iter, struct ext2_private
     return 0;
 }
 
+/**
+ * @brief Set block iterator to iterate indirect blocks
+ * 
+ * @param iter          Pointer to block iterator
+ * @param fs_private    Pointer to private fs data
+ * @return int          Status code
+ */
 static int
 block_iterator_convert_to_indirect(struct block_iterator *iter, struct ext2_private *fs_private)
 {
@@ -73,6 +128,13 @@ block_iterator_convert_to_indirect(struct block_iterator *iter, struct ext2_priv
     return 0;
 }
 
+/**
+ * @brief Set iterator to read the next block
+ * 
+ * @param iter          Pointer to block iterator
+ * @param fs_private    Pointer to private fs data
+ * @return int          Status code
+ */
 static int
 block_iterator_iterate(struct block_iterator *iter, struct ext2_private *fs_private)
 {
@@ -96,11 +158,25 @@ block_iterator_iterate(struct block_iterator *iter, struct ext2_private *fs_priv
     return 0;
 }
 
+/**
+ * @brief Get this iterators current data block number
+ * 
+ * @param iter  Pointer to the block iterator
+ * @return int  Block number
+ */
 static int
 block_iterator_block_no(struct block_iterator *iter){
     return iter->inode->i_block[iter->block_idx];
 }
 
+/**
+ * @brief Read the next block of data
+ * 
+ * @param iter          Pointer to the block iterator
+ * @param fs_private    Ponter to private fs data
+ * @param out           Output data buffer
+ * @return int          Number of bytes read
+ */
 static int
 ext2_read_block(struct block_iterator *iter, struct ext2_private *fs_private, char *out)
 {
@@ -111,12 +187,27 @@ ext2_read_block(struct block_iterator *iter, struct ext2_private *fs_private, ch
     return bufferedreader_read(fs_private->reader, out, fs_private->block_size);
 }
 
+/**
+ * @brief Convert inode number to block group
+ * 
+ * @param fs_private    Pointer to private fs data
+ * @param inode         Inode number
+ * @return int          Block group number
+ */
 static int
 inode_to_block_group(struct ext2_private *fs_private, uint32_t inode)
 {
     return (inode - 1) / fs_private->superblock.s_inodes_per_group;
 }
 
+/**
+ * @brief Read a block group descriptor
+ * 
+ * @param desc_out      Output pointer to block group descriptor structure
+ * @param fs_private    Pointer to private fs data
+ * @param block_group   Block group number
+ * @return int          Status code
+ */
 static int
 ext2_read_block_group_desc(struct block_group_descriptor **desc_out, struct ext2_private *fs_private, int block_group)
 {
@@ -144,6 +235,15 @@ ext2_read_block_group_desc(struct block_group_descriptor **desc_out, struct ext2
     return 0;
 }
 
+/**
+ * @brief Read an inode structure from an inode table
+ * 
+ * @param inode_out     Output pointer to inode structure
+ * @param fs_private    Pointer to private fs data
+ * @param inode_tbl     Inode table block number
+ * @param inode_no      Number of the inode to read
+ * @return int          Status code
+ */
 static int
 ext2_read_inode_from_tbl(struct inode **inode_out, struct ext2_private* fs_private, uint32_t inode_tbl, uint32_t inode_no)
 {
@@ -165,8 +265,6 @@ ext2_read_inode_from_tbl(struct inode **inode_out, struct ext2_private* fs_priva
     *inode_out = inode;
     return 0;
 }
-
-
 
 int
 ext2_read_inode(struct inode **inode_out, struct disk *disk, struct ext2_private *fs_private, uint32_t inode_no)

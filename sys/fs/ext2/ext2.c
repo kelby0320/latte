@@ -14,6 +14,12 @@
 
 #include <stdint.h>
 
+/**
+ * @brief Read the superblock of the filesystem
+ * 
+ * @param fs_private    Pointer to private fs data
+ * @return int          Number of bytes read
+ */
 static int
 ext2_read_superblock(struct ext2_private *fs_private)
 {
@@ -22,8 +28,14 @@ ext2_read_superblock(struct ext2_private *fs_private)
     return res;
 }
 
-
-
+/**
+ * @brief Find the inode corresponding to a file path
+ * 
+ * @param path          Pointer to the path
+ * @param disk          Pointer to the disk
+ * @param fs_private    Pointer to private fs data
+ * @return struct inode* Inode structure or 0
+ */
 static struct inode*
 ext2_path_to_inode(struct path* path, struct disk *disk, struct ext2_private *fs_private)
 {
@@ -67,9 +79,16 @@ err_out:
     if (inode) {
         kfree(inode);
     }
+
     return 0;
 }
 
+/**
+ * @brief Attempt to bind an Ext2 filesystem to the disk
+ *
+ * @param disk  Pointer to the disk
+ * @return int  Status code (0 on success)
+ */
 int
 ext2_resolve(struct disk *disk)
 {
@@ -99,6 +118,15 @@ ext2_resolve(struct disk *disk)
     return 0;
 }
 
+/**
+ * @brief Open a file on an Ext2 filesystem
+ *
+ * @param disk  Pointer to the disk
+ * @param path  Pointer to filepath
+ * @param mode  Open file mode
+ * @param out   Pointer to output private descriptor data
+ * @return int  Status code
+ */
 int
 ext2_open(struct disk *disk, struct path *path, FILE_MODE mode, void **out)
 {
@@ -129,12 +157,27 @@ ext2_open(struct disk *disk, struct path *path, FILE_MODE mode, void **out)
     return 0;
 }
 
+/**
+ * @brief Close an Ext2 open file
+ * 
+ * @param private   Pointer to private fs data
+ * @return int      Status code
+ */
 int
 ext2_close(void *private)
 {
     return 0;
 }
 
+/**
+ * @brief Read data from an Ext2 open file
+ * 
+ * @param disk  Pointer to the disk
+ * @param desc  Pointer to the Ext2 file descriptor
+ * @param buf   Pointer to the output buffer
+ * @param count Number of bytes to read
+ * @return int  Number of bytes actually read
+ */
 int
 ext2_read(struct disk *disk, void *desc, char *buf, uint32_t count)
 {
@@ -145,18 +188,43 @@ ext2_read(struct disk *disk, void *desc, char *buf, uint32_t count)
     return read;
 }
 
+/**
+ * @brief Write data to an Ext2 open file
+ * 
+ * @param disk  Pointer to the disk
+ * @param desc  Pointer to Ext2 file descriptor
+ * @param buf   Pointer to the input buffer
+ * @param count Number of bytes to write
+ * @return int  Number of bytes actually written
+ */
 int
 ext2_write(struct disk *disk, void *desc, const char *buf, uint32_t count)
 {
     return 0;
 }
 
+/**
+ * @brief Seek to a location in an Ext2 open file
+ * 
+ * @param desc      Pointer to Ext2 file descriptor
+ * @param offset    Seek offset
+ * @param seek_mode Seek mode
+ * @return int      Status code
+ */
 int
 ext2_seek(void *desc, uint32_t offset, FILE_SEEK_MODE seek_mode)
 {
     return 0;
 }
 
+/**
+ * @brief Read the status of an Ext2 open file
+ * 
+ * @param disk  Pointer to the disk
+ * @param desc  Pointer to Ext2 file descriptor
+ * @param stat  Pointer to output stat structure
+ * @return int  Status code
+ */
 int
 ext2_stat(struct disk *disk, void *desc, struct file_stat *stat)
 {

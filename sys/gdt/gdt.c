@@ -1,6 +1,12 @@
 #include "gdt.h"
 #include "kernel.h"
 
+/**
+ * @brief Encode structure gdt as real gdt
+ * 
+ * @param gdt               Pointer to read gdt item
+ * @param gdt_structured    Ponter to structure gdt item
+ */
 static void
 encode_gdt_structured(struct gdt* gdt, const struct gdt_structured *gdt_structured)
 {

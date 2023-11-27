@@ -11,6 +11,10 @@
 
 typedef uint8_t TASK_STATE;
 
+/**
+ * @brief Saved registers
+ * 
+ */
 struct registers {
     uint32_t edi;
     uint32_t esi;
@@ -28,21 +32,53 @@ struct registers {
 
 struct process;
 
+/**
+ * @brief Object that represents a task running on the system
+ * 
+ */
 struct task {
+    // Task state
     TASK_STATE state;
+
+    // Task id
     uint32_t id;
+
+    // Saved registers
     struct registers registers;
+
+    // The stack for this task
     void *stack;
+
+    // Stack size
     uint32_t stack_size;
+
+    // This tasks parent process
     struct process *process;
 };
 
+/**
+ * @brief Create a new task
+ * 
+ * @param process   Pointer to the parent process
+ * @return int      Status code
+ */
 int
 task_new(struct process *process);
 
+/**
+ * @brief Get a task
+ * 
+ * @param tid   Task Id
+ * @return struct task* Pointer to the task 
+ */
 struct task*
 task_get(uint32_t tid);
 
+/**
+ * @brief Free a task
+ * 
+ * @param task  Pointer to the task
+ */
 void
 task_free(struct task *task);
 

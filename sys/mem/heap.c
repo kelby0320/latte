@@ -2,6 +2,13 @@
 #include "libk/memory.h"
 #include "errno.h"
 
+/**
+ * @brief Allocate initial blocks in the heap
+ * 
+ * All order 10 blocks are marked as available
+ * 
+ * @param heap Pointer to the heap
+ */
 static void
 allocate_initial_blocks(struct heap *heap)
 {
@@ -20,6 +27,12 @@ allocate_initial_blocks(struct heap *heap)
     }
 }
 
+/**
+ * @brief Calculate order from size
+ * 
+ * @param size  Size in bytes
+ * @return int  Order number
+ */
 static int
 size_to_order_n(size_t size)
 {
@@ -34,6 +47,13 @@ size_to_order_n(size_t size)
     return -ENOMEM;
 }
 
+/**
+ * @brief Find a free block to allocate
+ * 
+ * @param block_tree    Pointer to block tree to search
+ * @param order_n       Order of block needed
+ * @return struct block_item* Block item found or 0
+ */
 static struct block_item*
 find_free_block(struct block_tree *block_tree, int order_n)
 {
@@ -56,6 +76,13 @@ find_free_block(struct block_tree *block_tree, int order_n)
     return item; 
 }
 
+/**
+ * @brief Find a pair of uninitialized blocks
+ * 
+ * @param block_tree    Pointer to the block tree to search
+ * @param order_n       Order of blocks needed
+ * @return struct block_item* Pointer to first block item in the pair or 0
+ */
 struct block_item*
 find_uninitialized_block_pair(struct block_tree *block_tree, int order_n)
 {
@@ -81,6 +108,14 @@ find_uninitialized_block_pair(struct block_tree *block_tree, int order_n)
     return item;
 }
 
+/**
+ * @brief Add a pair of buddy blocks to the block tree
+ * 
+ * @param block_tree        Pointer to the block tree
+ * @param item              Block_item to split into two buddies
+ * @param order_n           Block order
+ * @return struct block_item* Pointer to the new block pair
+ */
 static struct block_item*
 add_block_pair(struct block_tree *block_tree, struct block_item *item, int order_n)
 {
@@ -100,14 +135,29 @@ add_block_pair(struct block_tree *block_tree, struct block_item *item, int order
     return block_pair;
 }
 
+/**
+ * @brief Remove a block item from a block tree
+ * 
+ * @param block_tree    Pointer to the block tree
+ * @param item          Pointer to the item
+ * @param order_n       Order of the block
+ */
 static void
 remove_block(struct block_tree *block_tree, struct block_item *item, int order_n)
 {
-    struct block_list *block_list= &block_tree->block_lists[order_n];
+    struct block_list *block_list = &block_tree->block_lists[order_n];
     block_list->num_alloc_or_avail--;
     memset(item, 0, sizeof(struct block_item));
 }
 
+/**
+ * @brief Split a block item into two buddy blocks
+ * 
+ * @param block_tree        Pointer to the block tree
+ * @param item              Block item to split into two buddies
+ * @param order_n           Order of the block
+ * @return struct block_item* Pointer to first buddy block
+ */
 static struct block_item*
 split_block(struct block_tree *block_tree, struct block_item *item, int order_n)
 {
@@ -120,6 +170,13 @@ split_block(struct block_tree *block_tree, struct block_item *item, int order_n)
     return res;
 }
 
+/**
+ * @brief Get a free block from block tree
+ * 
+ * @param block_tree        Pointer to the block tree
+ * @param order_n           Order of the block to needed
+ * @return struct block_item* Pointer to the new block
+ */
 static struct block_item*
 get_block_from_block_tree(struct block_tree *block_tree, int order_n)
 {
@@ -151,6 +208,13 @@ get_block_from_block_tree(struct block_tree *block_tree, int order_n)
     return item;
 }
 
+/**
+ * @brief Get a free block from the heap
+ * 
+ * @param heap      Pointer to the heap
+ * @param order_n   Order of block needed
+ * @return struct block_item* Pointer to the new block
+ */
 static struct block_item*
 get_block(struct heap *heap, int order_n)
 {
@@ -238,6 +302,11 @@ get_block(struct heap *heap, int order_n)
 /*     remove_block(heap, buddy, order_n); */
 /* } */
 
+/**
+ * @brief Initialize a block tree
+ * 
+ * @param block_tree    Pointer to the block_tree
+ */
 static void
 block_tree_init(struct block_tree *block_tree)
 {
@@ -275,6 +344,13 @@ block_tree_init(struct block_tree *block_tree)
     }
 }
 
+/**
+ * @brief Allocate a number of maximum size blocks
+ * 
+ * @param heap  Pointer to the heap
+ * @param size  Size to allocate in bytes
+ * @return void* Pointer to allocated memory
+ */
 static void*
 heap_malloc_large_blocks(struct heap *heap, size_t size)
 {

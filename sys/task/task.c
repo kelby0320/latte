@@ -9,6 +9,11 @@
 
 struct task *tslots[LATTE_TASK_MAX_TASKS];
 
+/**
+ * @brief Get a free slot for a task
+ * 
+ * @return int Task Id
+ */
 static int
 get_free_slot()
 {
@@ -21,6 +26,13 @@ get_free_slot()
     return -EAGAIN;
 }
 
+/**
+ * @brief Assign a task to a slot
+ * 
+ * @param tid   Task Id
+ * @param task  Pointer to task
+ * @return int  Status code
+ */
 static int
 set_slot(int tid, struct task *task)
 {
@@ -31,7 +43,14 @@ set_slot(int tid, struct task *task)
     tslots[tid] = task;
     return 0;
 }
-
+/**
+ * @brief Initialize a task
+ * 
+ * @param task      Pointer to the task
+ * @param tid       Task Id
+ * @param process   Pointer to the parent process
+ * @return int      Status code
+ */
 static int
 task_init(struct task *task, int tid, struct process *process)
 {

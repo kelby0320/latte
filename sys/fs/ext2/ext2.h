@@ -3,6 +3,11 @@
 
 #include "fs/fs.h"
 
+/**
+ * @brief Initialize an Ext2 filesystem
+ * 
+ * @return struct filesystem* Pointer to filesystem
+ */
 struct filesystem*
 ext2_init();
 

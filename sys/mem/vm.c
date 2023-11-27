@@ -3,6 +3,11 @@
 #include "errno.h"
 #include "libk/kheap.h"
 
+/**
+ * @brief Free page tables
+ * 
+ * @param page_dir  Pointer to page directory
+ */
 static void
 free_page_dir_entries(uint32_t *page_dir)
 {
@@ -15,6 +20,13 @@ free_page_dir_entries(uint32_t *page_dir)
     }
 }
 
+/**
+ * @brief Initialize a page table
+ * 
+ * @param page_tbl      Pointer to page table
+ * @param tbl_offset    Physical memory page table offset
+ * @param flags         Page flags
+ */
 static void
 init_page_tbl(uint32_t *page_tbl, int tbl_offset, uint8_t flags)
 {
@@ -24,6 +36,13 @@ init_page_tbl(uint32_t *page_tbl, int tbl_offset, uint8_t flags)
     }
 }
 
+/**
+ * @brief Initialize a page directory
+ * 
+ * @param page_dir  Pointer to page directory
+ * @param flags     Page flags
+ * @return int 
+ */
 static int
 init_page_dir(uint32_t *page_dir, uint8_t flags)
 {
@@ -51,6 +70,15 @@ err_out:
     return res;
 }
 
+/**
+ * @brief Get page directory index and page table index from a virtual address
+ * 
+ * @param page_dir      Ponter to page directory
+ * @param virt          Virtual address
+ * @param dir_idx_out   Output page directory index
+ * @param tbl_idx_out   Output page table index
+ * @return int          Status code
+ */
 static int
 get_page_indices(uint32_t *page_dir, void *virt, uint32_t *dir_idx_out, uint32_t *tbl_idx_out)
 {
@@ -64,6 +92,14 @@ get_page_indices(uint32_t *page_dir, void *virt, uint32_t *dir_idx_out, uint32_t
     return 0;
 }
 
+/**
+ * @brief Set a page table entry
+ * 
+ * @param page_dir  Pointer to page table
+ * @param virt      Virtual address
+ * @param val       Value to set
+ * @return int      Status code
+ */
 static int
 set_page_entry(uint32_t *page_dir, void *virt, uint32_t val)
 {
@@ -85,6 +121,13 @@ set_page_entry(uint32_t *page_dir, void *virt, uint32_t val)
     return 0;
 }
 
+/**
+ * @brief Load a new page directory
+ * 
+ * Defined in vm.S
+ * 
+ * @param page_dir  Pointer to page directory
+ */
 void
 load_page_directory(uint32_t *page_dir);
 

@@ -9,6 +9,11 @@
 
 static struct process* pslots[LATTE_PROCESS_MAX_PROCESSES];
 
+/**
+ * @brief Get a free slot for a process
+ * 
+ * @return int Process Id
+ */
 static int
 get_free_slot()
 {
@@ -21,6 +26,13 @@ get_free_slot()
     return -EAGAIN;
 }
 
+/**
+ * @brief Assign a process to a slot
+ * 
+ * @param pid       Pid of the process
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
 static int
 set_slot(int pid, struct process *process)
 {

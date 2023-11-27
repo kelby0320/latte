@@ -5,10 +5,21 @@
 #include "libk/memory.h"
 #include "task/task.h"
 
+/**
+ * @brief Task queue used to schedule tasks
+ * 
+ */
 struct task_queue {
+    // The queue
     struct task *queue[LATTE_TASK_MAX_TASKS];
+    
+    // Start index of queue
     int start;
+
+    // End index of queue
     int end;
+    
+    // Length of queue
     int len;
 };
 
@@ -16,6 +27,13 @@ static struct task_queue ready_queue;
 static struct task_queue blocked_queue;
 static struct task *current_task;
 
+/**
+ * @brief Enqueue a task onto a task queue
+ * 
+ * @param queue     Pointer to the queue
+ * @param task      Pointer to the task
+ * @return int      Status code
+ */
 static int
 queue_enqueue(struct task_queue *queue, struct task *task)
 {
@@ -28,6 +46,13 @@ queue_enqueue(struct task_queue *queue, struct task *task)
     queue->len++;
 }
 
+/**
+ * @brief Dequeue a task from a task queue
+ *
+ * @param queue         Pointer to the queue
+ * @param task_out      Output pointer to the task
+ * @return int          Status code
+ */
 static int
 queue_dequeue(struct task_queue *queue, struct task *task_out)
 {

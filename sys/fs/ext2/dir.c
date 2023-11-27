@@ -9,14 +9,37 @@
 
 #include <stdint.h>
 
+/**
+ * @brief Directory iterator
+ * 
+ * This object is used to iterate through directory entries
+ *
+ */
 struct dir_iter {
+    // Directory Inode
     const struct inode *dir_inode;
+
+    // Data buffer
     char *buf;
+
+    // Data buffer size
     size_t buf_size;
+
+    // Offset into data buffer
     uint32_t buf_offset;
+
+    // Block of data to read from
     uint32_t block_no;
 };
 
+/**
+ * @brief Initialze a directory iterator
+ * 
+ * @param iter          Pointer to the directory iterator
+ * @param fs_private    Pointer to private fs data
+ * @param dir_inode     Pointer to the directory inode
+ * @return int          Status code
+ */
 static int
 dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private, const struct inode *dir_inode)
 {
@@ -40,12 +63,25 @@ dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private, const stru
     return 0;
 }
 
+/**
+ * @brief Free a directory iterator
+ * 
+ * @param iter Pointer to the directory iterator
+ */
 static void
 dir_iter_free(struct dir_iter *iter)
 {
     kfree(iter->buf);
 }
 
+/**
+ * @brief Read the next entry in the directory
+ * 
+ * @param iter          Pointer to the directory iterator
+ * @param fs_private    Pointer to private fs data
+ * @param dir_entry_out Pointer to the output directory entry
+ * @return int          Status code
+ */
 static int
 iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private, struct directory_entry *dir_entry_out)
 {
