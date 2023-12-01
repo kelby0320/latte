@@ -1,9 +1,10 @@
 CC = i686-elf-gcc
-AS = i686-elf-as
+AS = nasm
 
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
+ASFLAGS = -f elf -g
 
-OBJECTS = ./build/boot/boot.S.o \
+OBJECTS = ./build/boot/boot.asm.o \
 	./build/sys/dev/disk/ata/ata.o \
 	./build/sys/dev/disk/buffer/bufferedreader.o \
 	./build/sys/dev/disk/disk.o \
@@ -14,17 +15,21 @@ OBJECTS = ./build/boot/boot.S.o \
 	./build/sys/fs/ext2/ext2.o \
 	./build/sys/fs/ext2/inode.o \
 	./build/sys/fs/fat32/fat32.o \
+	./build/sys/gdt/gdt.asm.o \
 	./build/sys/gdt/gdt.o \
-	./build/sys/gdt/gdt.S.o \
+	./build/sys/irq/idt.asm.o \
+	./build/sys/irq/idt.o \
+	./build/sys/irq/irq.asm.o \
+	./build/sys/irq/irq.o \
 	./build/sys/kernel.o \
 	./build/sys/libk/kheap.o \
 	./build/sys/libk/libk.o \
 	./build/sys/libk/memory.o \
 	./build/sys/libk/string.o \
 	./build/sys/mem/heap.o \
+	./build/sys/mem/vm.asm.o \
 	./build/sys/mem/vm.o \
-	./build/sys/mem/vm.S.o \
-	./build/sys/port/io.S.o \
+	./build/sys/port/io.asm.o \
 	./build/sys/task/process.o \
 	./build/sys/task/sched.o \
 	./build/sys/task/task.o
@@ -59,6 +64,7 @@ build_dirs:
 	mkdir -p ./build/sys/fs/ext2
 	mkdir -p ./build/sys/fs/fat32
 	mkdir -p ./build/sys/gdt
+	mkdir -p ./build/sys/irq
 	mkdir -p ./build/sys/libk
 	mkdir -p ./build/sys/mem
 	mkdir -p ./build/sys/port
@@ -70,8 +76,8 @@ build_dirs:
 ./build/boot/latte.elf: build_dirs $(OBJECTS)
 	$(CC) -T ./sys/linker.ld -o ./build/boot/latte.elf -ffreestanding -O0 -nostdlib $(OBJECTS) -lgcc
 
-./build/boot/boot.S.o: ./boot/boot.S
-	$(AS) ./boot/boot.S -o ./build/boot/boot.S.o
+./build/boot/boot.asm.o: ./boot/boot.asm
+	$(AS) $(ASFLAGS) ./boot/boot.asm -o ./build/boot/boot.asm.o
 
 ./build/sys/dev/disk/ata/ata.o: ./sys/dev/disk/ata/ata.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/dev/disk/ata/ata.c -o ./build/sys/dev/disk/ata/ata.o
@@ -103,11 +109,23 @@ build_dirs:
 ./build/sys/fs/fat32/fat32.o: ./sys/fs/fat32/fat32.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/fs/fat32/fat32.c -o ./build/sys/fs/fat32/fat32.o
 
+./build/sys/gdt/gdt.asm.o: ./sys/gdt/gdt.asm
+	$(AS) $(ASFLAGS) ./sys/gdt/gdt.asm -o ./build/sys/gdt/gdt.asm.o
+
 ./build/sys/gdt/gdt.o: ./sys/gdt/gdt.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/gdt/gdt.c -o ./build/sys/gdt/gdt.o
 
-./build/sys/gdt/gdt.S.o: ./sys/gdt/gdt.S
-	$(AS) ./sys/gdt/gdt.S -o ./build/sys/gdt/gdt.S.o
+./build/sys/irq/idt.asm.o: ./sys/irq/idt.asm
+	$(AS) $(ASFLAGS) ./sys/irq/idt.asm -o ./build/sys/irq/idt.asm.o
+
+./build/sys/irq/idt.o: ./sys/irq/idt.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/irq/idt.c -o ./build/sys/irq/idt.o
+
+./build/sys/irq/irq.asm.o: ./sys/irq/irq.asm
+	$(AS) $(ASFLAGS) ./sys/irq/irq.asm -o ./build/sys/irq/irq.asm.o
+
+./build/sys/irq/irq.o: ./sys/irq/irq.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/irq/irq.c -o ./build/sys/irq/irq.o
 
 ./build/sys/kernel.o: ./sys/kernel.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/kernel.c -o ./build/sys/kernel.o
@@ -127,14 +145,14 @@ build_dirs:
 ./build/sys/mem/heap.o: ./sys/mem/heap.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/mem/heap.c -o ./build/sys/mem/heap.o
 
+./build/sys/mem/vm.asm.o: ./sys/mem/vm.asm
+	$(AS) $(ASFLAGS) ./sys/mem/vm.asm -o ./build/sys/mem/vm.asm.o
+
 ./build/sys/mem/vm.o: ./sys/mem/vm.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/mem/vm.c -o ./build/sys/mem/vm.o
 
-./build/sys/mem/vm.S.o: ./sys/mem/vm.S
-	$(AS) ./sys/mem/vm.S -o ./build/sys/mem/vm.S.o
-
-./build/sys/port/io.S.o: ./sys/port/io.S
-	$(AS) ./sys/port/io.S -o ./build/sys/port/io.S.o
+./build/sys/port/io.asm.o: ./sys/port/io.asm
+	$(AS) $(ASFLAGS) ./sys/port/io.asm -o ./build/sys/port/io.asm.o
 
 ./build/sys/task/process.o: ./sys/task/process.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/process.c -o ./build/sys/task/process.o
