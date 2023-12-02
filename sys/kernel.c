@@ -3,6 +3,7 @@
 #include "dev/term/term.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
+#include "irq/idt.h"
 #include "kernel.h"
 #include "libk/libk.h"
 #include "libk/memory.h"
@@ -43,6 +44,9 @@ kernel_main()
 
     // Find and Initialize Disks
     disk_probe_and_init();
+
+    // Initialize IDT
+    idt_init();    
 
     // Initialize kernel vm area
     int res = vm_area_init(&kernel_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE | VM_PAGE_SUPERVISOR);
