@@ -1,12 +1,12 @@
 section .text
 
-global load_gdt
+global gdt_load
 global gdt_set_kernel_data_segment
 global gdt_set_user_data_segment
 
 ; void
-; load_gdt(struct gdtr *gdtr); 
-load_gdt:
+; gdt_load(struct gdtr *gdtr); 
+gdt_load:
     push    ebp
     mov     ebp, esp
     mov     ebx, [ebp+8]                ; *gdtr

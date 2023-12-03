@@ -17,6 +17,8 @@ OBJECTS = ./build/boot/boot.asm.o \
 	./build/sys/fs/fat32/fat32.o \
 	./build/sys/gdt/gdt.asm.o \
 	./build/sys/gdt/gdt.o \
+	./build/sys/gdt/tss.asm.o \
+	./build/sys/gdt/tss.o \
 	./build/sys/irq/idt.asm.o \
 	./build/sys/irq/idt.o \
 	./build/sys/irq/irq.asm.o \
@@ -114,6 +116,12 @@ build_dirs:
 
 ./build/sys/gdt/gdt.o: ./sys/gdt/gdt.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/gdt/gdt.c -o ./build/sys/gdt/gdt.o
+
+./build/sys/gdt/tss.asm.o: ./sys/gdt/tss.asm
+	$(AS) $(ASFLAGS) ./sys/gdt/tss.asm -o ./build/sys/gdt/tss.asm.o
+
+./build/sys/gdt/tss.o: ./sys/gdt/tss.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/gdt/tss.c -o ./build/sys/gdt/tss.o
 
 ./build/sys/irq/idt.asm.o: ./sys/irq/idt.asm
 	$(AS) $(ASFLAGS) ./sys/irq/idt.asm -o ./build/sys/irq/idt.asm.o

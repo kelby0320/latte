@@ -1,6 +1,7 @@
 #include "gdt.h"
 
 #include "config.h"
+#include "gdt/tss.h"
 #include "libk/memory.h"
 #include "kernel.h"
 
@@ -18,11 +19,12 @@ struct gdt_structured {
 };
 
 struct gdt_structured gdt_structured[LATTE_TOTAL_GDT_SEGMENTS] = {
-    {.base = 0x00, .limit = 0x00, .type = 0x00}, /* Null Segment */
+    {.base = 0x00, .limit = 0x00, .type = 0x00},    /* Null Segment */
     {.base = 0x00, .limit = 0xFFFFF, .type = 0x9A}, /* Kernel Code Segment */
     {.base = 0x00, .limit = 0xFFFFF, .type = 0x92}, /* Kernel Data Segment */
     {.base = 0x00, .limit = 0xFFFFF, .type = 0xF8}, /* User Code Segment */
     {.base = 0x00, .limit = 0xFFFFF, .type = 0xF2}, /* User Data Segment */
+    {.base = 0x00, .limit = 0x00, .type = 0x00}     /* TSS Segment*/
 };
 
 /**
@@ -33,7 +35,7 @@ struct gdt_structured gdt_structured[LATTE_TOTAL_GDT_SEGMENTS] = {
  * @param gdtr   Pointer to the GDT descriptor structrue
  */
 void
-load_gdt(struct gdtr *gdtr);
+gdt_load(struct gdtr *gdtr);
 
 /**
  * @brief Encode structure gdt as real gdt
@@ -89,5 +91,14 @@ gdt_init()
     gdt_structured_to_gdt(gdt, gdt_structured, LATTE_TOTAL_GDT_SEGMENTS);
     gdtr.size = sizeof(gdt);
     gdtr.offset = gdt;
-    load_gdt(&gdtr);
+    gdt_load(&gdtr);
+}
+
+void
+gdt_set_tss(struct tss *tss)
+{
+    struct gdt_structured *tss_entry = &gdt_structured[5];
+    tss_entry->base = (uint32_t)tss;
+    tss_entry->limit = sizeof(struct tss);
+    tss_entry->type = 0xe9;
 }

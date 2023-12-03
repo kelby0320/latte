@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+struct tss;
+
 /**
  * @brief Global Descriptor Table Descriptor
  * 
@@ -32,6 +34,14 @@ struct gdt {
  */
 void
 gdt_init();
+
+/**
+ * @brief Set the TSS entry of the GDT
+ * 
+ * @param tss 
+ */
+void
+gdt_set_tss(struct tss *tss);
 
 /**
  * @brief Sets the segment registers to the kernel data segment
