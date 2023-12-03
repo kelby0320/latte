@@ -1,6 +1,8 @@
 #ifndef TASK_H
 #define TASK_H
 
+#include "irq/irq.h"
+
 #include <stdint.h>
 
 #define TASK_STATE_RUNNING 0
@@ -81,5 +83,22 @@ task_get(uint32_t tid);
  */
 void
 task_free(struct task *task);
+
+/**
+ * @brief Switch to a tasks vm_area
+ * 
+ * @param task  Pointer to the task
+ */
+void
+task_switch_to_vm_area(struct task *task);
+
+/**
+ * @brief Save a task's currently running context
+ * 
+ * @param task      Pointer to the task
+ * @param irq_frame Pointer to the irq_frame
+ */
+void
+task_save_state(struct task *task, struct irq_frame *irq_frame);
 
 #endif

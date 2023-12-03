@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "errno.h"
+#include "gdt/gdt.h"
 #include "libk/kheap.h"
 #include "libk/memory.h"
 #include "mem/vm.h"
@@ -120,4 +121,28 @@ void
 task_free(struct task *task)
 {
     // TODO
+}
+
+void
+task_switch_to_vm_area(struct task *task)
+{
+    gdt_set_user_data_segment();
+    vm_area_switch_map(task->process->vm_area);
+}
+
+void
+task_save_state(struct task *task, struct irq_frame *irq_frame)
+{
+    task->registers.edi = irq_frame->edi;
+    task->registers.esi = irq_frame->esi;
+    task->registers.ebp = irq_frame->ebp;
+    task->registers.ebx = irq_frame->ebx;
+    task->registers.edx = irq_frame->edx;
+    task->registers.ecx = irq_frame->ecx;
+    task->registers.eax = irq_frame->eax;
+    task->registers.ip = irq_frame->ip;
+    task->registers.cs = irq_frame->cs;
+    task->registers.flags = irq_frame->flags;
+    task->registers.esp = irq_frame->esp;
+    task->registers.ss = irq_frame->ss;
 }

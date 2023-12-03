@@ -21,6 +21,14 @@ int
 sched_add_task(struct task *task);
 
 /**
+ * @brief Get the currently executing task
+ * 
+ * @return struct task* 
+ */
+struct task*
+sched_get_current();
+
+/**
  * @brief Schedule a new task to run
  * 
  */

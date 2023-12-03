@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-struct interrupt_frame {
+struct irq_frame {
     uint32_t edi;
     uint32_t esi;
     uint32_t ebp;
@@ -20,10 +20,17 @@ struct interrupt_frame {
 } __attribute__((packed));
 
 /**
+ * @brief Intialize the IRQ subsystem
+ * 
+ */
+void
+irq_init();
+
+/**
  * @brief Interrupt handler prototype definition
  * 
  */
-typedef void (*ISR_HANDLER)();
+typedef void (*IRQ_HANDLER)();
 
 /**
  * @brief Register an interrupt handler
@@ -33,7 +40,7 @@ typedef void (*ISR_HANDLER)();
  * @return int 
  */
 int
-register_interrupt(int interrupt_no, ISR_HANDLER handler);
+register_irq(int interrupt_no, IRQ_HANDLER irq_handler);
 
 /**
  * @brief Enable Interrupts

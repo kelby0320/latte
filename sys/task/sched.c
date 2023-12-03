@@ -3,6 +3,7 @@
 #include "config.h"
 #include "errno.h"
 #include "libk/memory.h"
+#include "mem/vm.h"
 #include "task/task.h"
 
 /**
@@ -85,8 +86,14 @@ sched_add_task(struct task *task)
     return queue_enqueue(&ready_queue, task);
 }
 
+struct task*
+sched_get_current()
+{
+    return current_task;
+}
+
 void
 schedule()
 {
-    
+    // TODO
 }

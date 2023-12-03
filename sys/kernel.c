@@ -3,12 +3,14 @@
 #include "dev/term/term.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
-#include "irq/idt.h"
+#include "irq/irq.h"
 #include "kernel.h"
 #include "libk/libk.h"
 #include "libk/memory.h"
 #include "libk/string.h"
 #include "mem/vm.h"
+
+static struct vm_area kernel_area;
 
 void
 print(const char *str)
@@ -26,7 +28,12 @@ panic(const char *str)
     while (1);
 }
 
-static struct vm_area kernel_area;
+void
+switch_to_kernel_vm_area()
+{
+    gdt_set_kernel_data_segment();
+    vm_area_switch_map(&kernel_area);
+}
 
 void
 kernel_main()
@@ -45,8 +52,8 @@ kernel_main()
     // Find and Initialize Disks
     disk_probe_and_init();
 
-    // Initialize IDT
-    idt_init();    
+    // Initialize IRQs
+    irq_init();
 
     // Initialize kernel vm area
     int res = vm_area_init(&kernel_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE | VM_PAGE_SUPERVISOR);

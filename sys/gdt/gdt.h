@@ -33,4 +33,18 @@ struct gdt {
 void
 gdt_init();
 
+/**
+ * @brief Sets the segment registers to the kernel data segment
+ * 
+ */
+void
+gdt_set_kernel_data_segment();
+
+/**
+ * @brief Sets the segment registers to the user data segment
+ * 
+ */
+void
+gdt_set_user_data_segment();
+
 #endif
