@@ -32,6 +32,8 @@ OBJECTS = ./build/boot/boot.asm.o \
 	./build/sys/mem/vm.asm.o \
 	./build/sys/mem/vm.o \
 	./build/sys/port/io.asm.o \
+	./build/sys/task/elf.o \
+	./build/sys/task/loader.o \
 	./build/sys/task/process.o \
 	./build/sys/task/sched.o \
 	./build/sys/task/task.o
@@ -161,6 +163,12 @@ build_dirs:
 
 ./build/sys/port/io.asm.o: ./sys/port/io.asm
 	$(AS) $(ASFLAGS) ./sys/port/io.asm -o ./build/sys/port/io.asm.o
+
+./build/sys/task/elf.o: ./sys/task/elf.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/elf.c -o ./build/sys/task/elf.o
+
+./build/sys/task/loader.o: ./sys/task/loader.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/loader.c -o ./build/sys/task/loader.o
 
 ./build/sys/task/process.o: ./sys/task/process.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/process.c -o ./build/sys/task/process.o

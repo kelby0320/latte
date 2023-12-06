@@ -21,22 +21,16 @@ enum {
     FILE_MODE_INVALID
 };
 
-typedef unsigned int FILE_STAT_FLAGS;
-
-enum {
-    FILE_STAT_READ_ONLY = 0b00000001
-};
-
 /**
  * @brief File status structure
  * 
  */
 struct file_stat {
-    // File status flags
-    FILE_STAT_FLAGS flags;
+    // File mode
+    uint8_t mode;
 
     // File size
-    uint32_t filesize;
+    uint32_t size;
 };
 
 struct disk;

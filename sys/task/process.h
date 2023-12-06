@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "mem/vm.h"
+#include "task/loader.h"
 
 #include <stddef.h>
 #include <stdint.h>
@@ -31,6 +32,9 @@ struct process {
 
     // Filename of executable
     char filename[LATTE_MAX_PATH_LEN];
+
+    // Elf image descriptor
+    struct elf_img_desc elf_img_desc;
 
     // VM Area for the process
     struct vm_area *vm_area;
