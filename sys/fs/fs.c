@@ -1,23 +1,23 @@
 #include "fs/fs.h"
 
 #include "config.h"
-#include "errno.h"
 #include "dev/disk/disk.h"
+#include "errno.h"
 #include "fs/ext2/ext2.h"
 #include "fs/fat32/fat32.h"
 #include "fs/path.h"
 #include "kernel.h"
 #include "libk/memory.h"
 
-struct filesystem *filesystems[LATTE_MAX_FILESYSTEMS];
+struct filesystem      *filesystems[LATTE_MAX_FILESYSTEMS];
 struct file_descriptor *file_descriptors[LATTE_MAX_FILE_DESCRIPTORS];
 
 /**
  * @brief Get a pointer to an open filesystem slot
- * 
+ *
  * @return struct filesystem* Pointer to the filesystem
  */
-static struct filesystem*
+static struct filesystem *
 fs_get_free_filesystem()
 {
     for (int i = 0; i < LATTE_MAX_FILESYSTEMS; i++) {
@@ -31,7 +31,7 @@ fs_get_free_filesystem()
 
 /**
  * @brief Add a filesystem to the filesystems list
- * 
+ *
  * @param filesystem    The filesystem
  */
 static void
@@ -51,7 +51,7 @@ fs_insert_filesystem(struct filesystem *filesystem)
  * @param fd    The file descritpor index
  * @return struct file_descriptor* Pointer to the associated descriptor or 0
  */
-static struct file_descriptor*
+static struct file_descriptor *
 fs_get_descriptor(int fd)
 {
     if (fd < 0 || fd >= LATTE_MAX_FILE_DESCRIPTORS) {
@@ -63,7 +63,7 @@ fs_get_descriptor(int fd)
 
 /**
  * @brief Allocate a new file descriptor
- * 
+ *
  * @param desc_out  Pointer to the descriptor
  * @return int      Status code
  */
@@ -89,7 +89,7 @@ fs_get_new_descriptor(struct file_descriptor **desc_out)
 
 /**
  * @brief Deallocate a file_descriptor
- * 
+ *
  * @param descriptor The file descriptor
  */
 static void
@@ -101,7 +101,7 @@ fs_free_descriptor(struct file_descriptor *descriptor)
 
 /**
  * @brief Load filesystem drivers
- * 
+ *
  */
 static void
 fs_load()
@@ -112,12 +112,12 @@ fs_load()
 
 /**
  * @brief Convert string to FILE_MODE
- * 
+ *
  * @param str   The string to parse
  * @return FILE_MODE File mode identifier
  */
-static FILE_MODE 
-fs_get_mode_from_string(const char* str)
+static FILE_MODE
+fs_get_mode_from_string(const char *str)
 {
     FILE_MODE mode = FILE_MODE_INVALID;
 
@@ -141,10 +141,10 @@ fs_init()
 }
 
 int
-fopen(const char* filename, const char* mode_str)
+fopen(const char *filename, const char *mode_str)
 {
-    struct file_descriptor *descriptor; 
-    int res = fs_get_new_descriptor(&descriptor);
+    struct file_descriptor *descriptor;
+    int                     res = fs_get_new_descriptor(&descriptor);
     if (res < 0) {
         return res;
     }
@@ -198,14 +198,14 @@ fseek(int fd, int offset, FILE_SEEK_MODE whence)
 }
 
 int
-fread(int fd, char* ptr, size_t count)
+fread(int fd, char *ptr, size_t count)
 {
     struct file_descriptor *descriptor = fs_get_descriptor(fd);
     if (!descriptor) {
         return -EINVAL;
     }
 
-    struct disk *disk = descriptor->disk;
+    struct disk       *disk = descriptor->disk;
     struct filesystem *fs = descriptor->filesystem;
 
     int res = fs->read(disk, descriptor->private, ptr, count);
@@ -220,14 +220,14 @@ fwrite(int fd, const char *ptr, size_t count)
 }
 
 int
-fstat(int fd, struct file_stat* stat)
+fstat(int fd, struct file_stat *stat)
 {
     // TODO
     return -1;
 }
 
-struct filesystem*
-fs_resolve(struct disk* disk)
+struct filesystem *
+fs_resolve(struct disk *disk)
 {
     struct filesystem *fs = 0;
     for (int i = 0; i < LATTE_MAX_FILESYSTEMS; i++) {

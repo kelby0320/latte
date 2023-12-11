@@ -5,18 +5,17 @@
 
 #include <stddef.h>
 
-#define block_list_size(order)						\
-    (1 << (LATTE_HEAP_MAX_ORDER - order))
+#define block_list_size(order) (1 << (LATTE_HEAP_MAX_ORDER - order))
 
 typedef unsigned char HEAP_BLOCK_FLAGS;
 
-#define HEAP_BLOCK_AVAILABLE 0b00000001
-#define HEAP_BLOCK_ALLOCATED 0b00000010
+#define HEAP_BLOCK_AVAILABLE   0b00000001
+#define HEAP_BLOCK_ALLOCATED   0b00000010
 #define HEAP_BLOCK_MULTI_BLOCK 0b00000100
 
 /**
  * @brief Memory block to be allocated
- * 
+ *
  */
 struct block_item {
     // Memory address
@@ -28,7 +27,7 @@ struct block_item {
 
 /**
  * @brief List of blocks
- * 
+ *
  */
 struct block_list {
     // Pointer to actually list
@@ -37,7 +36,7 @@ struct block_list {
     // Number of blocks allocated or available
     int num_alloc_or_avail;
 
-    // Number of blocks allocated 
+    // Number of blocks allocated
     int num_alloc;
 
     // List size
@@ -46,7 +45,7 @@ struct block_list {
 
 /**
  * @brief Block tree structure
- * 
+ *
  */
 struct block_tree {
     // Order 0 through 10 block lists
@@ -71,9 +70,9 @@ struct block_tree {
 
 /**
  * @brief Heap
- * 
+ *
  * Managed using a buddy allocator scheme
- * 
+ *
  */
 struct heap {
     // List of block trees
@@ -85,7 +84,7 @@ struct heap {
 
 /**
  * @brief Initialize a new heap
- * 
+ *
  * @param heap      Pointer to heap structure
  * @param saddr     Starting address of the heap
  * @return int      Status code
@@ -95,12 +94,12 @@ heap_init(struct heap *heap, void *saddr);
 
 /**
  * @brief Allocate memory from the heap
- * 
+ *
  * @param heap      Pointer to the heap
  * @param size      Size to allocation
  * @return void*    Pointer to memory or 0
  */
-void*
+void *
 heap_malloc(struct heap *heap, size_t size);
 
 /**

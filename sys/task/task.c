@@ -12,7 +12,7 @@ struct task *tslots[LATTE_TASK_MAX_TASKS];
 
 /**
  * @brief Get a free slot for a task
- * 
+ *
  * @return int Task Id
  */
 static int
@@ -29,7 +29,7 @@ get_free_slot()
 
 /**
  * @brief Assign a task to a slot
- * 
+ *
  * @param tid   Task Id
  * @param task  Pointer to task
  * @return int  Status code
@@ -46,7 +46,7 @@ set_slot(int tid, struct task *task)
 }
 /**
  * @brief Initialize a task
- * 
+ *
  * @param task      Pointer to the task
  * @param tid       Task Id
  * @param process   Pointer to the parent process
@@ -60,8 +60,8 @@ task_init(struct task *task, int tid, struct process *process)
         return -ENOMEM;
     }
 
-    int res = vm_area_map_to(process->vm_area, (void*)LATTE_TASK_STACK_VIRT_ADDR_BOTTOM,
-                    stack, stack + LATTE_TASK_STACK_SIZE, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
+    int res = vm_area_map_to(process->vm_area, (void *)LATTE_TASK_STACK_VIRT_ADDR_BOTTOM, stack,
+                             stack + LATTE_TASK_STACK_SIZE, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
     if (res < 0) {
         kfree(stack);
         return res;
@@ -70,7 +70,7 @@ task_init(struct task *task, int tid, struct process *process)
     task->state = TASK_STATE_NEW;
     task->id = tid;
     memset(&task->registers, 0, sizeof(struct registers));
-    task->stack = (void*)LATTE_TASK_STACK_VIRT_ADDR_TOP;
+    task->stack = (void *)LATTE_TASK_STACK_VIRT_ADDR_TOP;
     task->stack_size = LATTE_TASK_STACK_SIZE;
     task->process = process;
 
@@ -89,7 +89,7 @@ task_new(struct process *process)
     if (!task) {
         return -ENOMEM;
     }
-    
+
     int res = task_init(task, tid, process);
     if (res < 0) {
         goto err_out;
@@ -107,7 +107,7 @@ err_out:
     return res;
 }
 
-struct task*
+struct task *
 task_get(uint32_t tid)
 {
     if (tid >= LATTE_TASK_MAX_TASKS) {

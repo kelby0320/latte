@@ -1,14 +1,14 @@
 #include "libk/string.h"
 
-char*
-strcat(char *dest, const char* src)
+char *
+strcat(char *dest, const char *src)
 {
     size_t srclen = strlen(src);
     size_t i = strlen(dest);
     size_t j = 0;
-    
+
     for (; j < srclen; i++, j++) {
-	    dest[i] = src[j];
+        dest[i] = src[j];
     }
 
     dest[i] = '\0';
@@ -23,7 +23,7 @@ strcmp(const char *str1, const char *str2)
 
     /* Loop through both strings comparing each character */
     while (str1[str1_idx] != 0 && str2[str2_idx] != 0) {
-        if  (str1[str1_idx] < str2[str2_idx]) {
+        if (str1[str1_idx] < str2[str2_idx]) {
             return -1;
         }
 
@@ -32,12 +32,12 @@ strcmp(const char *str1, const char *str2)
         }
 
         str1_idx++;
-        str2_idx++;	    
+        str2_idx++;
     }
-        
+
     /* If one string is longer than the other, check the final characters */
     if (str1[str1_idx] != 0 || str2[str2_idx] != 0) {
-        if  (str1[str1_idx] < str2[str2_idx]) {
+        if (str1[str1_idx] < str2[str2_idx]) {
             return -1;
         }
 
@@ -49,13 +49,13 @@ strcmp(const char *str1, const char *str2)
     return 0;
 }
 
-char*
+char *
 strcpy(char *dest, const char *src)
 {
     size_t srclen = strlen(src) + 1; // Include null terminator
 
     for (size_t i = 0; i < srclen; i++) {
-	    dest[i] = src[i];
+        dest[i] = src[i];
     }
 
     return dest;
@@ -74,16 +74,16 @@ strlen(const char *str)
     return len;
 }
 
-char*
+char *
 strncat(char *dest, const char *src, size_t n)
 {
     size_t srclen = strlen(src);
     size_t limit = srclen < n ? srclen : n;
     size_t i = strlen(dest);
     size_t j = 0;
-    
+
     for (; j < limit; i++, j++) {
-	    dest[i] = src[j];
+        dest[i] = src[j];
     }
 
     dest[i] = '\0';
@@ -91,13 +91,14 @@ strncat(char *dest, const char *src, size_t n)
     return dest;
 }
 
-int strncmp(const char *str1, const char *str2, size_t n)
+int
+strncmp(const char *str1, const char *str2, size_t n)
 {
     size_t str1_idx = 0, str2_idx = 0;
 
     /* Loop through both strings comparing each character */
     while (str1[str1_idx] != 0 && str2[str2_idx] != 0 && str1_idx < n) {
-        if  (str1[str1_idx] < str2[str2_idx]) {
+        if (str1[str1_idx] < str2[str2_idx]) {
             return -1;
         }
 
@@ -106,24 +107,24 @@ int strncmp(const char *str1, const char *str2, size_t n)
         }
 
         str1_idx++;
-        str2_idx++;	    
+        str2_idx++;
     }
-    
+
     /* If one string is longer than the other, check the final characters */
     if ((str1[str1_idx] != 0 || str2[str2_idx] != 0) && str1_idx < n) {
-        if  (str1[str1_idx] < str2[str2_idx]) {
+        if (str1[str1_idx] < str2[str2_idx]) {
             return -1;
         }
 
         if (str1[str1_idx] > str2[str2_idx]) {
             return 1;
-        }   
+        }
     }
 
     return 0;
 }
 
-char*
+char *
 strncpy(char *dest, const char *src, size_t n)
 {
     size_t srclen = strlen(src);
@@ -132,7 +133,7 @@ strncpy(char *dest, const char *src, size_t n)
 
     /* Copy src to dest */
     for (i = 0; i < limit; i++) {
-	    dest[i] = src[i];
+        dest[i] = src[i];
     }
 
     /* Add padding if necessary */

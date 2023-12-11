@@ -5,17 +5,17 @@
 
 #include <stdint.h>
 
-#define TASK_STATE_RUNNING 0
-#define TASK_STATE_READY 1
-#define TASK_STATE_BLOCKED 2
-#define TASK_STATE_NEW 3
+#define TASK_STATE_RUNNING  0
+#define TASK_STATE_READY    1
+#define TASK_STATE_BLOCKED  2
+#define TASK_STATE_NEW      3
 #define TASK_STATE_COMPLETE 4
 
 typedef uint8_t TASK_STATE;
 
 /**
  * @brief Saved registers
- * 
+ *
  */
 struct registers {
     uint32_t edi;
@@ -29,14 +29,14 @@ struct registers {
     uint32_t cs;
     uint32_t flags;
     uint32_t esp;
-    uint32_t ss; 
+    uint32_t ss;
 };
 
 struct process;
 
 /**
  * @brief Object that represents a task running on the system
- * 
+ *
  */
 struct task {
     // Task state
@@ -60,7 +60,7 @@ struct task {
 
 /**
  * @brief Create a new task
- * 
+ *
  * @param process   Pointer to the parent process
  * @return int      Status code
  */
@@ -69,16 +69,16 @@ task_new(struct process *process);
 
 /**
  * @brief Get a task
- * 
+ *
  * @param tid   Task Id
- * @return struct task* Pointer to the task 
+ * @return struct task* Pointer to the task
  */
-struct task*
+struct task *
 task_get(uint32_t tid);
 
 /**
  * @brief Free a task
- * 
+ *
  * @param task  Pointer to the task
  */
 void
@@ -86,7 +86,7 @@ task_free(struct task *task);
 
 /**
  * @brief Switch to a tasks vm_area
- * 
+ *
  * @param task  Pointer to the task
  */
 void
@@ -94,7 +94,7 @@ task_switch_to_vm_area(struct task *task);
 
 /**
  * @brief Save a task's currently running context
- * 
+ *
  * @param task      Pointer to the task
  * @param irq_frame Pointer to the irq_frame
  */

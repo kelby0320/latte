@@ -10,10 +10,10 @@
 
 /**
  * @brief Predicate for path characters
- * 
+ *
  * @param c     Character to test
- * @return true 
- * @return false 
+ * @return true
+ * @return false
  */
 static bool
 is_path_char(char c)
@@ -43,7 +43,7 @@ is_path_char(char c)
 
 /**
  * @brief Ensures disk id is valid
- * 
+ *
  * @param str   Disk id string
  * @return int  Status code
  */
@@ -62,7 +62,7 @@ validate_disk_id(const char *str)
 
 /**
  * @brief Ensure disk id separator is valid
- * 
+ *
  * @param str   Separator string
  * @return int  Status code
  */
@@ -82,7 +82,7 @@ validate_disk_id_sep(const char *str)
 
 /**
  * @brief Get the index just past the end of the disk id
- * 
+ *
  * @param path_str  Path string
  * @return int      Status code
  */
@@ -100,7 +100,7 @@ disk_id_end_idx(const char *path_str)
 
 /**
  * @brief Read and validate the disk id from a path string
- * 
+ *
  * @param buf       Output buffer to store the disk id
  * @param path_str  Path string
  * @return int      Status code
@@ -121,7 +121,6 @@ parse_disk_id(char *buf, const char **path_str)
     if (res < 0) {
         return -EINVAL;
     }
-    
 
     *path_str += end_disk_id + 1; // point to drive_id separator ":/"
     res = validate_disk_id_sep(*path_str);
@@ -136,7 +135,7 @@ parse_disk_id(char *buf, const char **path_str)
 
 /**
  * @brief Get the element from path object
- * 
+ *
  * @param path_buf  Output buffer
  * @param path_str  Path string
  * @return int      Element length
@@ -168,7 +167,8 @@ get_element_from_path(char *path_buf, char **path_str)
  * @return int          Element length
  */
 static int
-parse_next_element(struct path_element **next_element, struct path_element *prev_element, char **path_str)
+parse_next_element(struct path_element **next_element, struct path_element *prev_element,
+                   char **path_str)
 {
     struct path_element *element = kzalloc(sizeof(struct path_element));
     if (!element) {

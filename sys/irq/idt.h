@@ -5,7 +5,7 @@
 
 /**
  * @brief Interrupt Descriptor Table Register
- * 
+ *
  */
 struct idtr {
     // Size of the Interupt Descriptor Table - 1
@@ -17,7 +17,7 @@ struct idtr {
 
 /**
  * @brief Interrupt Descriptor Table Entry
- * 
+ *
  */
 struct idt_entry {
     // Bits 0 - 15 of the interrupt handler address
@@ -37,7 +37,7 @@ struct idt_entry {
 
 /**
  * @brief Initialize the Interrupt Descriptor Table
- * 
+ *
  */
 void
 idt_init();

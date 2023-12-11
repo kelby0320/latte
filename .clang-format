@@ -1,0 +1,17 @@
+---
+BasedOnStyle: LLVM
+IndentWidth: 4
+UseTab: Never
+BreakBeforeBraces: Linux
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: false
+AlwaysBreakAfterReturnType: All
+AllowShortBlocksOnASingleLine: Empty
+PointerAlignment: Right
+BinPackArguments: true
+BinPackParameters: true
+AlignAfterOpenBracket: Align
+ColumnLimit: 100
+IncludeBlocks: Preserve
+AlignConsecutiveMacros: true
+AlignConsecutiveDeclarations: true

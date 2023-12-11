@@ -8,29 +8,29 @@
 
 /**
  * @brief Task queue used to schedule tasks
- * 
+ *
  */
 struct task_queue {
     // The queue
     struct task *queue[LATTE_TASK_MAX_TASKS];
-    
+
     // Start index of queue
     int start;
 
     // End index of queue
     int end;
-    
+
     // Length of queue
     int len;
 };
 
 static struct task_queue ready_queue;
 static struct task_queue blocked_queue;
-static struct task *current_task;
+static struct task      *current_task;
 
 /**
  * @brief Enqueue a task onto a task queue
- * 
+ *
  * @param queue     Pointer to the queue
  * @param task      Pointer to the task
  * @return int      Status code
@@ -66,12 +66,11 @@ queue_dequeue(struct task_queue *queue, struct task *task_out)
     queue->len--;
 }
 
-
 int
 sched_init()
 {
-    memset(&ready_queue, 0, sizeof(struct task_queue ));
-    memset(&blocked_queue, 0, sizeof(struct task_queue ));
+    memset(&ready_queue, 0, sizeof(struct task_queue));
+    memset(&blocked_queue, 0, sizeof(struct task_queue));
     current_task = 0;
 }
 
@@ -86,7 +85,7 @@ sched_add_task(struct task *task)
     return queue_enqueue(&ready_queue, task);
 }
 
-struct task*
+struct task *
 sched_get_current()
 {
     return current_task;

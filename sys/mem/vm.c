@@ -5,15 +5,15 @@
 
 /**
  * @brief Free page tables
- * 
+ *
  * @param page_dir  Pointer to page directory
  */
 static void
 free_page_dir_entries(uint32_t *page_dir)
 {
     for (int i = 0; i < VM_PAGE_DIR_ENTRIES; i++) {
-        uint32_t dir_entry = page_dir[i];
-        uint32_t *page_tbl = (uint32_t*)(dir_entry & 0xfffff000);
+        uint32_t  dir_entry = page_dir[i];
+        uint32_t *page_tbl = (uint32_t *)(dir_entry & 0xfffff000);
         if (page_tbl) {
             kfree(page_tbl);
         }
@@ -22,7 +22,7 @@ free_page_dir_entries(uint32_t *page_dir)
 
 /**
  * @brief Initialize a page table
- * 
+ *
  * @param page_tbl      Pointer to page table
  * @param tbl_offset    Physical memory page table offset
  * @param flags         Page flags
@@ -38,10 +38,10 @@ init_page_tbl(uint32_t *page_tbl, int tbl_offset, uint8_t flags)
 
 /**
  * @brief Initialize a page directory
- * 
+ *
  * @param page_dir  Pointer to page directory
  * @param flags     Page flags
- * @return int 
+ * @return int
  */
 static int
 init_page_dir(uint32_t *page_dir, uint8_t flags)
@@ -72,7 +72,7 @@ err_out:
 
 /**
  * @brief Get page directory index and page table index from a virtual address
- * 
+ *
  * @param page_dir      Ponter to page directory
  * @param virt          Virtual address
  * @param dir_idx_out   Output page directory index
@@ -94,7 +94,7 @@ get_page_indices(uint32_t *page_dir, void *virt, uint32_t *dir_idx_out, uint32_t
 
 /**
  * @brief Set a page table entry
- * 
+ *
  * @param page_dir  Pointer to page table
  * @param virt      Virtual address
  * @param val       Value to set
@@ -109,30 +109,30 @@ set_page_entry(uint32_t *page_dir, void *virt, uint32_t val)
 
     uint32_t dir_idx;
     uint32_t tbl_idx;
-    int res = get_page_indices(page_dir, virt, &dir_idx, &tbl_idx);
+    int      res = get_page_indices(page_dir, virt, &dir_idx, &tbl_idx);
     if (res < 0) {
         return res;
     }
 
-    uint32_t dir_entry = page_dir[dir_idx];
-    uint32_t *page_tbl = (uint32_t*)(dir_entry & 0xfffff000);
+    uint32_t  dir_entry = page_dir[dir_idx];
+    uint32_t *page_tbl = (uint32_t *)(dir_entry & 0xfffff000);
     page_tbl[tbl_idx] = val;
-    
+
     return 0;
 }
 
 /**
  * @brief Load a new page directory
- * 
+ *
  * Defined in vm.S
- * 
+ *
  * @param page_dir  Pointer to page directory
  */
 void
 load_page_directory(uint32_t *page_dir);
 
 int
-vm_area_init(struct vm_area* vm_area, uint8_t flags)
+vm_area_init(struct vm_area *vm_area, uint8_t flags)
 {
     uint32_t *page_dir = kzalloc(sizeof(uint32_t) * VM_PAGE_DIR_ENTRIES);
     if (!page_dir) {
@@ -151,7 +151,7 @@ vm_area_init(struct vm_area* vm_area, uint8_t flags)
 }
 
 void
-vm_area_free(struct vm_area* vm_area)
+vm_area_free(struct vm_area *vm_area)
 {
     uint32_t *page_dir = vm_area->page_directory;
     free_page_dir_entries(page_dir);
@@ -213,6 +213,6 @@ vm_area_map_to(struct vm_area *vm_area, void *virt, void *phys, void *phys_end, 
     }
 
     uint32_t total_bytes = phys_end - phys;
-    size_t total_pages = total_bytes / VM_PAGE_SIZE;
+    size_t   total_pages = total_bytes / VM_PAGE_SIZE;
     return vm_area_map_range(vm_area, virt, phys, total_pages, flags);
 }

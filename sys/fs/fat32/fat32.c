@@ -1,8 +1,8 @@
 #include "fs/fat32/fat32.h"
 
-struct filesystem*
+struct filesystem *
 fat32_init()
 {
-    //TODO
+    // TODO
     return 0;
 }

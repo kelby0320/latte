@@ -3,7 +3,7 @@
 
 /**
  * @brief Read byte from io port
- * 
+ *
  * @param port  Port number
  * @return unsigned char Value read
  */
@@ -12,7 +12,7 @@ insb(unsigned short port);
 
 /**
  * @brief Read word from io port
- * 
+ *
  * @param port  Port number
  * @return unsigned short   Value read
  */
@@ -21,7 +21,7 @@ insw(unsigned short port);
 
 /**
  * @brief Write byte to io port
- * 
+ *
  * @param port  Port number
  * @param val   Value to write
  */
@@ -30,7 +30,7 @@ outb(unsigned short port, unsigned char val);
 
 /**
  * @brief Write word to io port
- * 
+ *
  * @param port  Port number
  * @param val   Value to write
  */

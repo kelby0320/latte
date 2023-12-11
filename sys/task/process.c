@@ -7,11 +7,11 @@
 #include "mem/vm.h"
 #include "task/task.h"
 
-static struct process* pslots[LATTE_PROCESS_MAX_PROCESSES];
+static struct process *pslots[LATTE_PROCESS_MAX_PROCESSES];
 
 /**
  * @brief Get a free slot for a process
- * 
+ *
  * @return int Process Id
  */
 static int
@@ -28,7 +28,7 @@ get_free_slot()
 
 /**
  * @brief Assign a process to a slot
- * 
+ *
  * @param pid       Pid of the process
  * @param process   Pointer to the process
  * @return int      Status code
@@ -48,7 +48,7 @@ static int
 process_init(struct process *process, int pid, const char *filename)
 {
     process->id = pid;
-    
+
     strncpy(process->filename, filename, LATTE_MAX_PATH_LEN);
     process->vm_area = kzalloc(sizeof(struct vm_area));
 
@@ -138,5 +138,4 @@ process_load_exec(struct process *process)
 void
 process_free(struct process *process)
 {
-    
 }

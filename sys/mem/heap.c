@@ -1,19 +1,19 @@
 #include "mem/heap.h"
-#include "libk/memory.h"
 #include "errno.h"
+#include "libk/memory.h"
 
 /**
  * @brief Allocate initial blocks in the heap
- * 
+ *
  * All order 10 blocks are marked as available
- * 
+ *
  * @param heap Pointer to the heap
  */
 static void
 allocate_initial_blocks(struct heap *heap)
 {
     unsigned int offset = LATTE_HEAP_MIN_BLOCK_SIZE * (1 << LATTE_HEAP_MAX_ORDER);
-    
+
     for (int i = 0; i < LATTE_HEAP_LARGE_BLOCKS; i++) {
         struct block_tree *block_tree = &heap->block_trees[i];
         struct block_list *order_10_list = &block_tree->block_lists[10];
@@ -29,7 +29,7 @@ allocate_initial_blocks(struct heap *heap)
 
 /**
  * @brief Calculate order from size
- * 
+ *
  * @param size  Size in bytes
  * @return int  Order number
  */
@@ -37,7 +37,7 @@ static int
 size_to_order_n(size_t size)
 {
     int order_n;
-    
+
     for (order_n = 0; order_n <= LATTE_HEAP_MAX_ORDER; order_n++) {
         if ((size / (LATTE_HEAP_MIN_BLOCK_SIZE << order_n)) == 0) {
             return order_n;
@@ -49,12 +49,12 @@ size_to_order_n(size_t size)
 
 /**
  * @brief Find a free block to allocate
- * 
+ *
  * @param block_tree    Pointer to block tree to search
  * @param order_n       Order of block needed
  * @return struct block_item* Block item found or 0
  */
-static struct block_item*
+static struct block_item *
 find_free_block(struct block_tree *block_tree, int order_n)
 {
     struct block_list *block_list = &block_tree->block_lists[order_n];
@@ -62,7 +62,7 @@ find_free_block(struct block_tree *block_tree, int order_n)
 
     /* Are there any items in this list? */
     if (block_list->num_alloc_or_avail == 0) {
-	    return item;
+        return item;
     }
 
     /* Search the entire list for available blocks */
@@ -73,17 +73,17 @@ find_free_block(struct block_tree *block_tree, int order_n)
         }
     }
 
-    return item; 
+    return item;
 }
 
 /**
  * @brief Find a pair of uninitialized blocks
- * 
+ *
  * @param block_tree    Pointer to the block tree to search
  * @param order_n       Order of blocks needed
  * @return struct block_item* Pointer to first block item in the pair or 0
  */
-struct block_item*
+struct block_item *
 find_uninitialized_block_pair(struct block_tree *block_tree, int order_n)
 {
     struct block_list *block_list = &block_tree->block_lists[order_n];
@@ -91,13 +91,13 @@ find_uninitialized_block_pair(struct block_tree *block_tree, int order_n)
 
     /* Is this list already full? */
     if (block_list->num_alloc_or_avail == (int)block_list->size) {
-	    return item;
+        return item;
     }
 
     for (size_t i = 0; i < block_list->size - 1; i++) {
         if (block_list->list[i].flags == 0) {
             /* One item is available */
-            if (block_list->list[i+1].flags == 0) {
+            if (block_list->list[i + 1].flags == 0) {
                 /* We found two consecutive uninitialized items */
                 item = &block_list->list[i];
                 break;
@@ -110,13 +110,13 @@ find_uninitialized_block_pair(struct block_tree *block_tree, int order_n)
 
 /**
  * @brief Add a pair of buddy blocks to the block tree
- * 
+ *
  * @param block_tree        Pointer to the block tree
  * @param item              Block_item to split into two buddies
  * @param order_n           Block order
  * @return struct block_item* Pointer to the new block pair
  */
-static struct block_item*
+static struct block_item *
 add_block_pair(struct block_tree *block_tree, struct block_item *item, int order_n)
 {
     struct block_list *block_list = &block_tree->block_lists[order_n];
@@ -137,7 +137,7 @@ add_block_pair(struct block_tree *block_tree, struct block_item *item, int order
 
 /**
  * @brief Remove a block item from a block tree
- * 
+ *
  * @param block_tree    Pointer to the block tree
  * @param item          Pointer to the item
  * @param order_n       Order of the block
@@ -152,37 +152,37 @@ remove_block(struct block_tree *block_tree, struct block_item *item, int order_n
 
 /**
  * @brief Split a block item into two buddy blocks
- * 
+ *
  * @param block_tree        Pointer to the block tree
  * @param item              Block item to split into two buddies
  * @param order_n           Order of the block
  * @return struct block_item* Pointer to first buddy block
  */
-static struct block_item*
+static struct block_item *
 split_block(struct block_tree *block_tree, struct block_item *item, int order_n)
 {
     struct block_item *res = add_block_pair(block_tree, item, order_n - 1);
     if (!res) {
         return NULL;
     }
-    
+
     remove_block(block_tree, item, order_n);
     return res;
 }
 
 /**
  * @brief Get a free block from block tree
- * 
+ *
  * @param block_tree        Pointer to the block tree
  * @param order_n           Order of the block to needed
  * @return struct block_item* Pointer to the new block
  */
-static struct block_item*
+static struct block_item *
 get_block_from_block_tree(struct block_tree *block_tree, int order_n)
 {
     struct block_item *item = find_free_block(block_tree, order_n);
     if (!item) {
-        /* 
+        /*
             No free block or order_n was available.
             We are already at the highest order and cannot search further.
         */
@@ -195,7 +195,7 @@ get_block_from_block_tree(struct block_tree *block_tree, int order_n)
         */
         item = get_block_from_block_tree(block_tree, order_n + 1);
         if (!item) {
-            return NULL;    /* Out of memory */
+            return NULL; /* Out of memory */
         }
 
         /*
@@ -210,12 +210,12 @@ get_block_from_block_tree(struct block_tree *block_tree, int order_n)
 
 /**
  * @brief Get a free block from the heap
- * 
+ *
  * @param heap      Pointer to the heap
  * @param order_n   Order of block needed
  * @return struct block_item* Pointer to the new block
  */
-static struct block_item*
+static struct block_item *
 get_block(struct heap *heap, int order_n)
 {
     for (int i = 0; i < LATTE_HEAP_LARGE_BLOCKS; i++) {
@@ -249,7 +249,7 @@ get_block(struct heap *heap, int order_n)
 /* { */
 /*     int order_n; */
 /*     struct block_item *item = 0; */
-    
+
 /*     for (order_n = 0; i < LATTE_HEAP_MAX_ORDER + 1; order_n++) { */
 /* 	struct block_list *block_list = heap->block_lists[order_n]; */
 
@@ -275,11 +275,11 @@ get_block(struct heap *heap, int order_n)
 /*     struct block_item *buddy = 0; */
 /*     unsigned int order_n_block_size = LATTE_HEAP_MIN_BLOCK_SIZE * (1 << order_n); */
 /*     unsigned int order_n_plus_one_block_size = LATTE_HEAP_MIN_BLOCK_SIZE * (1 << order_n + 1); */
-    
+
 /*     if (order_n == LATTE_HEAP_MAX_ORDER) { */
 /* 	return NULL; */
 /*     } */
-    
+
 /*     unsigned int is_aligned = item->addr % order_n_plus_one_block_size; */
 /*     if (aligned) { */
 /* 	buddy = item->addr + order_n_block_size; */
@@ -291,7 +291,8 @@ get_block(struct heap *heap, int order_n)
 /* } */
 
 /* static struct block_item* */
-/* merge_blocks(struct heap *heap, struct block_item *item, struct block_item *buddy, int order_n) */
+/* merge_blocks(struct heap *heap, struct block_item *item, struct block_item *buddy, int order_n)
+ */
 /* { */
 /*     /\* */
 /*       Remove item and buddy */
@@ -304,7 +305,7 @@ get_block(struct heap *heap, int order_n)
 
 /**
  * @brief Initialize a block tree
- * 
+ *
  * @param block_tree    Pointer to the block_tree
  */
 static void
@@ -338,20 +339,20 @@ block_tree_init(struct block_tree *block_tree)
 
     /* Setup initial values for each block_list */
     for (int i = 0; i <= LATTE_HEAP_MAX_ORDER; i++) {
-	block_tree->block_lists[i].num_alloc_or_avail = 0;
-	block_tree->block_lists[i].num_alloc = 0;
-	block_tree->block_lists[i].size = block_list_size(i);
+        block_tree->block_lists[i].num_alloc_or_avail = 0;
+        block_tree->block_lists[i].num_alloc = 0;
+        block_tree->block_lists[i].size = block_list_size(i);
     }
 }
 
 /**
  * @brief Allocate a number of maximum size blocks
- * 
+ *
  * @param heap  Pointer to the heap
  * @param size  Size to allocate in bytes
  * @return void* Pointer to allocated memory
  */
-static void*
+static void *
 heap_malloc_large_blocks(struct heap *heap, size_t size)
 {
     /* TODO */
@@ -363,9 +364,9 @@ heap_init(struct heap *heap, void *saddr)
 {
     /* Initialize all block lists */
     for (int i = 0; i < LATTE_HEAP_LARGE_BLOCKS; i++) {
-	    block_tree_init(&heap->block_trees[i]);
+        block_tree_init(&heap->block_trees[i]);
     }
-    
+
     /* Set heap start address  */
     heap->saddr = saddr;
 
@@ -374,21 +375,21 @@ heap_init(struct heap *heap, void *saddr)
     return 0;
 }
 
-void*
+void *
 heap_malloc(struct heap *heap, size_t size)
 {
     if (size > LATTE_HEAP_MAX_BLOCK_SIZE) {
-	    return heap_malloc_large_blocks(heap, size);
+        return heap_malloc_large_blocks(heap, size);
     }
-    
+
     int order_n = size_to_order_n(size);
     if (order_n == -ENOMEM) {
-	    return NULL;
+        return NULL;
     }
-    
+
     struct block_item *item = get_block(heap, order_n);
     if (!item) {
-	    return NULL;
+        return NULL;
     }
 
     item->flags = HEAP_BLOCK_ALLOCATED;

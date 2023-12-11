@@ -12,19 +12,20 @@ struct disk;
 
 /**
  * @brief Prototype definition of the function used to read sectors from a disk.
- * 
+ *
  * @param disk  Pointer to disk structure
  * @param lba   Logical Block Address to read
  * @param total Number of sectors to read
  * @param buf   Output buffer to write data to
  * @return int  Status code
- * 
+ *
  */
-typedef int (*DISK_READ_SECTORS_FUNCTION)(struct disk *disk, unsigned int lba, int total, void *buf);
+typedef int (*DISK_READ_SECTORS_FUNCTION)(struct disk *disk, unsigned int lba, int total,
+                                          void *buf);
 
 /**
  * @brief Disk type definition.
- * 
+ *
  */
 struct disk {
     // The type of the disk
@@ -48,20 +49,19 @@ struct disk {
 
 /**
  * @brief Find and initialize disks.
- * 
+ *
  */
 void
 disk_probe_and_init();
 
-
 /**
  * @brief Allocate a new disk structure.
- * 
+ *
  * A maximum of LATTE_MAX_DISKS disks can be allocated.
- * 
- * @return struct disk* 
+ *
+ * @return struct disk*
  */
-struct disk*
+struct disk *
 disk_get_free_disk();
 
 #endif

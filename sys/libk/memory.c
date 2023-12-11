@@ -5,13 +5,13 @@
 int
 memcmp(const void *ptr1, const void *ptr2, size_t n)
 {
-    char *cptr1 = (char*)ptr1;
-    char *cptr2 = (char*)ptr2;
+    char *cptr1 = (char *)ptr1;
+    char *cptr2 = (char *)ptr2;
 
     for (size_t i = 0; i < n; i++) {
         if (cptr1[i] < cptr2[i]) {
             return -1;
-	    }
+        }
 
         if (cptr1[i] > cptr2[i]) {
             return 1;
@@ -21,12 +21,12 @@ memcmp(const void *ptr1, const void *ptr2, size_t n)
     return 0;
 }
 
-void*
+void *
 memcpy(void *dest, const void *src, size_t n)
 {
-    char *dptr = (char*)dest;
-    char *sptr = (char*)src;
-    
+    char *dptr = (char *)dest;
+    char *sptr = (char *)src;
+
     for (size_t i = 0; i < n; i++) {
         dptr[i] = sptr[i];
     }
@@ -34,10 +34,10 @@ memcpy(void *dest, const void *src, size_t n)
     return dest;
 }
 
-void*
+void *
 memset(void *dest, int ch, size_t n)
 {
-    char *ptr = (char*)dest;
+    char *ptr = (char *)dest;
     for (size_t i = 0; i < n; i++) {
         ptr[i] = (char)ch;
     }

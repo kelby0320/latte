@@ -5,8 +5,8 @@
 
 struct tss {
     uint32_t link;
-    uint32_t esp0;  // Kernel stack pointer
-    uint32_t ss0;   // Kernel stack segment
+    uint32_t esp0; // Kernel stack pointer
+    uint32_t ss0;  // Kernel stack segment
     uint32_t esp1;
     uint32_t esp2;
     uint32_t ss2;
@@ -33,7 +33,7 @@ struct tss {
 
 /**
  * @brief Initialize the TSS structure
- * 
+ *
  */
 void
 tss_init();

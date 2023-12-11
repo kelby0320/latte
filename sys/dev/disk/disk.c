@@ -8,7 +8,7 @@
 #include "libk/memory.h"
 #include "libk/string.h"
 
-struct disk* disks[LATTE_MAX_DISKS];
+struct disk *disks[LATTE_MAX_DISKS];
 
 void
 disk_probe_and_init()
@@ -21,7 +21,7 @@ disk_probe_and_init()
     }
 }
 
-struct disk*
+struct disk *
 disk_get_free_disk()
 {
     for (int i = 0; i < LATTE_MAX_DISKS; i++) {
@@ -34,7 +34,7 @@ disk_get_free_disk()
     return 0;
 }
 
-struct disk*
+struct disk *
 disk_get_disk(const char *disk_id)
 {
     for (int i = 0; i < LATTE_MAX_DISKS; i++) {

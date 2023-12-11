@@ -2,20 +2,20 @@
 
 #include "config.h"
 #include "gdt/tss.h"
-#include "libk/memory.h"
 #include "kernel.h"
+#include "libk/memory.h"
 
 struct gdtr gdtr;
-struct gdt gdt[LATTE_TOTAL_GDT_SEGMENTS];
+struct gdt  gdt[LATTE_TOTAL_GDT_SEGMENTS];
 
 /**
  * @brief Structured GDT item
- * 
+ *
  */
 struct gdt_structured {
     uint32_t base;
     uint32_t limit;
-    uint8_t type;
+    uint8_t  type;
 };
 
 struct gdt_structured gdt_structured[LATTE_TOTAL_GDT_SEGMENTS] = {
@@ -29,9 +29,9 @@ struct gdt_structured gdt_structured[LATTE_TOTAL_GDT_SEGMENTS] = {
 
 /**
  * @brief Load the Global Descriptor Table
- * 
+ *
  * Defined in gdt.S
- * 
+ *
  * @param gdtr   Pointer to the GDT descriptor structrue
  */
 void
@@ -39,15 +39,15 @@ gdt_load(struct gdtr *gdtr);
 
 /**
  * @brief Encode structure gdt as real gdt
- * 
+ *
  * @param gdt               Pointer to read gdt item
  * @param gdt_structured    Ponter to structure gdt item
  */
 static void
-encode_gdt_structured(struct gdt* gdt, const struct gdt_structured *gdt_structured)
+encode_gdt_structured(struct gdt *gdt, const struct gdt_structured *gdt_structured)
 {
     if (gdt_structured->limit > 0xFFFFF) {
-	    panic("GDT cannot encode limits greater than 0xFFFFF\n");
+        panic("GDT cannot encode limits greater than 0xFFFFF\n");
     }
 
     // Encode the limit
@@ -70,16 +70,16 @@ encode_gdt_structured(struct gdt* gdt, const struct gdt_structured *gdt_structur
 
 /**
  * @brief Convert structure gdt to real gdt
- * 
+ *
  * @param gdt               Pointer to real gdt
  * @param gdt_structured    Ponter to structure gdt
  * @param total_entries     Total entries in gdt
  */
 static void
-gdt_structured_to_gdt(struct gdt* gdt, struct gdt_structured* structured_gdt, int total_entries)
+gdt_structured_to_gdt(struct gdt *gdt, struct gdt_structured *structured_gdt, int total_entries)
 {
     for (int i = 0; i < total_entries; i++) {
-	    encode_gdt_structured(&gdt[i], &structured_gdt[i]);
+        encode_gdt_structured(&gdt[i], &structured_gdt[i]);
     }
 }
 

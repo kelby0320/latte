@@ -1,13 +1,11 @@
-#include "config.h"
+#include "kernel.h"
+
 #include "dev/disk/disk.h"
 #include "dev/term/term.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "irq/irq.h"
-#include "kernel.h"
 #include "libk/libk.h"
-#include "libk/memory.h"
-#include "libk/string.h"
 #include "mem/vm.h"
 
 static struct vm_area kernel_area;
@@ -17,7 +15,7 @@ print(const char *str)
 {
     size_t len = strlen(str);
     for (size_t i = 0; i < len; i++) {
-	    terminal_writechar(str[i]);
+        terminal_writechar(str[i]);
     }
 }
 
@@ -25,7 +23,7 @@ void
 panic(const char *str)
 {
     print(str);
-    while (1);
+    while (1) {}
 }
 
 void
@@ -68,9 +66,9 @@ kernel_main()
     enable_paging();
 
     char buf[1024];
-    int fd = fopen("hdd0:/latte.txt", "r");
+    int  fd = fopen("hdd0:/latte.txt", "r");
     fread(fd, buf, 32);
     print(buf);
 
-    while (1);
+    while (1) {}
 }

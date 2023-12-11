@@ -8,16 +8,16 @@
 
 #include <stdint.h>
 
-extern void* isr_table[LATTE_TOTAL_IDT_ENTRIES];
+extern void *isr_table[LATTE_TOTAL_IDT_ENTRIES];
 
-struct idtr idtr;
+struct idtr      idtr;
 struct idt_entry int_desc_tbl[LATTE_TOTAL_IDT_ENTRIES];
 
 /**
  * @brief Load the interrupt descriptor table
- * 
+ *
  * Defined in idt.S
- * 
+ *
  */
 void
 load_idt(struct idtr *idtr);

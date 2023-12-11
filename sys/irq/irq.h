@@ -21,37 +21,37 @@ struct irq_frame {
 
 /**
  * @brief Intialize the IRQ subsystem
- * 
+ *
  */
 void
 irq_init();
 
 /**
  * @brief Interrupt handler prototype definition
- * 
+ *
  */
 typedef void (*IRQ_HANDLER)();
 
 /**
  * @brief Register an interrupt handler
- * 
+ *
  * @param interrupt_no  Interrupt number
  * @param handler       Pointer to interrupt handler
- * @return int 
+ * @return int
  */
 int
 register_irq(int interrupt_no, IRQ_HANDLER irq_handler);
 
 /**
  * @brief Enable Interrupts
- * 
+ *
  */
 void
 enable_interrupts();
 
 /**
  * @brief Disable Interrupts
- * 
+ *
  */
 void
 disable_interrupts();

@@ -33,10 +33,9 @@ bufferedreader_read(struct bufferedreader *reader, void *out, int count)
     unsigned int sector = reader->pos / LATTE_SECTOR_SIZE;
     unsigned int offset = reader->pos % LATTE_SECTOR_SIZE;
 
-    char buf[LATTE_SECTOR_SIZE];
+    char         buf[LATTE_SECTOR_SIZE];
     unsigned int bytes_read = 0;
-    int out_idx = 0;
-    
+    int          out_idx = 0;
 
     while (bytes_read < count) {
         // Read a sector of data
@@ -47,9 +46,11 @@ bufferedreader_read(struct bufferedreader *reader, void *out, int count)
 
         // Copy data to the out buffer accounting for offset
         int buf_idx = offset;
-        int read_limit = (LATTE_SECTOR_SIZE - offset) < (count - bytes_read) ? (LATTE_SECTOR_SIZE - offset) : (count - bytes_read);
+        int read_limit = (LATTE_SECTOR_SIZE - offset) < (count - bytes_read)
+                             ? (LATTE_SECTOR_SIZE - offset)
+                             : (count - bytes_read);
         for (int i = 0; i < read_limit; i++) {
-            ((char*)out)[out_idx] = buf[buf_idx];
+            ((char *)out)[out_idx] = buf[buf_idx];
             out_idx++;
             buf_idx++;
             bytes_read++;

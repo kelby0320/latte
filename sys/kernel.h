@@ -10,5 +10,4 @@ panic(const char *str);
 void
 switch_to_kernel_vm_area();
 
-
 #endif

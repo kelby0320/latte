@@ -3,16 +3,16 @@
 
 #include "config.h"
 
-#define PATH_SEPARATOR '/'
+#define PATH_SEPARATOR    '/'
 #define DISK_ID_SEPARATOR ':'
 
 /**
  * @brief Linked list of elements in a path
- * 
+ *
  * e.g:
  *  For a file path such as - hdd0:/home/user/file.txt
  *  The path_element linked list would be as follows
- * 
+ *
  *  0x1000 - {element = "home", next = 0x0044}
  *  0x1044 - {element = "user", next = 0x0088}
  *  0x1088 - {element = "file.txt", next = 0x0000}
@@ -27,7 +27,7 @@ struct path_element {
 
 /**
  * @brief Object representing a path
- * 
+ *
  */
 struct path {
     // Id of the disk
@@ -39,7 +39,7 @@ struct path {
 
 /**
  * @brief Make a path from a path string
- * 
+ *
  * @param path_out  Output pointer to path structure
  * @param path_str  Path string
  * @return int      Status code
@@ -49,7 +49,7 @@ path_from_str(struct path **path_out, const char *path_str);
 
 /**
  * @brief Free a path object
- * 
+ *
  * @param path  Pointer to path
  */
 void

@@ -1,8 +1,8 @@
 #include "fs/ext2/ext2.h"
 
 #include "config.h"
-#include "dev/disk/disk.h"
 #include "dev/disk/buffer/bufferedreader.h"
+#include "dev/disk/disk.h"
 #include "errno.h"
 #include "fs/ext2/common.h"
 #include "fs/ext2/dir.h"
@@ -16,7 +16,7 @@
 
 /**
  * @brief Read the superblock of the filesystem
- * 
+ *
  * @param fs_private    Pointer to private fs data
  * @return int          Number of bytes read
  */
@@ -24,23 +24,24 @@ static int
 ext2_read_superblock(struct ext2_private *fs_private)
 {
     bufferedreader_seek(fs_private->reader, EXT2_FS_START + EXT2_SUPERBLOCK_OFFSET);
-    int res = bufferedreader_read(fs_private->reader, &fs_private->superblock, EXT2_SUPERBLOCK_SIZE);
+    int res =
+        bufferedreader_read(fs_private->reader, &fs_private->superblock, EXT2_SUPERBLOCK_SIZE);
     return res;
 }
 
 /**
  * @brief Find the inode corresponding to a file path
- * 
+ *
  * @param path          Pointer to the path
  * @param disk          Pointer to the disk
  * @param fs_private    Pointer to private fs data
  * @return struct inode* Inode structure or 0
  */
-static struct inode*
-ext2_path_to_inode(struct path* path, struct disk *disk, struct ext2_private *fs_private)
+static struct inode *
+ext2_path_to_inode(struct path *path, struct disk *disk, struct ext2_private *fs_private)
 {
     struct path_element *path_element = path->root->element;
-    struct inode *inode, *dir_inode;
+    struct inode        *inode, *dir_inode;
 
     // Read root directory
     int res = ext2_read_inode(&dir_inode, disk, fs_private, EXT2_ROOT_DIR_INODE);
@@ -54,7 +55,7 @@ ext2_path_to_inode(struct path* path, struct disk *disk, struct ext2_private *fs
         if (res < 0) {
             goto err_out;
         }
-        
+
         if (!path_element->next) {
             // No more path elements, we have final inode
             return inode;
@@ -64,7 +65,7 @@ ext2_path_to_inode(struct path* path, struct disk *disk, struct ext2_private *fs
             // Not a directory, Error!
             goto err_out;
         }
-        
+
         // Search next directory
         kfree(dir_inode);
         dir_inode = inode;
@@ -134,7 +135,7 @@ ext2_open(struct disk *disk, struct path *path, FILE_MODE mode, void **out)
         return -EACCES;
     }
 
-    struct ext2_file_descriptor *descriptor  = kzalloc(sizeof(struct ext2_file_descriptor));
+    struct ext2_file_descriptor *descriptor = kzalloc(sizeof(struct ext2_file_descriptor));
     if (!descriptor) {
         return -ENOMEM;
     }
@@ -153,13 +154,13 @@ ext2_open(struct disk *disk, struct path *path, FILE_MODE mode, void **out)
     descriptor->inode = inode;
     descriptor->offset = 0;
 
-    *out = (void*)descriptor;
+    *out = (void *)descriptor;
     return 0;
 }
 
 /**
  * @brief Close an Ext2 open file
- * 
+ *
  * @param private   Pointer to private fs data
  * @return int      Status code
  */
@@ -171,7 +172,7 @@ ext2_close(void *private)
 
 /**
  * @brief Read data from an Ext2 open file
- * 
+ *
  * @param disk  Pointer to the disk
  * @param desc  Pointer to the Ext2 file descriptor
  * @param buf   Pointer to the output buffer
@@ -182,7 +183,7 @@ int
 ext2_read(struct disk *disk, void *desc, char *buf, uint32_t count)
 {
     struct ext2_file_descriptor *descriptor = desc;
-    struct ext2_private *fs_private = disk->fs_private;
+    struct ext2_private         *fs_private = disk->fs_private;
 
     int read = ext2_read_inode_data(fs_private, descriptor->inode, buf, count, descriptor->offset);
     return read;
@@ -190,7 +191,7 @@ ext2_read(struct disk *disk, void *desc, char *buf, uint32_t count)
 
 /**
  * @brief Write data to an Ext2 open file
- * 
+ *
  * @param disk  Pointer to the disk
  * @param desc  Pointer to Ext2 file descriptor
  * @param buf   Pointer to the input buffer
@@ -205,7 +206,7 @@ ext2_write(struct disk *disk, void *desc, const char *buf, uint32_t count)
 
 /**
  * @brief Seek to a location in an Ext2 open file
- * 
+ *
  * @param desc      Pointer to Ext2 file descriptor
  * @param offset    Seek offset
  * @param seek_mode Seek mode
@@ -216,17 +217,17 @@ ext2_seek(void *desc, uint32_t offset, FILE_SEEK_MODE seek_mode)
 {
     struct ext2_file_descriptor *descriptor = desc;
     switch (seek_mode) {
-        case SEEK_SET:
-            descriptor->offset = offset;
-            break;
-        case SEEK_CUR:
-            descriptor->offset = descriptor->offset + offset;
-            break;
-        case SEEK_END:
-            descriptor->offset = descriptor->inode->i_size + offset;
-            break;
-        default:
-            return -EINVAL;
+    case SEEK_SET:
+        descriptor->offset = offset;
+        break;
+    case SEEK_CUR:
+        descriptor->offset = descriptor->offset + offset;
+        break;
+    case SEEK_END:
+        descriptor->offset = descriptor->inode->i_size + offset;
+        break;
+    default:
+        return -EINVAL;
     }
 
     return 0;
@@ -234,7 +235,7 @@ ext2_seek(void *desc, uint32_t offset, FILE_SEEK_MODE seek_mode)
 
 /**
  * @brief Read the status of an Ext2 open file
- * 
+ *
  * @param disk  Pointer to the disk
  * @param desc  Pointer to Ext2 file descriptor
  * @param stat  Pointer to output stat structure
@@ -244,11 +245,11 @@ int
 ext2_stat(struct disk *disk, void *desc, struct file_stat *stat)
 {
     struct ext2_file_descriptor *descriptor = desc;
-    struct ext2_private *fs_private = disk->fs_private;
+    struct ext2_private         *fs_private = disk->fs_private;
 
     struct inode inode;
-    int res = ext2_read_inode(&inode, disk, fs_private, descriptor->inode);
-    if (res< 0) {
+    int          res = ext2_read_inode(&inode, disk, fs_private, descriptor->inode);
+    if (res < 0) {
         return -EIO;
     }
 
@@ -258,7 +259,7 @@ ext2_stat(struct disk *disk, void *desc, struct file_stat *stat)
     return 0;
 }
 
-struct filesystem*
+struct filesystem *
 ext2_init()
 {
     struct filesystem *fs = kzalloc(sizeof(struct filesystem));

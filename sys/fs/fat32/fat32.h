@@ -3,7 +3,7 @@
 
 #include "fs/fs.h"
 
-struct filesystem*
+struct filesystem *
 fat32_init();
 
 #endif

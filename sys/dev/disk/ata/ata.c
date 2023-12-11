@@ -4,13 +4,13 @@
 #include "dev/disk/disk.h"
 #include "errno.h"
 #include "fs/fs.h"
-#include "port/io.h"
 #include "libk/kheap.h"
 #include "libk/string.h"
+#include "port/io.h"
 
 /**
  * @brief Read sectors from an ATA device.
- * 
+ *
  * @param disk  Pointer to the disk
  * @param lba   Logical Block Address to read from
  * @param total Number of sectors to read
@@ -21,8 +21,8 @@ int
 ata_read_sectors(struct disk *disk, unsigned int lba, int total, void *buf)
 {
 
-    unsigned int register_base = ((struct ata*)disk->disk_private)->bus_base_addr;
-    unsigned int drive_no = ((struct ata*)disk->disk_private)->drive_no;
+    unsigned int register_base = ((struct ata *)disk->disk_private)->bus_base_addr;
+    unsigned int drive_no = ((struct ata *)disk->disk_private)->drive_no;
 
     unsigned int data_reg = register_base + ATA_PIO_DATA_REG_OFFSET;
     unsigned int sector_count_reg = register_base + ATA_PIO_SECTOR_COUNT_REG_OFFSET;
@@ -40,7 +40,7 @@ ata_read_sectors(struct disk *disk, unsigned int lba, int total, void *buf)
     outb(lba_hi_reg, lba_hi(lba));
     outb(cmd_reg, ATA_PIO_CMD_READ_SECTORS);
 
-    unsigned short* ptr = (unsigned short*) buf;
+    unsigned short *ptr = (unsigned short *)buf;
     for (int b = 0; b < total; b++) {
         // Wait for the buffer to be ready
         char c = insb(status_reg);

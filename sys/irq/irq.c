@@ -12,10 +12,10 @@
 static IRQ_HANDLER irq_handlers[LATTE_TOTAL_IDT_ENTRIES];
 
 /**
- * @brief 
- * 
- * @param interrupt_no 
- * @param irq_frame 
+ * @brief
+ *
+ * @param interrupt_no
+ * @param irq_frame
  */
 void
 generic_isr_handler(int interrupt_no, struct irq_frame *irq_frame)

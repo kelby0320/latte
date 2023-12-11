@@ -16,7 +16,7 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
     if (phdr->p_type != PT_LOAD) {
         return 0; // Skip loading
     }
-    
+
     size_t segment_offset = phdr->p_offset;
     size_t segment_size = phdr->p_memsz;
 
@@ -39,7 +39,7 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
     if (res < 0) {
         return -EIO;
     }
-    
+
     uint8_t flags = VM_PAGE_PRESENT;
     if (phdr->p_flags & PF_W) {
         flags |= VM_PAGE_WRITABLE;
@@ -56,7 +56,7 @@ loader_read_program_headers(struct elf_img_desc *img_desc)
     if (res < 0) {
         return -EIO;
     }
-    
+
     int num_pheaders = img_desc->elf_header.e_phnum;
     if (num_pheaders >= ELF_IMG_DESC_MAX_PHEADERS) {
         return -EINVAL;

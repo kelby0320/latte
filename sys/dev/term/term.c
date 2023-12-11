@@ -3,14 +3,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define VGA_WIDTH 80
+#define VGA_WIDTH  80
 #define VGA_HEIGHT 25
-#define VGA_MEMORY (uint16_t*)0xB8000
+#define VGA_MEMORY (uint16_t *)0xB8000
 
 static uint16_t *terminal_buffer = NULL;
-static size_t terminal_row = 0;
-static size_t terminal_col = 0;
-static uint8_t terminal_color;
+static size_t    terminal_row = 0;
+static size_t    terminal_col = 0;
+static uint8_t   terminal_color;
 
 static inline uint8_t
 vga_color(enum vga_color fg, enum vga_color bg)
@@ -40,7 +40,7 @@ terminal_writechar(char c)
     }
 
     terminal_putchar(terminal_col, terminal_row, c);
-    
+
     terminal_col++;
     if (terminal_col >= VGA_WIDTH) {
         terminal_col = 0;
