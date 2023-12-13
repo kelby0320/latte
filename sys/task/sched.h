@@ -29,6 +29,13 @@ struct task *
 sched_get_current();
 
 /**
+ * @brief Schedule the first task to run
+ *
+ */
+void
+schedule_first_task();    
+
+/**
  * @brief Schedule a new task to run
  *
  */

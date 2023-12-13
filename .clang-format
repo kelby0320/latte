@@ -14,4 +14,3 @@ AlignAfterOpenBracket: Align
 ColumnLimit: 100
 IncludeBlocks: Preserve
 AlignConsecutiveMacros: true
-AlignConsecutiveDeclarations: true

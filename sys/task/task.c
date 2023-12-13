@@ -11,6 +11,14 @@
 struct task *tslots[LATTE_TASK_MAX_TASKS];
 
 /**
+ * @brief Setup processor regisers and begin executing in user space
+ *
+ * @param registers Pointer to registers structure
+ */
+void
+task_return(struct registers *registers);
+
+/**
  * @brief Get a free slot for a task
  *
  * @return int Task Id
@@ -70,6 +78,11 @@ task_init(struct task *task, int tid, struct process *process)
     task->state = TASK_STATE_NEW;
     task->id = tid;
     memset(&task->registers, 0, sizeof(struct registers));
+    task->registers.ip = LATTE_TASK_LOAD_VIRT_ADDR;
+    task->registers.cs = LATTE_USER_CODE_SEGMENT;
+    task->registers.ds = LATTE_USER_DATA_SEGMENT;
+    task->registers.ss = LATTE_USER_DATA_SEGMENT;
+    task->registers.esp = LATTE_TASK_STACK_VIRT_ADDR_TOP;
     task->stack = (void *)LATTE_TASK_STACK_VIRT_ADDR_TOP;
     task->stack_size = LATTE_TASK_STACK_SIZE;
     task->process = process;
@@ -124,10 +137,10 @@ task_free(struct task *task)
 }
 
 void
-task_switch_to_vm_area(struct task *task)
+task_switch_and_return(struct task *task)
 {
-    gdt_set_user_data_segment();
-    vm_area_switch_map(task->process->vm_area);
+    process_switch_to_vm_area(task->process);
+    task_return(&task->registers);
 }
 
 void

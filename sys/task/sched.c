@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "errno.h"
+#include "kernel.h"
 #include "libk/memory.h"
 #include "mem/vm.h"
 #include "task/task.h"
@@ -26,7 +27,7 @@ struct task_queue {
 
 static struct task_queue ready_queue;
 static struct task_queue blocked_queue;
-static struct task      *current_task;
+static struct task *current_task;
 
 /**
  * @brief Enqueue a task onto a task queue
@@ -66,6 +67,18 @@ queue_dequeue(struct task_queue *queue, struct task *task_out)
     queue->len--;
 }
 
+/**
+ * @brief Get queue length
+ *
+ * @param           Pointer to the queue
+ * @return int      Queue length
+ */
+int
+queue_len(struct task_queue *queue)
+{
+    return queue->len;
+}
+
 int
 sched_init()
 {
@@ -92,7 +105,34 @@ sched_get_current()
 }
 
 void
+schedule_first_task()
+{
+    if (queue_len(&ready_queue) == 0) {
+        panic("No tasks");
+    }
+
+    queue_dequeue(&ready_queue, current_task);
+    current_task->state = TASK_STATE_RUNNING;
+
+    task_switch_and_return(current_task);
+}
+
+void
 schedule()
 {
-    // TODO
+    current_task->state = TASK_STATE_READY;
+
+    int res = queue_enqueue(&ready_queue, current_task);
+    if (res < 0) {
+        panic("Failed to enqueue task");
+    }
+
+    res = queue_dequeue(&ready_queue, current_task);
+    if (res < 0) {
+        panic("Failed to dequeue task");
+    }
+
+    current_task->state = TASK_STATE_RUNNING;
+
+    task_switch_and_return(current_task);
 }

@@ -36,6 +36,7 @@ OBJECTS = ./build/boot/boot.asm.o \
 	./build/sys/task/loader.o \
 	./build/sys/task/process.o \
 	./build/sys/task/sched.o \
+	./build/sys/task/task.asm.o \
 	./build/sys/task/task.o
 
 TEST_OBJECTS = ./build/test/test.o \
@@ -175,6 +176,9 @@ build_dirs:
 
 ./build/sys/task/sched.o: ./sys/task/sched.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/sched.c -o ./build/sys/task/sched.o
+
+./build/sys/task/task.asm.o: ./sys/task/task.asm
+	$(AS) $(ASFLAGS) ./sys/task/task.asm -o ./build/sys/task/task.asm.o
 
 ./build/sys/task/task.o: ./sys/task/task.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c ./sys/task/task.c -o ./build/sys/task/task.o

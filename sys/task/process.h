@@ -55,11 +55,10 @@ struct process {
 /**
  * @brief Create a new process
  *
- * @param filename  Path to the executable to load
  * @return int      Status code
  */
 int
-process_spawn(const char *filename);
+process_new();
 
 /**
  * @brief Add a new tasks to a process
@@ -84,11 +83,20 @@ process_remove_task(struct process *process, uint16_t task_id);
 /**
  * @brief Load the process's executable
  *
- * @param process   Pointer to the process
+ * @param pid       Process Id
+ * @param filename  Filename
  * @return int      Status code
  */
 int
-process_load_exec(struct process *process);
+process_load_exec(int pid, const char *filename);
+
+/**
+ * @brief Switch to a process's vm_area
+ *
+ * @param process   Pointer to the process
+ */
+void
+process_switch_to_vm_area(struct process *process);    
 
 /**
  * @brief Free a process

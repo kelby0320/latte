@@ -27,6 +27,7 @@ struct registers {
     uint32_t eax;
     uint32_t ip;
     uint32_t cs;
+    uint32_t ds;
     uint32_t flags;
     uint32_t esp;
     uint32_t ss;
@@ -85,12 +86,12 @@ void
 task_free(struct task *task);
 
 /**
- * @brief Switch to a tasks vm_area
+ * @brief Switch to this task and begin executing in user space
  *
- * @param task  Pointer to the task
+ * @param task      Pointer to the task
  */
 void
-task_switch_to_vm_area(struct task *task);
+task_switch_and_return(struct task *task);
 
 /**
  * @brief Save a task's currently running context

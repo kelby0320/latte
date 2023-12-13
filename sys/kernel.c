@@ -7,6 +7,8 @@
 #include "irq/irq.h"
 #include "libk/libk.h"
 #include "mem/vm.h"
+#include "task/process.h"
+#include "task/sched.h"
 
 static struct vm_area kernel_area;
 
@@ -69,6 +71,10 @@ kernel_main()
     int  fd = fopen("hdd0:/latte.txt", "r");
     fread(fd, buf, 32);
     print(buf);
+
+    /* int pid = process_new(); */
+    /* process_load_exec(pid, "hdd0:/testprog.elf"); */
+    /* schedule_first_task();  */
 
     while (1) {}
 }
