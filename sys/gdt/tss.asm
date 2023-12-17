@@ -3,7 +3,7 @@ section .text
 global tss_load
 
 ; void
-; tss_load();
+; tss_load(int tss_segment);
 tss_load:
     push    ebp
     mov     ebp, esp

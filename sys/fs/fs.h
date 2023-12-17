@@ -75,13 +75,15 @@ typedef int (*FS_WRITE_FUNCTION)(struct disk *disk, void *private, const char *b
 /**
  * @brief Prototype definition of the function to seek to a location in a file.
  *
+ * @param disk      Pointer to the disk
  * @param private   Pointer to private fs data
  * @param offset    Location to seek to
  * @param seek_mode Seek mode
  * @returns int     Status code
  *
  */
-typedef int (*FS_SEEK_FUNCTION)(void *private, uint32_t offset, FILE_SEEK_MODE seek_mode);
+typedef int (*FS_SEEK_FUNCTION)(struct disk *disk, void *private, uint32_t offset,
+                                FILE_SEEK_MODE seek_mode);
 
 /**
  * @brief Prototype definition of the function to read file status.

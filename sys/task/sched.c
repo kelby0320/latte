@@ -56,13 +56,13 @@ queue_enqueue(struct task_queue *queue, struct task *task)
  * @return int          Status code
  */
 static int
-queue_dequeue(struct task_queue *queue, struct task *task_out)
+queue_dequeue(struct task_queue *queue, struct task **task_out)
 {
     if (queue->len == 0) {
         return -EINVAL;
     }
 
-    task_out = queue->queue[queue->start];
+    *task_out = queue->queue[queue->start];
     queue->start = (queue->start + 1) % LATTE_TASK_MAX_TASKS;
     queue->len--;
 }
@@ -111,7 +111,7 @@ schedule_first_task()
         panic("No tasks");
     }
 
-    queue_dequeue(&ready_queue, current_task);
+    queue_dequeue(&ready_queue, &current_task);
     current_task->state = TASK_STATE_RUNNING;
 
     task_switch_and_return(current_task);
@@ -127,7 +127,7 @@ schedule()
         panic("Failed to enqueue task");
     }
 
-    res = queue_dequeue(&ready_queue, current_task);
+    res = queue_dequeue(&ready_queue, &current_task);
     if (res < 0) {
         panic("Failed to dequeue task");
     }

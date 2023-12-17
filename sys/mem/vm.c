@@ -12,7 +12,7 @@ static void
 free_page_dir_entries(uint32_t *page_dir)
 {
     for (int i = 0; i < VM_PAGE_DIR_ENTRIES; i++) {
-        uint32_t  dir_entry = page_dir[i];
+        uint32_t dir_entry = page_dir[i];
         uint32_t *page_tbl = (uint32_t *)(dir_entry & 0xfffff000);
         if (page_tbl) {
             kfree(page_tbl);
@@ -59,7 +59,7 @@ init_page_dir(uint32_t *page_dir, uint8_t flags)
         init_page_tbl(page_tbl, tbl_offset, flags);
 
         tbl_offset += VM_PAGE_TBL_ENTRIES * VM_PAGE_SIZE;
-        uint32_t dir_entry = (uint32_t)page_tbl | flags;
+        uint32_t dir_entry = (uint32_t)page_tbl | flags | VM_PAGE_WRITABLE;
         page_dir[i] = dir_entry;
     }
 
@@ -73,14 +73,13 @@ err_out:
 /**
  * @brief Get page directory index and page table index from a virtual address
  *
- * @param page_dir      Ponter to page directory
  * @param virt          Virtual address
  * @param dir_idx_out   Output page directory index
  * @param tbl_idx_out   Output page table index
  * @return int          Status code
  */
 static int
-get_page_indices(uint32_t *page_dir, void *virt, uint32_t *dir_idx_out, uint32_t *tbl_idx_out)
+get_page_indices(void *virt, uint32_t *dir_idx_out, uint32_t *tbl_idx_out)
 {
     if (!is_aligned(virt)) {
         return -EINVAL;
@@ -109,12 +108,12 @@ set_page_entry(uint32_t *page_dir, void *virt, uint32_t val)
 
     uint32_t dir_idx;
     uint32_t tbl_idx;
-    int      res = get_page_indices(page_dir, virt, &dir_idx, &tbl_idx);
+    int res = get_page_indices(virt, &dir_idx, &tbl_idx);
     if (res < 0) {
         return res;
     }
 
-    uint32_t  dir_entry = page_dir[dir_idx];
+    uint32_t dir_entry = page_dir[dir_idx];
     uint32_t *page_tbl = (uint32_t *)(dir_entry & 0xfffff000);
     page_tbl[tbl_idx] = val;
 
@@ -213,6 +212,6 @@ vm_area_map_to(struct vm_area *vm_area, void *virt, void *phys, void *phys_end, 
     }
 
     uint32_t total_bytes = phys_end - phys;
-    size_t   total_pages = total_bytes / VM_PAGE_SIZE;
+    size_t total_pages = total_bytes / VM_PAGE_SIZE;
     return vm_area_map_range(vm_area, virt, phys, total_pages, flags);
 }

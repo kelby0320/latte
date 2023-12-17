@@ -58,10 +58,12 @@ INCLUDES = -I./sys
 
 TEST_INCLUDES = -I./sys -I./test
 
-all: ./build/boot/latte.elf
+all: ./build/boot/latte.elf libs bin
 
 build_dirs:
+	mkdir -p ./build/bin
 	mkdir -p ./build/boot
+	mkdir -p ./build/lib
 	mkdir -p ./build/sys/dev/disk/ata
 	mkdir -p ./build/sys/dev/disk/buffer
 	mkdir -p ./build/sys/dev/term
@@ -231,5 +233,17 @@ test: build_dirs $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 ./build/test/sys/mem/test_heap: $(TEST_OBJECTS)
 	gcc -g ./build/test/test.o ./build/test/sys/mem/heap.o ./build/test/sys/mem/test_heap.o -o ./build/test/sys/mem/test_heap
 
-clean:
+libs:
+	cd ./lib/libc && $(MAKE) all
+
+bin: libs
+	cd ./bin/testprog && $(MAKE) all
+
+clean_libs:
+	cd ./lib/libc && $(MAKE) clean
+
+clean_bin:
+	cd ./bin/testprog && $(MAKE) clean
+
+clean: clean_libs
 	rm -r ./build

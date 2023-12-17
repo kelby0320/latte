@@ -28,10 +28,11 @@ ext2_read_inode(struct inode **inode_out, struct disk *disk, struct ext2_private
  * @param out           Pointer to the output buffer
  * @param count         Number of bytes to read
  * @param blk_offset    Block offset into inode data
+ * @param byte_offset   Byte offset into block to start reading at
  * @return int          Status code
  */
 int
 ext2_read_inode_data(struct ext2_private *fs_private, const struct inode *inode, char *out,
-                     size_t count, unsigned int blk_offset);
+                     size_t count, unsigned int blk_offset, unsigned int byte_offset);
 
 #endif

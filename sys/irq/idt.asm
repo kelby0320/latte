@@ -28,17 +28,19 @@ int%1:
     iret
 %endmacro
 
-; A macro to define an ISR table entry
-%macro make_isr_tbl_entry 1
-    dd int%1
-%endmacro
-
 ; Create all ISRs
 %assign i 0
 %rep 256
 make_isr i
 %assign i i+1
 %endrep
+
+section .data
+
+; A macro to define an ISR table entry
+%macro make_isr_tbl_entry 1
+    dd int%1
+%endmacro
 
 ; A table of pointers to ISRs
 isr_table:

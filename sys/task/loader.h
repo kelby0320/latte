@@ -24,6 +24,9 @@ struct elf_img_desc {
     // Memory segment allocations
     void *segment_allocations[ELF_IMG_DESC_MAX_PHEADERS];
 
+    // Number of segment allocations
+    int num_seg_allocs;
+
     // ELF file descriptor
     int fd;
 };

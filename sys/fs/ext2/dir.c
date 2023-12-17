@@ -56,7 +56,7 @@ dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private, const stru
 
     // Read inital block of data
     int res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size,
-                                   iter->block_no);
+                                   iter->block_no, 0);
     if (res < 0) {
         return res;
     }
@@ -94,7 +94,7 @@ iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private,
         iter->block_no++;
         iter->buf_offset = 0;
         res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size,
-                                   iter->block_no);
+                                   iter->block_no, 0);
         if (res < 0) {
             return res;
         }
@@ -102,7 +102,7 @@ iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private,
 
     // Parse directory_entry from buffer
     struct directory_entry *entry = (struct directory_entry *)(iter->buf + iter->buf_offset);
-    int                     rec_len = entry->rec_len;
+    int rec_len = entry->rec_len;
     if (rec_len > sizeof(struct directory_entry)) {
         rec_len = sizeof(struct directory_entry);
     }
@@ -126,7 +126,7 @@ ext2_get_directory_entry(struct inode **inode_out, struct disk *disk,
 
     // Setup a directory iterator
     struct dir_iter iter;
-    int             res = dir_iter_init(&iter, fs_private, dir_inode);
+    int res = dir_iter_init(&iter, fs_private, dir_inode);
     if (res < 0) {
         return res;
     }
@@ -135,7 +135,7 @@ ext2_get_directory_entry(struct inode **inode_out, struct disk *disk,
     struct directory_entry entry;
     res = iterate_dir(&iter, fs_private, &entry);
     while (res > 0) {
-        if (entry.file_type = EXT2_FT_UNKNOWN) {
+        if (entry.file_type == EXT2_FT_UNKNOWN) {
             // End of directory, entry not found
             res = -ENOENT;
             goto out;

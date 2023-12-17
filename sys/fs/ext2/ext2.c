@@ -41,7 +41,7 @@ static struct inode *
 ext2_path_to_inode(struct path *path, struct disk *disk, struct ext2_private *fs_private)
 {
     struct path_element *path_element = path->root->element;
-    struct inode        *inode, *dir_inode;
+    struct inode *inode, *dir_inode;
 
     // Read root directory
     int res = ext2_read_inode(&dir_inode, disk, fs_private, EXT2_ROOT_DIR_INODE);
@@ -152,7 +152,8 @@ ext2_open(struct disk *disk, struct path *path, FILE_MODE mode, void **out)
     }
 
     descriptor->inode = inode;
-    descriptor->offset = 0;
+    descriptor->blk_offset = 0;
+    descriptor->byte_offset = 0;
 
     *out = (void *)descriptor;
     return 0;
@@ -183,9 +184,10 @@ int
 ext2_read(struct disk *disk, void *desc, char *buf, uint32_t count)
 {
     struct ext2_file_descriptor *descriptor = desc;
-    struct ext2_private         *fs_private = disk->fs_private;
+    struct ext2_private *fs_private = disk->fs_private;
 
-    int read = ext2_read_inode_data(fs_private, descriptor->inode, buf, count, descriptor->offset);
+    int read = ext2_read_inode_data(fs_private, descriptor->inode, buf, count,
+                                    descriptor->blk_offset, descriptor->byte_offset);
     return read;
 }
 
@@ -213,18 +215,24 @@ ext2_write(struct disk *disk, void *desc, const char *buf, uint32_t count)
  * @return int      Status code
  */
 int
-ext2_seek(void *desc, uint32_t offset, FILE_SEEK_MODE seek_mode)
+ext2_seek(struct disk *disk, void *desc, uint32_t offset, FILE_SEEK_MODE seek_mode)
 {
     struct ext2_file_descriptor *descriptor = desc;
+    struct ext2_private *fs_private = disk->fs_private;
+    uint32_t block_size = fs_private->block_size;
+
     switch (seek_mode) {
     case SEEK_SET:
-        descriptor->offset = offset;
+        descriptor->blk_offset = offset / block_size;
+        descriptor->byte_offset = offset % block_size;
         break;
     case SEEK_CUR:
-        descriptor->offset = descriptor->offset + offset;
+        descriptor->blk_offset = descriptor->blk_offset + offset / block_size;
+        descriptor->byte_offset = offset % block_size;
         break;
     case SEEK_END:
-        descriptor->offset = descriptor->inode->i_size + offset;
+        descriptor->blk_offset = descriptor->inode->i_size + offset / block_size;
+        descriptor->byte_offset = offset % block_size;
         break;
     default:
         return -EINVAL;
@@ -245,10 +253,10 @@ int
 ext2_stat(struct disk *disk, void *desc, struct file_stat *stat)
 {
     struct ext2_file_descriptor *descriptor = desc;
-    struct ext2_private         *fs_private = disk->fs_private;
+    struct ext2_private *fs_private = disk->fs_private;
 
     struct inode inode;
-    int          res = ext2_read_inode(&inode, disk, fs_private, descriptor->inode);
+    int res = ext2_read_inode(&inode, disk, fs_private, descriptor->inode);
     if (res < 0) {
         return -EIO;
     }

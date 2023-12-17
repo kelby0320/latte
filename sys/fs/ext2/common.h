@@ -73,27 +73,27 @@ struct superblock {
     uint32_t s_feature_compat;    /* Compatible feature set */
     uint32_t s_feature_incompat;  /* Incompatible feature set */
     uint32_t s_feature_ro_compat; /* Readonly-compatible feature set */
-    uint8_t  s_uuid[16];          /* 128-bit uuid for volume */
-    char     s_volume_name[16];   /* Volume name */
-    char     s_last_mounted[64];  /* Directory where last mounted */
+    uint8_t s_uuid[16];           /* 128-bit uuid for volume */
+    char s_volume_name[16];       /* Volume name */
+    char s_last_mounted[64];      /* Directory where last mounted */
     uint32_t s_algo_bitmap;       /* For compression */
     /* Performance Hints */
     uint8_t s_prealloc_blocks;     /* Number of blocks to preallocate for regular files */
     uint8_t s_prealloc_dir_blocks; /* Number of blocks to preallocate for directories */
     uint8_t s_padding1[2];
     /* Journaling Support */
-    uint8_t  s_journal_uuid[16]; /* UUID of journal superblock */
-    uint32_t s_jounal_inum;      /* Inode number of journal file */
-    uint32_t s_jounal_dev;       /* Device number of journal file */
-    uint32_t s_last_orphan;      /* Start of list of inodes to delete */
+    uint8_t s_journal_uuid[16]; /* UUID of journal superblock */
+    uint32_t s_jounal_inum;     /* Inode number of journal file */
+    uint32_t s_jounal_dev;      /* Device number of journal file */
+    uint32_t s_last_orphan;     /* Start of list of inodes to delete */
     /* Directory Indexing Support */
-    uint32_t s_hash_seed[4];     /* HTREE hash seed */
-    uint8_t  s_def_hash_version; /* Default hash version to use */
-    uint8_t  s_padding2[3];
+    uint32_t s_hash_seed[4];    /* HTREE hash seed */
+    uint8_t s_def_hash_version; /* Default hash version to use */
+    uint8_t s_padding2[3];
     /* Other Options */
     uint32_t s_default_mount_options;
     uint32_t s_first_mega_bg; /* First metablock block group */
-    uint8_t  s_reserved[760];
+    uint8_t s_reserved[760];
 } __attribute((packed));
 
 struct block_group_descriptor {
@@ -104,15 +104,15 @@ struct block_group_descriptor {
     uint16_t bg_free_inodes_count; /* Free inodes count */
     uint16_t bg_used_dirs_count;   /* Directories count */
     uint16_t bg_pad;
-    uint8_t  bg_reserved[12];
+    uint8_t bg_reserved[12];
 } __attribute((packed));
 
 struct directory_entry {
-    uint32_t inode;     /* Inode number */
-    uint16_t rec_len;   /* Directory entry length */
-    uint8_t  name_len;  /* Name length */
-    uint8_t  file_type; /* File type */
-    char     name[256]; /* File name, up to 255 characters, plus null terminator */
+    uint32_t inode;    /* Inode number */
+    uint16_t rec_len;  /* Directory entry length */
+    uint8_t name_len;  /* Name length */
+    uint8_t file_type; /* File type */
+    char name[256];    /* File name, up to 255 characters, plus null terminator */
 } __attribute((packed));
 
 struct inode {
@@ -138,14 +138,15 @@ struct inode {
 
 struct ext2_private {
     struct superblock superblock;
-    uint32_t          block_size;
+    uint32_t block_size;
 
     struct bufferedreader *reader;
 };
 
 struct ext2_file_descriptor {
     struct inode *inode;
-    int           offset;
+    int blk_offset;
+    int byte_offset;
 };
 
 #endif

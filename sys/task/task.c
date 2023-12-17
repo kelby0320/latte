@@ -69,7 +69,8 @@ task_init(struct task *task, int tid, struct process *process)
     }
 
     int res = vm_area_map_to(process->vm_area, (void *)LATTE_TASK_STACK_VIRT_ADDR_BOTTOM, stack,
-                             stack + LATTE_TASK_STACK_SIZE, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
+                             stack + LATTE_TASK_STACK_SIZE,
+                             VM_PAGE_PRESENT | VM_PAGE_WRITABLE | VM_PAGE_USER);
     if (res < 0) {
         kfree(stack);
         return res;
@@ -78,7 +79,7 @@ task_init(struct task *task, int tid, struct process *process)
     task->state = TASK_STATE_NEW;
     task->id = tid;
     memset(&task->registers, 0, sizeof(struct registers));
-    task->registers.ip = LATTE_TASK_LOAD_VIRT_ADDR;
+    task->registers.ip = process->elf_img_desc.elf_header.e_entry;
     task->registers.cs = LATTE_USER_CODE_SEGMENT;
     task->registers.ds = LATTE_USER_DATA_SEGMENT;
     task->registers.ss = LATTE_USER_DATA_SEGMENT;

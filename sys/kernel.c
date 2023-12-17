@@ -4,6 +4,7 @@
 #include "dev/term/term.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
+#include "gdt/tss.h"
 #include "irq/irq.h"
 #include "libk/libk.h"
 #include "mem/vm.h"
@@ -43,38 +44,43 @@ kernel_main()
     // Initialize GDT
     gdt_init();
 
+    // Initialize Task Switch Segment
+    tss_init();
+
+    // Load the TSS
+    tss_load(LATTE_TSS_SEGMENT);
+
     // Initialize libk
     libk_init();
 
     // Initialize filesystem drivers
     fs_init();
 
-    // Find and Initialize Disks
+    // // Find and Initialize Disks
     disk_probe_and_init();
 
     // Initialize IRQs
     irq_init();
 
     // Initialize kernel vm area
-    int res = vm_area_init(&kernel_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE | VM_PAGE_SUPERVISOR);
+    int res = vm_area_init(&kernel_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
     if (res < 0) {
         panic("Failed to initialize kernel vm area");
     }
 
     // Switch to kernel virtual memory map
-    vm_area_switch_map(&kernel_area);
+    switch_to_kernel_vm_area();
 
     // Enable virtual memory
     enable_paging();
 
     char buf[1024];
-    int  fd = fopen("hdd0:/latte.txt", "r");
+    int fd = fopen("hdd0:/latte.txt", "r");
     fread(fd, buf, 32);
     print(buf);
 
-    /* int pid = process_new(); */
-    /* process_load_exec(pid, "hdd0:/testprog.elf"); */
-    /* schedule_first_task();  */
+    process_spawn("hdd0:/bin/testprog");
+    schedule_first_task();
 
     while (1) {}
 }

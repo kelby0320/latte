@@ -8,6 +8,7 @@
 #include "libk/string.h"
 #include "mem/vm.h"
 #include "task/loader.h"
+#include "task/sched.h"
 #include "task/task.h"
 
 static struct process *pslots[LATTE_PROCESS_MAX_PROCESSES];
@@ -83,7 +84,7 @@ process_init(struct process *process, int pid)
     process->id = pid;
     process->vm_area = kzalloc(sizeof(struct vm_area));
 
-    int res = vm_area_init(process->vm_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
+    int res = vm_area_init(process->vm_area, VM_PAGE_PRESENT | VM_PAGE_USER);
     if (res < 0) {
         kfree(process->vm_area);
         return res;
@@ -92,8 +93,40 @@ process_init(struct process *process, int pid)
     return 0;
 }
 
+/**
+ * @brief Load the process's executable
+ *
+ * @param pid       Process Id
+ * @param filename  Filename
+ * @return int      Status code
+ */
+static int
+process_load_exec(struct process *process, const char *filename)
+{
+    strncpy(process->filename, filename, LATTE_MAX_PATH_LEN);
+
+    int res = loader_init_image(&process->elf_img_desc, filename);
+    if (res < 0) {
+        goto err_out;
+    }
+
+    res = loader_map_image(&process->elf_img_desc, process->vm_area);
+    if (res < 0) {
+        // If this fails, what is the state of vm_area?
+        goto err_out;
+    }
+
+    return 0;
+
+err_out:
+    loader_free_image(&process->elf_img_desc);
+    memset(&process->elf_img_desc, 0, sizeof(process->elf_img_desc));
+    memset(&process->filename, 0, sizeof(process->filename));
+    return res;
+}
+
 int
-process_new()
+process_spawn(const char *filename)
 {
     int pid = get_free_slot();
     if (pid < 0) {
@@ -108,6 +141,11 @@ process_new()
     int res = process_init(process, pid);
     if (res < 0) {
         goto err_out1;
+    }
+
+    res = process_load_exec(process, filename);
+    if (res < 0) {
+        goto err_out2;
     }
 
     int tid = task_new(process);
@@ -152,44 +190,16 @@ process_add_task(struct process *process, struct task *task)
 
     process->tasks[process->num_tasks] = task;
     process->num_tasks++;
+
+    sched_add_task(task);
+
+    return 0;
 }
 
 int
 process_remove_task(struct process *process, uint16_t task_id)
 {
     return 0;
-}
-
-int
-process_load_exec(int pid, const char *filename)
-{
-    struct process *process = 0;
-
-    int res = get_process_from_slot(pid, &process);
-    if (res < 0) {
-        return res;
-    }
-
-    strncpy(process->filename, filename, LATTE_MAX_PATH_LEN);
-
-    res = loader_init_image(&process->elf_img_desc, filename);
-    if (res < 0) {
-        goto err_out;
-    }
-
-    res = loader_map_image(&process->elf_img_desc, process->vm_area);
-    if (res < 0) {
-        // If this fails, what is the state of vm_area?
-        goto err_out;
-    }
-
-    return 0;
-
-err_out:
-    loader_free_image(&process->elf_img_desc);
-    memset(&process->elf_img_desc, 0, sizeof(process->elf_img_desc));
-    memset(&process->filename, 0, sizeof(process->filename));
-    return res;
 }
 
 void

@@ -277,7 +277,7 @@ ext2_read_inode(struct inode **inode_out, struct disk *disk, struct ext2_private
     int block_group = inode_to_block_group(fs_private, inode_no);
 
     struct block_group_descriptor *desc;
-    int                            res = ext2_read_block_group_desc(&desc, fs_private, block_group);
+    int res = ext2_read_block_group_desc(&desc, fs_private, block_group);
     if (res < 0) {
         return res;
     }
@@ -294,30 +294,37 @@ ext2_read_inode(struct inode **inode_out, struct disk *disk, struct ext2_private
 
 int
 ext2_read_inode_data(struct ext2_private *fs_private, const struct inode *inode, char *out,
-                     size_t count, unsigned int blk_offset)
+                     size_t count, unsigned int blk_offset, unsigned int byte_offset)
 {
     struct block_iterator iter;
     block_iterator_init(&iter, fs_private, inode);
     block_iterator_skip_blocks(&iter, blk_offset);
 
-    char buf[fs_private->block_size];
-    int  bytes_read = 0;
-    int  bytes_remaining = count;
+    char *buf = kzalloc(fs_private->block_size);
+    int bytes_read = 0;
+    int bytes_remaining = count;
 
     while (bytes_read < bytes_remaining) {
         ext2_read_block(&iter, fs_private, buf);
 
-        int bytes_to_copy = fs_private->block_size;
+        int bytes_to_copy = fs_private->block_size - byte_offset;
         if (bytes_remaining < bytes_to_copy) {
             bytes_to_copy = bytes_remaining;
         }
 
-        memcpy(out + bytes_read, buf, bytes_to_copy);
+        char *dest = out + bytes_read;
+        char *src = buf + byte_offset;
+
+        memcpy(dest, src, bytes_to_copy);
+
         bytes_read += bytes_to_copy;
-        bytes_remaining -= bytes_read;
+        bytes_remaining -= bytes_to_copy;
+        byte_offset = 0;
 
         block_iterator_iterate(&iter, fs_private);
     }
+
+    kfree(buf);
 
     return bytes_read;
 }

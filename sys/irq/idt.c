@@ -10,7 +10,7 @@
 
 extern void *isr_table[LATTE_TOTAL_IDT_ENTRIES];
 
-struct idtr      idtr;
+struct idtr idtr;
 struct idt_entry int_desc_tbl[LATTE_TOTAL_IDT_ENTRIES];
 
 /**
@@ -30,11 +30,11 @@ set_idt_entry(int interrupt_no, void *isr)
     }
 
     struct idt_entry *idt_entry = &int_desc_tbl[interrupt_no];
-    idt_entry->offset1 = (uint16_t)isr & 0x0000ffff;
+    idt_entry->offset1 = (uint32_t)isr & 0x0000ffff;
     idt_entry->segment = LATTE_KERNEL_CODE_SEGMENT;
     idt_entry->reserved = 0;
     idt_entry->attr = 0xee;
-    idt_entry->offset2 = (uint16_t)isr >> 16;
+    idt_entry->offset2 = (uint32_t)isr >> 16;
 
     return 0;
 }

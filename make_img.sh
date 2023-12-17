@@ -9,6 +9,10 @@ sudo mount /dev/loop1 /mnt/latte
 sudo grub-install --root-directory=/mnt/latte --no-floppy --modules="normal part_msdos ext2 multiboot" /dev/loop0
 sudo cp ./boot/grub/grub.cfg /mnt/latte/boot/grub
 sudo cp ./build/boot/latte.elf /mnt/latte/boot
+sudo mkdir /mnt/latte/bin
+sudo cp ./build/bin/testprog /mnt/latte/bin
+sudo mkdir /mnt/latte/lib
+sudo cp ./build/lib/libc.a /mnt/latte/lib
 sudo cp ./latte.txt /mnt/latte
 sudo umount /mnt/latte
 sudo losetup -d /dev/loop0

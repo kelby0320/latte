@@ -9,7 +9,7 @@
 #include "kernel.h"
 #include "libk/memory.h"
 
-struct filesystem      *filesystems[LATTE_MAX_FILESYSTEMS];
+struct filesystem *filesystems[LATTE_MAX_FILESYSTEMS];
 struct file_descriptor *file_descriptors[LATTE_MAX_FILE_DESCRIPTORS];
 
 /**
@@ -144,7 +144,7 @@ int
 fopen(const char *filename, const char *mode_str)
 {
     struct file_descriptor *descriptor;
-    int                     res = fs_get_new_descriptor(&descriptor);
+    int res = fs_get_new_descriptor(&descriptor);
     if (res < 0) {
         return res;
     }
@@ -193,8 +193,16 @@ fclose(int fd)
 int
 fseek(int fd, int offset, FILE_SEEK_MODE whence)
 {
-    // TODO
-    return -1;
+    struct file_descriptor *descriptor = fs_get_descriptor(fd);
+    if (!descriptor) {
+        return -EINVAL;
+    }
+
+    struct disk *disk = descriptor->disk;
+    struct filesystem *fs = descriptor->filesystem;
+
+    int res = fs->seek(disk, descriptor->private, offset, whence);
+    return res;
 }
 
 int
@@ -205,7 +213,7 @@ fread(int fd, char *ptr, size_t count)
         return -EINVAL;
     }
 
-    struct disk       *disk = descriptor->disk;
+    struct disk *disk = descriptor->disk;
     struct filesystem *fs = descriptor->filesystem;
 
     int res = fs->read(disk, descriptor->private, ptr, count);
@@ -222,8 +230,16 @@ fwrite(int fd, const char *ptr, size_t count)
 int
 fstat(int fd, struct file_stat *stat)
 {
-    // TODO
-    return -1;
+    struct file_descriptor *descriptor = fs_get_descriptor(fd);
+    if (!descriptor) {
+        return -EINVAL;
+    }
+
+    struct disk *disk = descriptor->disk;
+    struct filesystem *fs = descriptor->filesystem;
+
+    int res = fs->stat(disk, descriptor->private, stat);
+    return res;
 }
 
 struct filesystem *

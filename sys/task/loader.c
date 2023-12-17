@@ -25,27 +25,40 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
         segment_size += VM_PAGE_SIZE - (segment_size % VM_PAGE_SIZE);
     }
 
+    if (elf_img_desc->num_seg_allocs == ELF_IMG_DESC_MAX_PHEADERS) {
+        return -ENOMEM;
+    }
+
     void *segment = kzalloc(segment_size);
     if (!segment) {
         return -ENOMEM;
     }
 
+    elf_img_desc->segment_allocations[elf_img_desc->num_seg_allocs] = segment;
+    elf_img_desc->num_seg_allocs++;
+
     int res = fseek(elf_img_desc->fd, segment_offset, SEEK_SET);
     if (res < 0) {
-        return -EIO;
+        res = -EIO;
+        goto err_out;
     }
 
     res = fread(elf_img_desc->fd, segment, phdr->p_filesz);
     if (res < 0) {
-        return -EIO;
+        res = -EIO;
+        goto err_out;
     }
 
-    uint8_t flags = VM_PAGE_PRESENT;
+    uint8_t flags = VM_PAGE_PRESENT | VM_PAGE_USER;
     if (phdr->p_flags & PF_W) {
         flags |= VM_PAGE_WRITABLE;
     }
 
     return vm_area_map_to(vm_area, phdr->p_vaddr, segment, segment + segment_size, flags);
+
+err_out:
+    kfree(segment);
+    return res;
 }
 
 static int
@@ -107,6 +120,8 @@ loader_init_image(struct elf_img_desc *img_desc, const char *filename)
     if (res < 0) {
         goto err_out;
     }
+
+    img_desc->num_seg_allocs = 0;
 
     return 0;
 

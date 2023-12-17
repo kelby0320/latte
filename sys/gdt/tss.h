@@ -38,7 +38,12 @@ struct tss {
 void
 tss_init();
 
+/**
+ * @brief Load the TSS segment
+ *
+ * @param tss_segment   GDT segment number of the TSS segment
+ */
 void
-tss_load();
+tss_load(int tss_segment);
 
 #endif
