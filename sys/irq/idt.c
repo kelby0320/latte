@@ -22,8 +22,8 @@ struct idt_entry int_desc_tbl[LATTE_TOTAL_IDT_ENTRIES];
 void
 load_idt(struct idtr *idtr);
 
-static int
-set_idt_entry(int interrupt_no, void *isr)
+int
+idt_set_entry(int interrupt_no, void *isr)
 {
     if (interrupt_no < 0 || interrupt_no > LATTE_TOTAL_IDT_ENTRIES) {
         return -EINVAL;
@@ -45,14 +45,6 @@ idt_init()
     memset(int_desc_tbl, 0, sizeof(int_desc_tbl));
     idtr.size = sizeof(int_desc_tbl) - 1;
     idtr.offset = (uint32_t)int_desc_tbl;
-
-    int res = 0;
-    for (int i = 0; i < LATTE_TOTAL_IDT_ENTRIES; i++) {
-        res = set_idt_entry(i, isr_table[i]);
-        if (res < 0) {
-            panic("Failed setting ISR");
-        }
-    }
 
     load_idt(&idtr);
 }
