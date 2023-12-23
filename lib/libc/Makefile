@@ -1,3 +1,5 @@
+LIBC = ./libc.a
+
 CC = i686-elf-gcc
 AS = i686-elf-as
 AR = i686-elf-ar
@@ -5,24 +7,23 @@ AR = i686-elf-ar
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
 ASFLAGS = -g
 
-BUILDDIR = ../../build
+C_OBJECTS = ./src/start.o
 
-OBJECTS = \
-	$(BUILDDIR)/lib/start.s.o \
-	$(BUILDDIR)/lib/start.o
+AS_OBJECTS = ./src/start.s.o 
 
 INCLUDES=-I../../include
 
-all: $(BUILDDIR)/lib/libc.a
+all: $(LIBC)
 
-$(BUILDDIR)/lib/libc.a: $(OBJECTS)
-	$(AR) rcs $(BUILDDIR)/lib/libc.a $(OBJECTS)
+$(LIBC): $(C_OBJECTS) $(AS_OBJECTS)
+	$(AR) rcs $(LIBC) $(C_OBJECTS) $(AS_OBJECTS)
 
-$(BUILDDIR)/lib/start.s.o: ./src/start.s
-	$(AS) $(ASFLAGS) ./src/start.s -o $(BUILDDIR)/lib/start.s.o
+$(filter %.o,$(C_OBJECTS)): %.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(BUILDDIR)/lib/start.o: ./src/start.o
-	$(CC) $(CFLAGS) $(INCLUDES) -c ./src/start.c -o $(BUILDDIR)/lib/start.o
+$(filter %.s.o,$(AS_OBJECTS)): %.s.o: %.s
+	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf ${OBJECTS}
+	-rm -rf $(C_OBJECTS) $(AS_OBJECTS)
+	-rm $(LIBC)
