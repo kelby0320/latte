@@ -3,22 +3,6 @@
 
 #include <stdint.h>
 
-struct irq_frame {
-    uint32_t edi;
-    uint32_t esi;
-    uint32_t ebp;
-    uint32_t reserved;
-    uint32_t ebx;
-    uint32_t edx;
-    uint32_t ecx;
-    uint32_t eax;
-    uint32_t ip;
-    uint32_t cs;
-    uint32_t flags;
-    uint32_t esp;
-    uint32_t ss;
-} __attribute__((packed));
-
 /**
  * @brief Intialize the IRQ subsystem
  *
@@ -37,10 +21,19 @@ typedef void (*IRQ_HANDLER)();
  *
  * @param interrupt_no  Interrupt number
  * @param handler       Pointer to interrupt handler
- * @return int
+ * @return int          Status code
  */
 int
 register_irq(int interrupt_no, IRQ_HANDLER irq_handler);
+
+/**
+ * @brief Execute an irq handler
+ *
+ * @param interrupt_no  Interrupt number
+ * @return int          Status code
+ */
+int
+do_irq(int interrupt_no);
 
 /**
  * @brief Enable Interrupts

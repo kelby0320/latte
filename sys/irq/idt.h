@@ -42,7 +42,4 @@ struct idt_entry {
 void
 idt_init();
 
-int
-idt_set_entry(int interrupt_no, void *isr);
-
 #endif

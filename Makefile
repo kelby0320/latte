@@ -25,6 +25,7 @@ C_OBJECTS = ./sys/dev/disk/ata/ata.o \
 	./sys/gdt/tss.o \
 	./sys/irq/idt.o \
 	./sys/irq/irq.o \
+	./sys/irq/isr.o \
 	./sys/kernel.o \
 	./sys/libk/kheap.o \
 	./sys/libk/libk.o \

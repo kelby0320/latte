@@ -145,18 +145,18 @@ task_switch_and_return(struct task *task)
 }
 
 void
-task_save_state(struct task *task, struct irq_frame *irq_frame)
+task_save_state(struct task *task, struct isr_frame *isr_frame)
 {
-    task->registers.edi = irq_frame->edi;
-    task->registers.esi = irq_frame->esi;
-    task->registers.ebp = irq_frame->ebp;
-    task->registers.ebx = irq_frame->ebx;
-    task->registers.edx = irq_frame->edx;
-    task->registers.ecx = irq_frame->ecx;
-    task->registers.eax = irq_frame->eax;
-    task->registers.ip = irq_frame->ip;
-    task->registers.cs = irq_frame->cs;
-    task->registers.flags = irq_frame->flags;
-    task->registers.esp = irq_frame->esp;
-    task->registers.ss = irq_frame->ss;
+    task->registers.edi = isr_frame->edi;
+    task->registers.esi = isr_frame->esi;
+    task->registers.ebp = isr_frame->ebp;
+    task->registers.ebx = isr_frame->ebx;
+    task->registers.edx = isr_frame->edx;
+    task->registers.ecx = isr_frame->ecx;
+    task->registers.eax = isr_frame->eax;
+    task->registers.ip = isr_frame->ip;
+    task->registers.cs = isr_frame->cs;
+    task->registers.flags = isr_frame->flags;
+    task->registers.esp = isr_frame->esp;
+    task->registers.ss = isr_frame->ss;
 }

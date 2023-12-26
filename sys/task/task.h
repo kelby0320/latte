@@ -1,7 +1,7 @@
 #ifndef TASK_H
 #define TASK_H
 
-#include "irq/irq.h"
+#include "irq/isr.h"
 
 #include <stdint.h>
 
@@ -100,6 +100,6 @@ task_switch_and_return(struct task *task);
  * @param irq_frame Pointer to the irq_frame
  */
 void
-task_save_state(struct task *task, struct irq_frame *irq_frame);
+task_save_state(struct task *task, struct isr_frame *irq_frame);
 
 #endif

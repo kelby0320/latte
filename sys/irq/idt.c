@@ -2,26 +2,31 @@
 
 #include "config.h"
 #include "errno.h"
-#include "irq/irq.h"
-#include "kernel.h"
+#include "irq/isr.h"
 #include "libk/memory.h"
 
 #include <stdint.h>
 
-extern void *isr_table[LATTE_TOTAL_IDT_ENTRIES];
-
 struct idtr idtr;
 struct idt_entry int_desc_tbl[LATTE_TOTAL_IDT_ENTRIES];
 
+extern void *isr_wrapper_table[31];
+extern void *(*isr_syscall_wrapper)(int syscall_number, struct isr_frame *isr_frame);
+
 /**
  * @brief Load the interrupt descriptor table
- *
- * Defined in idt.S
  *
  */
 void
 load_idt(struct idtr *idtr);
 
+/**
+ * @brief Set an entry in the IDT
+ *
+ * @param interrupt_no  Interrupt Number
+ * @param isr           Interrupt Handler function pointer
+ * @return int
+ */
 int
 idt_set_entry(int interrupt_no, void *isr)
 {
@@ -45,6 +50,12 @@ idt_init()
     memset(int_desc_tbl, 0, sizeof(int_desc_tbl));
     idtr.size = sizeof(int_desc_tbl) - 1;
     idtr.offset = (uint32_t)int_desc_tbl;
+
+    for (int i = 0; i < 31; i++) {
+        idt_set_entry(i, isr_wrapper_table[i]);
+    }
+
+    idt_set_entry(80, isr_syscall_wrapper);
 
     load_idt(&idtr);
 }
