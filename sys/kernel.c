@@ -37,7 +37,7 @@ switch_to_kernel_vm_area()
 }
 
 void
-kernel_main()
+kernel_main(unsigned long magic, void *addr)
 {
     terminal_initialize();
 

@@ -11,7 +11,8 @@ ASFLAGS = -g
 INCLUDES = -I./sys
 TEST_INCLUDES = -I./sys -I./test
 
-C_OBJECTS = ./sys/dev/disk/ata/ata.o \
+C_OBJECTS = ./sys/boot/multiboot.o \
+	./sys/dev/disk/ata/ata.o \
 	./sys/dev/disk/buffer/bufferedreader.o \
 	./sys/dev/disk/disk.o \
 	./sys/dev/term/term.o \
@@ -33,13 +34,14 @@ C_OBJECTS = ./sys/dev/disk/ata/ata.o \
 	./sys/libk/string.o \
 	./sys/mem/heap.o \
 	./sys/mem/vm.o \
+	./sys/syscall/syscall.o \
 	./sys/task/elf.o \
 	./sys/task/loader.o \
 	./sys/task/process.o \
 	./sys/task/sched.o \
 	./sys/task/task.o
 
-AS_OBJECTS = ./boot/boot.s.o \
+AS_OBJECTS = ./sys/boot/boot.s.o \
 	./sys/gdt/gdt.s.o \
 	./sys/gdt/tss.s.o \
 	./sys/irq/idt.s.o \

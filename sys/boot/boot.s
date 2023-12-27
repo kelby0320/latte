@@ -22,7 +22,16 @@ stack_top:
 	.section .text
 	.global _start
 _start:
+	# Setup stack
 	mov		$stack_top, %esp
+	
+	# Reset flags
+	push 	$0
+	popf	
+
+	push 	%ebx						# Push pointer to multiboot info structure
+	push	%eax						# Push magic number
+
 	call 	kernel_main
 
 	# Hang if kernel returns
