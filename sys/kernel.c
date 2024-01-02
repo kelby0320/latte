@@ -1,5 +1,6 @@
 #include "kernel.h"
 
+#include "boot/multiboot2.h"
 #include "dev/disk/disk.h"
 #include "dev/term/term.h"
 #include "fs/fs.h"
@@ -41,6 +42,11 @@ kernel_main(unsigned long magic, void *addr)
 {
     terminal_initialize();
 
+    int res = multiboot2_verify_magic_number(magic);
+    if (!res) {
+        panic("Invalid multiboot magic number");
+    }
+
     // Initialize GDT
     gdt_init();
 
@@ -63,7 +69,7 @@ kernel_main(unsigned long magic, void *addr)
     irq_init();
 
     // Initialize kernel vm area
-    int res = vm_area_init(&kernel_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
+    res = vm_area_init(&kernel_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
     if (res < 0) {
         panic("Failed to initialize kernel vm area");
     }

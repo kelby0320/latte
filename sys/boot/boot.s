@@ -1,16 +1,17 @@
 	# Constants
-	.set ALIGN, 	1<<0				# Align loaded modules on page boundaries
-	.set MEMINFO,	1<<1				# Provide memory map
-	.set FLAGS,		ALIGN | MEMINFO		# Multiboot 'flag' field
-	.set MAGIC, 	0x1BADB002			# 'Magic Number'
-	.set CHECKSUM, 	-(MAGIC + FLAGS)	# Checksum to prove we are multiboot
+	.set MULTIBOOT2_HEADER_MAGIC, 	0xE85250D6			# Multiboot2 magic number
+	.set MULTIBOOT2_ARCH_I386,		0					# 32-bit protected mode
+
 
 	# Multiboot header
 	.section .multiboot
-	.align 4
-	.long MAGIC
-	.long FLAGS
-	.long CHECKSUM
+	.align 	8
+multiboot_header_start:
+	.long 	MULTIBOOT2_HEADER_MAGIC
+	.long 	MULTIBOOT2_ARCH_I386
+	.long 	multiboot_header_end - multiboot_header_start
+	.long	-(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT2_ARCH_I386 + (multiboot_header_end - multiboot_header_start))
+multiboot_header_end:
 
 	# Reserver kernel stack
 	.section .bss

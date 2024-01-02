@@ -1,5 +1,5 @@
 /**
- * @file multiboot.c
+ * @file multiboot2.c
  * @author Kelby Madal-Hellmuth (kelby0320@gmail.com)
  * @brief Multiboot utility functions
  * @version 0.1
@@ -9,4 +9,12 @@
  *
  * @license SPDX-License-Identifier: MIT
  */
-#include "boot/multiboot.h"
+#include "boot/multiboot2.h"
+
+#include "errno.h"
+
+int
+multiboot2_verify_magic_number(unsigned long magic)
+{
+    return magic == MULTIBOOT2_BOOTLOADER_MAGIC;
+}
