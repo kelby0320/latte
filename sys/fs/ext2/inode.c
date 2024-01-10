@@ -1,8 +1,8 @@
 #include "fs/ext2/inode.h"
 
 #include "config.h"
-#include "dev/disk/buffer/bufferedreader.h"
 #include "errno.h"
+#include "fs/bufferedreader.h"
 #include "fs/ext2/common.h"
 #include "libk/kheap.h"
 #include "libk/memory.h"
@@ -15,7 +15,7 @@
  */
 struct block_iterator {
     // Pointer to inode
-    const struct inode *inode;
+    const struct ext2_inode *inode;
 
     // Block size
     uint32_t block_size;
@@ -41,7 +41,7 @@ struct block_iterator {
 
 static int
 block_iterator_init(struct block_iterator *iter, struct ext2_private *fs_private,
-                    const struct inode *inode)
+                    const struct ext2_inode *inode)
 {
     iter->inode = inode;
     iter->block_size = fs_private->block_size;
@@ -211,7 +211,7 @@ inode_to_block_group(struct ext2_private *fs_private, uint32_t inode)
  * @return int          Status code
  */
 static int
-ext2_read_block_group_desc(struct block_group_descriptor **desc_out,
+ext2_read_block_group_desc(struct ext2_block_group_descriptor **desc_out,
                            struct ext2_private *fs_private, int block_group)
 {
     int bg_desc_tbl_start_blk = 1;
@@ -220,15 +220,17 @@ ext2_read_block_group_desc(struct block_group_descriptor **desc_out,
     }
 
     int bg_desc_tbl_start = EXT2_FS_START + (bg_desc_tbl_start_blk * fs_private->block_size);
-    int bg_desc_start = bg_desc_tbl_start + (block_group * sizeof(struct block_group_descriptor));
+    int bg_desc_start =
+        bg_desc_tbl_start + (block_group * sizeof(struct ext2_block_group_descriptor));
 
-    struct block_group_descriptor *desc = kzalloc(sizeof(struct block_group_descriptor));
+    struct ext2_block_group_descriptor *desc = kzalloc(sizeof(struct ext2_block_group_descriptor));
     if (!desc) {
         return -ENOMEM;
     }
 
     bufferedreader_seek(fs_private->reader, bg_desc_start);
-    int res = bufferedreader_read(fs_private->reader, desc, sizeof(struct block_group_descriptor));
+    int res =
+        bufferedreader_read(fs_private->reader, desc, sizeof(struct ext2_block_group_descriptor));
     if (res < 0) {
         kfree(desc);
         return res;
@@ -248,19 +250,19 @@ ext2_read_block_group_desc(struct block_group_descriptor **desc_out,
  * @return int          Status code
  */
 static int
-ext2_read_inode_from_tbl(struct inode **inode_out, struct ext2_private *fs_private,
+ext2_read_inode_from_tbl(struct ext2_inode **inode_out, struct ext2_private *fs_private,
                          uint32_t inode_tbl, uint32_t inode_no)
 {
     int inode_tbl_start = EXT2_FS_START + (inode_tbl * fs_private->block_size);
     int inode_start = inode_tbl_start + ((inode_no - 1) * fs_private->superblock.s_inode_size);
 
-    struct inode *inode = kzalloc(sizeof(struct inode));
+    struct ext2_inode *inode = kzalloc(sizeof(struct ext2_inode));
     if (!inode) {
         return -ENOMEM;
     }
 
     bufferedreader_seek(fs_private->reader, inode_start);
-    int res = bufferedreader_read(fs_private->reader, inode, sizeof(struct inode));
+    int res = bufferedreader_read(fs_private->reader, inode, sizeof(struct ext2_inode));
     if (res < 0) {
         kfree(inode);
         return res;
@@ -271,18 +273,18 @@ ext2_read_inode_from_tbl(struct inode **inode_out, struct ext2_private *fs_priva
 }
 
 int
-ext2_read_inode(struct inode **inode_out, struct disk *disk, struct ext2_private *fs_private,
+ext2_read_inode(struct ext2_inode **inode_out, struct disk *disk, struct ext2_private *fs_private,
                 uint32_t inode_no)
 {
     int block_group = inode_to_block_group(fs_private, inode_no);
 
-    struct block_group_descriptor *desc;
+    struct ext2_block_group_descriptor *desc;
     int res = ext2_read_block_group_desc(&desc, fs_private, block_group);
     if (res < 0) {
         return res;
     }
 
-    struct inode *inode;
+    struct ext2_inode *inode;
     res = ext2_read_inode_from_tbl(&inode, fs_private, desc->bg_inode_table, inode_no);
     if (res < 0) {
         return res;
@@ -293,7 +295,7 @@ ext2_read_inode(struct inode **inode_out, struct disk *disk, struct ext2_private
 }
 
 int
-ext2_read_inode_data(struct ext2_private *fs_private, const struct inode *inode, char *out,
+ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *inode, char *out,
                      size_t count, unsigned int blk_offset, unsigned int byte_offset)
 {
     struct block_iterator iter;

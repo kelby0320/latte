@@ -28,108 +28,30 @@ struct disk;
 struct path;
 
 /**
- * @brief Prototype definition of the fuction used to open a file.
- *
- * @param disk  Pointer to the disk
- * @param path  Pointer to the path
- * @param mode  Open file mode
- * @param out   Pointer to fs specific file descriptor
- * @returns int Status code
- *
- */
-typedef int (*FS_OPEN_FUNCTION)(struct disk *disk, struct path *path, FILE_MODE mode, void **out);
-
-/**
- * @brief Prototype definition of the function used to close an open file.
- *
- * @param private   Pointer to fs private data
- * @returns int     Status code
- *
- */
-typedef int (*FS_CLOSE_FUNCTION)(void *private);
-
-/**
- * @brief Prototype defintion of the fuction used to read from a file.
- *
- * @param disk      Pointer to the disk
- * @param private   Pointer to private fs data
- * @param buf       Output buffer
- * @param count     Number of bytes to read
- * @returns int     Number of bytes actually read
- *
- */
-typedef int (*FS_READ_FUNCTION)(struct disk *disk, void *private, char *buf, uint32_t count);
-
-/**
- * @brief Prototype definition of the fuction to write to a file.
- *
- * @param disk      Pointer to the disk
- * @param private   Pointer to private fs data
- * @param buf       Pointer to data buffer
- * @param count     Number of bytes to write from the data buffer
- * @returns         Number of bytes actually written
- *
- */
-typedef int (*FS_WRITE_FUNCTION)(struct disk *disk, void *private, const char *buf, uint32_t count);
-
-/**
- * @brief Prototype definition of the function to seek to a location in a file.
- *
- * @param disk      Pointer to the disk
- * @param private   Pointer to private fs data
- * @param offset    Location to seek to
- * @param seek_mode Seek mode
- * @returns int     Status code
- *
- */
-typedef int (*FS_SEEK_FUNCTION)(struct disk *disk, void *private, uint32_t offset,
-                                FILE_SEEK_MODE seek_mode);
-
-/**
- * @brief Prototype definition of the function to read file status.
- *
- * @param disk      Pointer to the disk
- * @param private   Pointer to private fs data
- * @param stat      Pointer to file_stat structure to populate
- * @returns int     Status code
- *
- */
-typedef int (*FS_STAT_FUNCTION)(struct disk *disk, void *private, struct file_stat *stat);
-
-/**
- * @brief Prototype definition of the function that binds a filesystem to a disk.
- *
- * @param disk      Pointer to the disk
- * @returns int     Status code
- *
- */
-typedef int (*FS_RESOLVE_FUNCTION)(struct disk *disk);
-
-/**
  * @brief Filesystem interface structure
  *
  */
 struct filesystem {
     // Pointer to function to resolve the filesystem
-    FS_RESOLVE_FUNCTION resolve;
+    int (*resolve)(struct disk *disk);
 
     // Pointer to function to open a file
-    FS_OPEN_FUNCTION open;
+    int (*open)(struct disk *disk, struct path *path, FILE_MODE mode, void **out);
 
     // Pointer to function to close a file
-    FS_CLOSE_FUNCTION close;
+    int (*close)(void *private);
 
     // Pointer to function to seek in a file
-    FS_SEEK_FUNCTION seek;
+    int (*seek)(struct disk *disk, void *private, uint32_t offset, FILE_SEEK_MODE seek_mode);
 
     // Pointer to function to read from a file
-    FS_READ_FUNCTION read;
+    int (*read)(struct disk *disk, void *private, char *buf, uint32_t count);
 
     // Pointer to function to write to a file
-    FS_WRITE_FUNCTION write;
+    int (*write)(struct disk *disk, void *private, const char *buf, uint32_t count);
 
     // Pointer to function to read file status
-    FS_STAT_FUNCTION stat;
+    int (*stat)(struct disk *disk, void *private, struct file_stat *stat);
 
     // Pointer to private fs data
     void *private;

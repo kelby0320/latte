@@ -1,9 +1,9 @@
 #include "fs/ext2/ext2.h"
 
 #include "config.h"
-#include "dev/disk/buffer/bufferedreader.h"
 #include "dev/disk/disk.h"
 #include "errno.h"
+#include "fs/bufferedreader.h"
 #include "fs/ext2/common.h"
 #include "fs/ext2/dir.h"
 #include "fs/ext2/inode.h"
@@ -37,11 +37,11 @@ ext2_read_superblock(struct ext2_private *fs_private)
  * @param fs_private    Pointer to private fs data
  * @return struct inode* Inode structure or 0
  */
-static struct inode *
+static struct ext2_inode *
 ext2_path_to_inode(struct path *path, struct disk *disk, struct ext2_private *fs_private)
 {
     struct path_element *path_element = path->root->element;
-    struct inode *inode, *dir_inode;
+    struct ext2_inode *inode, *dir_inode;
 
     // Read root directory
     int res = ext2_read_inode(&dir_inode, disk, fs_private, EXT2_ROOT_DIR_INODE);
@@ -140,7 +140,7 @@ ext2_open(struct disk *disk, struct path *path, FILE_MODE mode, void **out)
         return -ENOMEM;
     }
 
-    struct inode *inode = ext2_path_to_inode(path, disk, disk->fs_private);
+    struct ext2_inode *inode = ext2_path_to_inode(path, disk, disk->fs_private);
     if (!inode) {
         kfree(descriptor);
         return -EEXIST;
@@ -255,7 +255,7 @@ ext2_stat(struct disk *disk, void *desc, struct file_stat *stat)
     struct ext2_file_descriptor *descriptor = desc;
     struct ext2_private *fs_private = disk->fs_private;
 
-    struct inode inode;
+    struct ext2_inode inode;
     int res = ext2_read_inode(&inode, disk, fs_private, descriptor->inode);
     if (res < 0) {
         return -EIO;

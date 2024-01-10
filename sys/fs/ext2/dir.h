@@ -18,8 +18,8 @@ struct disk;
  * @return int          Status code
  */
 int
-ext2_get_directory_entry(struct inode **inode_out, struct disk *disk,
-                         struct ext2_private *fs_private, const struct inode *dir_inode,
+ext2_get_directory_entry(struct ext2_inode **inode_out, struct disk *disk,
+                         struct ext2_private *fs_private, const struct ext2_inode *dir_inode,
                          const char *name);
 
 #endif

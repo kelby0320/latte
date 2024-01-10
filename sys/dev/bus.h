@@ -5,16 +5,18 @@
 
 #include <stddef.h>
 
+struct bus;
+
 union bus_addr {
     void *ptr;
     unsigned int val;
 };
 
 struct io_operations {
-    int (*probe)(void *private);
-    int (*read)(void *private, unsigned int device_id, union bus_addr addr, char *buf,
+    int (*probe)(struct bus *bus);
+    int (*read)(struct bus *bus, unsigned int device_id, union bus_addr addr, char *buf,
                 size_t count);
-    int (*write)(void *private, unsigned int device_id, union bus_addr addr, const char *buf,
+    int (*write)(struct bus *bus, unsigned int device_id, union bus_addr addr, const char *buf,
                  size_t count);
 };
 
@@ -25,6 +27,9 @@ struct io_operations {
 struct bus {
     // The name of the bus
     char name[LATTE_BUS_NAME_MAX_SIZE];
+
+    // Bus Id
+    unsigned int id;
 
     // Pointer to io_operations for the bus
     struct io_operations *io_operations;
@@ -55,5 +60,13 @@ bus_init();
  */
 int
 bus_add_bus(struct bus *bus);
+
+/**
+ * @brief Get a new bus id number
+ *
+ * @return int  Bus id
+ */
+int
+bus_get_new_bus_id();
 
 #endif

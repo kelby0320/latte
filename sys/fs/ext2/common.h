@@ -40,7 +40,7 @@
 #define EXT2_S_IWOTH 0x0002
 #define EXT2_S_IXOTH 0x0001
 
-struct superblock {
+struct ext2_superblock {
     uint32_t s_inodes_count;      /* Inodes count */
     uint32_t s_blocks_count;      /* Blocks count */
     uint32_t s_r_blocks_count;    /* Reserved blocks count */
@@ -96,7 +96,7 @@ struct superblock {
     uint8_t s_reserved[760];
 } __attribute((packed));
 
-struct block_group_descriptor {
+struct ext2_block_group_descriptor {
     uint32_t bg_block_bitmap;      /* Blocks bitmap block */
     uint32_t bg_inode_bitmap;      /* Inodes bitmap block */
     uint32_t bg_inode_table;       /* Inodes table block */
@@ -107,7 +107,7 @@ struct block_group_descriptor {
     uint8_t bg_reserved[12];
 } __attribute((packed));
 
-struct directory_entry {
+struct ext2_directory_entry {
     uint32_t inode;    /* Inode number */
     uint16_t rec_len;  /* Directory entry length */
     uint8_t name_len;  /* Name length */
@@ -115,7 +115,7 @@ struct directory_entry {
     char name[256];    /* File name, up to 255 characters, plus null terminator */
 } __attribute((packed));
 
-struct inode {
+struct ext2_inode {
     uint16_t i_mode;        /* File mode */
     uint16_t i_uid;         /* Low 16 bits of owner uid */
     uint32_t i_size;        /* Size in bytes */
@@ -137,14 +137,14 @@ struct inode {
 } __attribute((packed));
 
 struct ext2_private {
-    struct superblock superblock;
+    struct ext2_superblock superblock;
     uint32_t block_size;
 
     struct bufferedreader *reader;
 };
 
 struct ext2_file_descriptor {
-    struct inode *inode;
+    struct ext2_inode *inode;
     int blk_offset;
     int byte_offset;
 };

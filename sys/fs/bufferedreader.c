@@ -1,4 +1,4 @@
-#include "dev/disk/buffer/bufferedreader.h"
+#include "fs/bufferedreader.h"
 
 #include "config.h"
 #include "dev/disk/disk.h"
@@ -33,9 +33,9 @@ bufferedreader_read(struct bufferedreader *reader, void *out, int count)
     unsigned int sector = reader->pos / LATTE_SECTOR_SIZE;
     unsigned int offset = reader->pos % LATTE_SECTOR_SIZE;
 
-    char         buf[LATTE_SECTOR_SIZE];
+    char buf[LATTE_SECTOR_SIZE];
     unsigned int bytes_read = 0;
-    int          out_idx = 0;
+    int out_idx = 0;
 
     while (bytes_read < count) {
         // Read a sector of data
