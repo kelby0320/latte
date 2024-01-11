@@ -1,6 +1,7 @@
 #include "kernel.h"
 
 #include "boot/multiboot2.h"
+#include "config.h"
 #include "dev/disk/disk.h"
 #include "dev/term/term.h"
 #include "fs/fs.h"
@@ -8,6 +9,7 @@
 #include "gdt/tss.h"
 #include "irq/irq.h"
 #include "libk/libk.h"
+#include "libk/string.h"
 #include "mem/vm.h"
 #include "task/process.h"
 #include "task/sched.h"

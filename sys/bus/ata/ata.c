@@ -1,6 +1,7 @@
-#include "dev/bus/ata/ata.h"
+#include "bus/ata/ata.h"
+
+#include "bus/bus.h"
 #include "dev/block/block.h"
-#include "dev/bus.h"
 #include "dev/device.h"
 #include "errno.h"
 #include "libk/kheap.h"
@@ -44,12 +45,17 @@
 
 #define lba_drive(lba, drive_no) (lba >> 24) | 0b11100000 | (drive_no << 4)
 
+/**
+ * @brief Identify a drive on an ATA bus
+ *
+ * @param ata_bus   Pointer to the ATA bus
+ * @param drive_no  ATA drive number
+ * @return int      Status code
+ */
 static int
-ata_bus_identify(struct bus *bus, int drive_no)
+ata_bus_identify(struct ata_bus *ata_bus, int drive_no)
 {
-    struct ata_bus_private *ata_private = (struct ata_bus_private *)bus->private;
-
-    unsigned int register_base = ata_private->base_addr;
+    unsigned int register_base = ata_bus->base_addr;
 
     unsigned int data_reg = register_base + ATA_PIO_DATA_REG_OFFSET;
     unsigned int sector_count_reg = register_base + ATA_PIO_SECTOR_COUNT_REG_OFFSET;
@@ -106,15 +112,22 @@ ata_bus_identify(struct bus *bus, int drive_no)
     }
 }
 
+/**
+ * @brief Add a block device to the bus
+ *
+ * @param ata_bus   Pointer to the ATA bus
+ * @param drive_no  ATA drive number
+ * @return int      Status code
+ */
 static int
-add_block_device(struct bus *bus, int drive_no)
+add_block_device(struct ata_bus *ata_bus, int drive_no)
 {
     struct device *device = kzalloc(sizeof(struct device));
     if (!device) {
         return -ENOMEM;
     }
 
-    device->bus = bus;
+    device->bus = (struct bus *)ata_bus;
     device->id = drive_no;
 
     int res = block_device_init(device);
@@ -134,17 +147,32 @@ err_out:
     return res;
 }
 
+/**
+ * @brief Probe an ATA bus
+ *
+ * @param bus       Pointer to the bus
+ * @param drive_no  ATA drive number
+ * @return int      Status code
+ */
 static int
 ata_probe_drive(struct bus *bus, int drive_no)
 {
-    int res = ata_bus_identify(bus, drive_no);
+    struct ata_bus *ata_bus = (struct ata_bus *)bus;
+
+    int res = ata_bus_identify(ata_bus, drive_no);
     if (res) {
-        return add_block_device(bus, drive_no);
+        return add_block_device(ata_bus, drive_no);
     }
 
     return 0;
 }
 
+/**
+ * @brief       Probe for ATA buses
+ *
+ * @param bus   Pointer to the bus
+ * @return int  Status code
+ */
 static int
 ata_bus_probe(struct bus *bus)
 {
@@ -161,15 +189,20 @@ ata_bus_probe(struct bus *bus)
     return 0;
 }
 
+/**
+ * @brief Read from an ATA bus
+ *
+ * @param ata_bus           Pointer to the ATA bus
+ * @param lba               LBA to read from
+ * @param buf               Buffer to read into
+ * @param sector_count      Number of sectores to read
+ * @return int              Status code
+ */
 static int
-ata_bus_read(struct bus *bus, unsigned int device_id, union bus_addr addr, char *buf,
+ata_bus_read(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, char *buf,
              size_t sector_count)
 {
-    struct ata_bus_private *ata_private = (struct ata_bus_private *)bus->private;
-
-    unsigned int register_base = ata_private->base_addr;
-    unsigned int drive_no = device_id;
-    unsigned int lba = addr.val;
+    unsigned int register_base = ata_bus->base_addr;
 
     // drive_no must be either 0 or 1
     if (drive_no > 2) {
@@ -210,39 +243,50 @@ ata_bus_read(struct bus *bus, unsigned int device_id, union bus_addr addr, char 
     return 0;
 }
 
+/**
+ * @brief Write to an ATA bus
+ *
+ * @param ata_bus           Pointer to the ATA bus
+ * @param lba               LBA to write to
+ * @param buf               Buffer to write
+ * @param size              Size of the buffer
+ * @return int
+ */
 static int
-ata_bus_write(struct bus *bus, unsigned int device_id, union bus_addr addr, const char *buf,
-              size_t sector_count)
+ata_bus_write(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, const char *buf,
+              size_t size)
 {
     // TODO
     return 0;
 }
 
+/**
+ * @brief Initialize an ATA bus
+ *
+ * @param base_addr     Base address of the ATA registers
+ * @param name          Name of the bus
+ * @param id            Bus Id
+ * @return int          Status code
+ */
 int
 ata_init_bus(unsigned int base_addr, const char *name, unsigned int id)
 {
-    struct bus *ata_bus = kzalloc(sizeof(struct bus));
+    struct ata_bus *ata_bus = kzalloc(sizeof(struct ata_bus));
     if (!ata_bus) {
         return -ENOMEM;
     }
 
-    struct ata_bus_private *ata_bus_private = kzalloc(sizeof(struct ata_bus_private));
-    if (!ata_bus_private) {
-        return -ENOMEM;
-    }
+    ata_bus->base_addr = base_addr;
 
-    ata_bus_private->base_addr = base_addr;
+    strcpy(ata_bus->bus.name, name);
+    ata_bus->bus.id = id;
 
-    strcpy(ata_bus->name, name);
-    ata_bus->id = id;
+    ata_bus->bus.probe = ata_bus_probe;
+    ata_bus->read = ata_bus_read;
+    ata_bus->write = ata_bus_write;
 
-    ata_bus->io_operations->probe = ata_bus_probe;
-    ata_bus->io_operations->read = ata_bus_read;
-    ata_bus->io_operations->write = ata_bus_write;
-
-    int res = bus_add_bus(ata_bus);
+    int res = bus_add_bus((struct bus *)ata_bus);
     if (!res) {
-        kfree(ata_bus_private);
         kfree(ata_bus);
         return -EAGAIN;
     }

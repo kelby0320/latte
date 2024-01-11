@@ -5,21 +5,6 @@
 
 #include <stddef.h>
 
-struct bus;
-
-union bus_addr {
-    void *ptr;
-    unsigned int val;
-};
-
-struct io_operations {
-    int (*probe)(struct bus *bus);
-    int (*read)(struct bus *bus, unsigned int device_id, union bus_addr addr, char *buf,
-                size_t count);
-    int (*write)(struct bus *bus, unsigned int device_id, union bus_addr addr, const char *buf,
-                 size_t count);
-};
-
 /**
  * @brief Bus interface structure
  *
@@ -31,11 +16,8 @@ struct bus {
     // Bus Id
     unsigned int id;
 
-    // Pointer to io_operations for the bus
-    struct io_operations *io_operations;
-
-    // Pointer to private data for the bus
-    void *private;
+    // Function to probe this bus for devices
+    int (*probe)(struct bus *bus);
 };
 
 /**
@@ -64,7 +46,7 @@ bus_add_bus(struct bus *bus);
 /**
  * @brief Get a new bus id number
  *
- * @return int  Bus id
+ * @return int  Bus Id
  */
 int
 bus_get_new_bus_id();

@@ -12,14 +12,14 @@ INCLUDES = -I./sys
 TEST_INCLUDES = -I./sys -I./test
 
 C_OBJECTS = ./sys/boot/multiboot2.o \
+	./sys/bus/ata/ata.o \
+	./sys/bus/bus.o \
 	./sys/dev/block/block.o \
-	./sys/dev/bus/ata/ata.o \
 	./sys/dev/disk/ata/ata.o \
-	./sys/dev/disk/buffer/bufferedreader.o \
 	./sys/dev/disk/disk.o \
 	./sys/dev/term/term.o \
-	./sys/dev/bus.o \
 	./sys/dev/device.o \
+	./sys/fs/bufferedreader.o \
 	./sys/fs/fs.o \
 	./sys/fs/path.o \
 	./sys/fs/ext2/dir.o \

@@ -1,7 +1,7 @@
-#include "dev/bus.h"
+#include "bus/bus.h"
 
+#include "bus/ata/ata.h"
 #include "config.h"
-#include "dev/bus/ata/ata.h"
 #include "errno.h"
 #include "libk/memory.h"
 
@@ -13,8 +13,7 @@ void
 bus_probe()
 {
     for (int i = 0; i < bus_list_len; i++) {
-        void *private = bus_list[i]->private;
-        bus_list[i]->io_operations->probe(private);
+        bus_list[i]->probe(bus_list[i]);
     }
 }
 

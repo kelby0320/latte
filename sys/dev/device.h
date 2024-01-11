@@ -17,8 +17,8 @@ enum { SEEK_SET, SEEK_CUR, SEEK_END };
 struct file_operations {
     int (*open)(struct device *device);
     int (*close)(struct device *device);
-    int (*read)(struct device *device, char *buf, size_t count);
-    int (*write)(struct device *device, const char *buf, size_t count);
+    int (*read)(struct device *device, size_t offset, char *buf, size_t count);
+    int (*write)(struct device *device, size_t offset, const char *buf, size_t count);
     int (*seek)(struct device *device, int offset, unsigned int seek_mode);
 };
 
@@ -39,9 +39,6 @@ struct device {
 
     // Pointer to file_operations structure for the device
     struct file_operations file_operations;
-
-    // Pointer to private data for the device
-    void *private;
 };
 
 int
