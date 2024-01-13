@@ -2,13 +2,12 @@
 #define DEVICE_H
 
 #include "config.h"
+#include "fs/fs.h"
 
 #include <stddef.h>
 
 struct bus;
 struct device;
-
-enum { SEEK_SET, SEEK_CUR, SEEK_END };
 
 /**
  * @brief File operations structure for devices
@@ -43,5 +42,8 @@ struct device {
 
 int
 device_add_device(struct device *device);
+
+struct device *
+device_find(const char *name);
 
 #endif

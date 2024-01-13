@@ -11,6 +11,7 @@
 #include "kernel.h"
 #include "libk/kheap.h"
 #include "libk/memory.h"
+#include "libk/string.h"
 
 #include <stdint.h>
 
@@ -282,6 +283,8 @@ ext2_init()
     fs->stat = ext2_stat;
     fs->seek = ext2_seek;
     fs->resolve = ext2_resolve;
+
+    strncpy(fs->name, "ext2", FILESYSTEM_NAME_MAX_LEN);
 
     return fs;
 }

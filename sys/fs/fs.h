@@ -4,11 +4,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef unsigned int FILE_SEEK_MODE;
+#define FILESYSTEM_NAME_MAX_LEN 128
+
+typedef unsigned int file_seek_mode_t;
 
 enum { SEEK_SET, SEEK_CUR, SEEK_END };
 
-typedef unsigned int FILE_MODE;
+typedef unsigned int file_mode_t;
 
 enum { FILE_MODE_READ, FILE_MODE_WRITE, FILE_MODE_APPEND, FILE_MODE_INVALID };
 
@@ -24,8 +26,9 @@ struct file_stat {
     uint32_t size;
 };
 
-struct disk;
 struct path;
+struct file_descriptor;
+struct partition;
 
 /**
  * @brief Filesystem interface structure
@@ -33,127 +36,54 @@ struct path;
  */
 struct filesystem {
     // Pointer to function to resolve the filesystem
-    int (*resolve)(struct disk *disk);
+    struct filesystem *(*resolve)(const struct partition *partition);
 
     // Pointer to function to open a file
-    int (*open)(struct disk *disk, struct path *path, FILE_MODE mode, void **out);
+    int (*open)(const struct partition *partition, struct path *path, file_mode_t mode, void **out);
 
     // Pointer to function to close a file
     int (*close)(void *private);
 
     // Pointer to function to seek in a file
-    int (*seek)(struct disk *disk, void *private, uint32_t offset, FILE_SEEK_MODE seek_mode);
+    int (*seek)(struct file_descriptor *file_descriptor, uint32_t offset,
+                file_seek_mode_t seek_mode);
 
     // Pointer to function to read from a file
-    int (*read)(struct disk *disk, void *private, char *buf, uint32_t count);
+    int (*read)(struct file_descriptor *file_descriptor, char *buf, uint32_t count);
 
     // Pointer to function to write to a file
-    int (*write)(struct disk *disk, void *private, const char *buf, uint32_t count);
+    int (*write)(struct file_descriptor *file_descriptor, const char *buf, uint32_t count);
 
     // Pointer to function to read file status
-    int (*stat)(struct disk *disk, void *private, struct file_stat *stat);
-
-    // Pointer to private fs data
-    void *private;
+    int (*stat)(struct file_descriptor *file_descriptor, struct file_stat *stat);
 
     // Filesystem name
-    char name[128];
+    char name[FILESYSTEM_NAME_MAX_LEN];
 };
 
 /**
- * @brief Common file descriptor structure
- *
- */
-struct file_descriptor {
-    // Pointer to disk
-    struct disk *disk;
-
-    // Pointer to filesystem
-    struct filesystem *filesystem;
-
-    // Pointer to private descriptor data
-    void *private;
-
-    // Global file descriptor number
-    int index;
-};
-
-/**
- * @brief Inialize filesystems
+ * @brief Initialize the fileystem subsystem
  *
  */
 void
 fs_init();
 
 /**
- * @brief Open a file
+ * @brief Resolve a filesystem to a partition
  *
- * @param filename  Path string to the file
- * @param mode_str  Open file mode
- * @return int      Status code
+ * @param partition     Pointer to the partition
+ * @return int          Status code
  */
 int
-fopen(const char *filename, const char *mode_str);
+fs_resolve(struct partition *partition);
 
 /**
- * @brief Close an open file
+ * @brief Convert string to FILE_MODE
  *
- * @param fd        Global file descriptor number
- * @return int      Status code
+ * @param str   The string to parse
+ * @return FILE_MODE File mode identifier
  */
-int
-fclose(int fd);
-
-/**
- * @brief Seek to a location in an open file
- *
- * @param fd        Global file descriptor numer
- * @param offset    Seek location
- * @param whence    Seek mode
- * @return int      Status code
- */
-int
-fseek(int fd, int offset, FILE_SEEK_MODE whence);
-
-/**
- * @brief Read from an open file
- *
- * @param fd        Global file descriptor number
- * @param ptr       Pointer to output buffer
- * @param count     Number of bytes to read
- * @return int      Number of bytes to read
- */
-int
-fread(int fd, char *ptr, size_t count);
-
-/**
- * @brief Write to an open file
- *
- * @param fd        Global file descriptor number
- * @param ptr       Pointer to buffer
- * @param count     Number of bytes to write
- * @return int      Number of bytes actually written
- */
-int
-fwrite(int fd, const char *ptr, size_t count);
-
-/**
- * @brief Read file status
- *
- * @param fd        Global file descriptor number
- * @param stat      Pointer to file_stat structure
- * @return int      Status code
- */
-int
-fstat(int fd, struct file_stat *stat);
-
-/**
- * @brief Attempt to bind a filesystem to a disk
- *
- * @param disk      Pointer to the disk
- * @return struct filesystem* Bound filesystem or 0
- */
-struct filesystem *
-fs_resolve(struct disk *disk);
+file_mode_t
+fs_get_mode_from_string(const char *str);
 
 #endif

@@ -82,13 +82,13 @@ kernel_main(unsigned long magic, void *addr)
     // Enable virtual memory
     enable_paging();
 
-    char buf[1024];
-    int fd = fopen("hdd0:/latte.txt", "r");
-    fread(fd, buf, 32);
-    print(buf);
+    // char buf[1024];
+    // int fd = fopen("hdd0:/latte.txt", "r");
+    // fread(fd, buf, 32);
+    // print(buf);
 
-    process_spawn("hdd0:/bin/testprog");
-    schedule_first_task();
+    // process_spawn("hdd0:/bin/testprog");
+    // schedule_first_task();
 
     while (1) {}
 }
