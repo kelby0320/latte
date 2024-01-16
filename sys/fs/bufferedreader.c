@@ -1,12 +1,13 @@
 #include "fs/bufferedreader.h"
 
 #include "config.h"
-#include "dev/disk/disk.h"
+#include "dev/block/block.h"
 #include "errno.h"
 #include "libk/kheap.h"
+#include "vfs/partition.h"
 
 int
-bufferedreader_new(struct bufferedreader **reader_out, struct disk *disk)
+bufferedreader_new(struct bufferedreader **reader_out, struct partition *partition)
 {
     struct bufferedreader *reader = kzalloc(sizeof(struct bufferedreader));
     if (!reader) {
@@ -14,7 +15,7 @@ bufferedreader_new(struct bufferedreader **reader_out, struct disk *disk)
     }
 
     reader->pos = 0;
-    reader->disk = disk;
+    reader->partition = partition;
 
     *reader_out = reader;
     return 0;
@@ -37,9 +38,11 @@ bufferedreader_read(struct bufferedreader *reader, void *out, int count)
     unsigned int bytes_read = 0;
     int out_idx = 0;
 
+    struct block_device *block_device = reader->partition->block_device;
+
     while (bytes_read < count) {
         // Read a sector of data
-        int res = reader->disk->read_sectors(reader->disk, sector, 1, buf);
+        int res = block_device_read_sectors(block_device, sector, buf, 1);
         if (res < 0) {
             return res;
         }

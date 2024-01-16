@@ -11,14 +11,12 @@ struct disk;
  * @brief Read an inode structure
  *
  * @param inode_out     Pointer to output inode structure
- * @param disk          Pointer to the disk
  * @param fs_private    Pointer to private fs data
  * @param inode_no      Inode number
  * @return int          Status code
  */
 int
-ext2_read_inode(struct ext2_inode **inode_out, struct disk *disk, struct ext2_private *fs_private,
-                uint32_t inode_no);
+ext2_read_inode(struct ext2_inode **inode_out, struct ext2_private *fs_private, uint32_t inode_no);
 
 /**
  * @brief Read an inodes file data
@@ -32,7 +30,7 @@ ext2_read_inode(struct ext2_inode **inode_out, struct disk *disk, struct ext2_pr
  * @return int          Status code
  */
 int
-ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *inode, char *out,
-                     size_t count, unsigned int blk_offset, unsigned int byte_offset);
+ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *inode, char *out, size_t count,
+                     unsigned int blk_offset, unsigned int byte_offset);
 
 #endif

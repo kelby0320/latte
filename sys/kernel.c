@@ -2,7 +2,6 @@
 
 #include "boot/multiboot2.h"
 #include "config.h"
-#include "dev/disk/disk.h"
 #include "dev/term/term.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
@@ -63,9 +62,6 @@ kernel_main(unsigned long magic, void *addr)
 
     // Initialize filesystem drivers
     fs_init();
-
-    // // Find and Initialize Disks
-    disk_probe_and_init();
 
     // Initialize IRQs
     irq_init();

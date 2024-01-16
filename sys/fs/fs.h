@@ -36,10 +36,10 @@ struct partition;
  */
 struct filesystem {
     // Pointer to function to resolve the filesystem
-    struct filesystem *(*resolve)(const struct partition *partition);
+    void *(*resolve)(struct partition *partition);
 
     // Pointer to function to open a file
-    int (*open)(const struct partition *partition, struct path *path, file_mode_t mode, void **out);
+    int (*open)(struct partition *partition, struct path *path, file_mode_t mode, void **out);
 
     // Pointer to function to close a file
     int (*close)(void *private);

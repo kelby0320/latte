@@ -175,7 +175,7 @@ parse_next_element(struct path_element **next_element, struct path_element *prev
         return -ENOMEM;
     }
 
-    int res = get_element_from_path(&element->element, path_str);
+    int res = get_element_from_path(element->element, path_str);
     if (res == 0) {
         // No more elements in path
         kfree(element);

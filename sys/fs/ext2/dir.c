@@ -1,6 +1,5 @@
 #include "fs/ext2/dir.h"
 
-#include "dev/disk/disk.h"
 #include "errno.h"
 #include "fs/ext2/inode.h"
 #include "libk/kheap.h"
@@ -41,8 +40,7 @@ struct dir_iter {
  * @return int          Status code
  */
 static int
-dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private,
-              const struct ext2_inode *dir_inode)
+dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private, const struct ext2_inode *dir_inode)
 {
     char *buf = kzalloc(fs_private->block_size);
     if (!buf) {
@@ -56,8 +54,7 @@ dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private,
     iter->block_no = 0;
 
     // Read inital block of data
-    int res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size,
-                                   iter->block_no, 0);
+    int res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size, iter->block_no, 0);
     if (res < 0) {
         return res;
     }
@@ -85,8 +82,7 @@ dir_iter_free(struct dir_iter *iter)
  * @return int          Status code
  */
 static int
-iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private,
-            struct ext2_directory_entry *dir_entry_out)
+iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private, struct ext2_directory_entry *dir_entry_out)
 {
     int res = 0;
 
@@ -94,16 +90,14 @@ iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private,
         // Read next block of data
         iter->block_no++;
         iter->buf_offset = 0;
-        res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size,
-                                   iter->block_no, 0);
+        res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size, iter->block_no, 0);
         if (res < 0) {
             return res;
         }
     }
 
     // Parse directory_entry from buffer
-    struct ext2_directory_entry *entry =
-        (struct ext2_directory_entry *)(iter->buf + iter->buf_offset);
+    struct ext2_directory_entry *entry = (struct ext2_directory_entry *)(iter->buf + iter->buf_offset);
     int rec_len = entry->rec_len;
     if (rec_len > sizeof(struct ext2_directory_entry)) {
         rec_len = sizeof(struct ext2_directory_entry);
@@ -117,9 +111,8 @@ iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private,
 }
 
 int
-ext2_get_directory_entry(struct ext2_inode **inode_out, struct disk *disk,
-                         struct ext2_private *fs_private, const struct ext2_inode *dir_inode,
-                         const char *name)
+ext2_get_directory_entry(struct ext2_inode **inode_out, struct ext2_private *fs_private,
+                         const struct ext2_inode *dir_inode, const char *name)
 {
     // Confirm dir_inode is a directory
     if (!(dir_inode->i_mode & EXT2_S_IFDIR)) {
@@ -145,7 +138,7 @@ ext2_get_directory_entry(struct ext2_inode **inode_out, struct disk *disk,
 
         if (strcmp(entry.name, name) == 0) {
             // Found matching entry
-            res = ext2_read_inode(inode_out, disk, fs_private, entry.inode);
+            res = ext2_read_inode(inode_out, fs_private, entry.inode);
             goto out;
         }
 

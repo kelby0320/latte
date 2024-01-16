@@ -1,7 +1,6 @@
 #include "fs/fs.h"
 
 #include "config.h"
-#include "dev/disk/disk.h"
 #include "errno.h"
 #include "fs/ext2/ext2.h"
 #include "fs/fat32/fat32.h"

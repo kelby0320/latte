@@ -143,7 +143,7 @@ struct ext2_private {
     struct bufferedreader *reader;
 };
 
-struct ext2_file_descriptor {
+struct ext2_descriptor_private {
     struct ext2_inode *inode;
     int blk_offset;
     int byte_offset;
