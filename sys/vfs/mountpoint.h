@@ -11,9 +11,16 @@ struct filesystem;
  *
  */
 struct mountpoint {
+    // Pointer to the block device
     struct block_device *block_device;
+
+    // Pointer to the filesystem
     struct filesystem *filesystem;
+
+    // Pointer to filesystem private data
     void *fs_private;
+
+    // Mountpoint path
     char path[LATTE_MAX_PATH_LEN];
 };
 

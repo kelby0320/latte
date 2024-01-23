@@ -47,9 +47,18 @@ struct device {
     struct file_operations file_operations;
 };
 
+/**
+ * @brief Device iterator structure
+ *
+ */
 struct device_iterator {
+    // Pointer to the device list
     struct device **device_list;
+
+    // Pointer to the device list length
     int *device_list_len;
+
+    // Current index of the device iterator
     int current_idx;
 };
 
@@ -86,15 +95,38 @@ device_add_device(struct device *device);
 struct device *
 device_find(const char *name);
 
+/**
+ * @brief Initialize a device iterator
+ *
+ * @param iter  Pointer to the device iterator
+ * @return int  Status code
+ */
 int
 device_iterator_init(struct device_iterator **iter);
 
+/**
+ * @brief Free a device iterator
+ *
+ * @param iter  Pointer to the iterator
+ */
 void
 device_iterator_free(struct device_iterator *iter);
 
+/**
+ * @brief Get the current device associated with a device iterator
+ *
+ * @param iter              Pointer to the device iterator
+ * @return struct device*   Pointer to the associated device
+ */
 struct device *
 device_iterator_val(struct device_iterator *iter);
 
+/**
+ * @brief Increment the device iterator
+ *
+ * @param iter  Pointer to the device iterator
+ * @return int  Status code
+ */
 int
 device_iterator_next(struct device_iterator *iter);
 

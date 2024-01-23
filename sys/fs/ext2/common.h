@@ -136,16 +136,33 @@ struct ext2_inode {
     uint32_t i_osd2[3];     /* OS dependent 2 */
 } __attribute((packed));
 
+/**
+ * @brief Ext2 private filesystem data structure
+ *
+ */
 struct ext2_private {
+    // Copy of the superblock
     struct ext2_superblock superblock;
+
+    // Block size
     uint32_t block_size;
 
+    // Pointer to a buffered reader for the filesystem
     struct bufferedreader *reader;
 };
 
+/**
+ * @brief Ext2 private file descriptor structure
+ *
+ */
 struct ext2_descriptor_private {
+    // Pointer to the inode
     struct ext2_inode *inode;
+
+    // Block offset into the file
     int blk_offset;
+
+    // Byte offset into the file
     int byte_offset;
 };
 

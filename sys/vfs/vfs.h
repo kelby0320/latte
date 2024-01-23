@@ -9,8 +9,6 @@
 /**
  * @brief Initialize Virtual File System
  *
- * @param biosdev   Bios boot device
- * @param part_no   Boot partition number
  * @return int  Status code
  */
 int
@@ -21,7 +19,6 @@ vfs_init();
  *
  * @param path          Path to mount in the VFS
  * @param blk_dev_name  Block device to mount
- * @param part_no       Partition on the block device to mount
  * @return int          Status code
  */
 int

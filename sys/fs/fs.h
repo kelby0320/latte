@@ -70,9 +70,9 @@ void
 fs_init();
 
 /**
- * @brief Resolve a filesystem to a partition
+ * @brief Resolve a filesystem to a mountpoint
  *
- * @param partition     Pointer to the partition
+ * @param mountpoint     Pointer to the mountpoint
  * @return int          Status code
  */
 int

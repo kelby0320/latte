@@ -13,6 +13,13 @@
 #include "vfs/file_descriptor.h"
 #include "vfs/mountpoint.h"
 
+/**
+ * @brief Determine whether a device is a boot device
+ *
+ * @param device    Pointer to the device
+ * @return true
+ * @return false
+ */
 static bool
 is_boot_device(struct device *device)
 {
@@ -26,6 +33,12 @@ is_boot_device(struct device *device)
     return false;
 }
 
+/**
+ * @brief Find a bootable block device
+ *
+ * @param block_device_out  Output pointer to boot block device
+ * @return int              Status code
+ */
 static int
 vfs_find_boot_block_device(struct block_device **block_device_out)
 {

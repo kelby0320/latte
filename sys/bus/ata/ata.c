@@ -257,6 +257,7 @@ ata_bus_probe(struct bus *bus)
  * @brief Read from an ATA bus
  *
  * @param ata_bus           Pointer to the ATA bus
+ * @param drive_no          Drive number
  * @param lba               LBA to read from
  * @param buf               Buffer to read into
  * @param sector_count      Number of sectores to read
@@ -311,10 +312,11 @@ ata_bus_read(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, c
  * @brief Write to an ATA bus
  *
  * @param ata_bus           Pointer to the ATA bus
+ * @param drive_no
  * @param lba               LBA to write to
  * @param buf               Buffer to write
  * @param size              Size of the buffer
- * @return int
+ * @return int              Status code
  */
 static int
 ata_bus_write(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, const char *buf,

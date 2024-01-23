@@ -24,7 +24,7 @@ struct bufferedreader {
  * @brief Create a new bufferedreader.
  *
  * @param reader_out    Pointer to struct that will be allocated and initialized.
- * @param disk          Pointer to the disk
+ * @param block_device  Pointer to the block device
  * @return int          Status code
  */
 int

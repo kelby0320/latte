@@ -29,9 +29,16 @@ typedef unsigned int block_device_type_t;
  *
  */
 struct block_device {
+    // Base device structure
     struct device device;
+
+    // Block device type
     block_device_type_t type;
+
+    // Drive number
     unsigned int drive_no;
+
+    // Starting LBA of the block device
     unsigned int lba_offset;
 };
 
@@ -39,7 +46,9 @@ struct block_device {
  * @brief Initialize a block device
  *
  * @param block_device  Pointer to a block device
+ * @param type          Type of block device
  * @param drive_no      Driver number
+ * @param lba_offset    Starting LBA
  * @return int          Status code
  */
 int
@@ -52,7 +61,7 @@ block_device_init(struct block_device *block_device, block_device_type_t type,
  * @param block_device  Pointer to the block device
  * @param lba           LBA to read from
  * @param buf           Buffer to read into
- * @param sector_count     Sector count to read
+ * @param sector_count  Sector count to read
  * @return int
  */
 int

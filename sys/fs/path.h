@@ -10,11 +10,11 @@
  * @brief Linked list of elements in a path
  *
  * e.g:
- *  For a file path such as - hdd0:/home/user/file.txt
+ *  For a file path such as - /home/user/file.txt
  *  The path_element linked list would be as follows
  *
- *  0x1000 - {element = "home", next = 0x0044}
- *  0x1044 - {element = "user", next = 0x0088}
+ *  0x1000 - {element = "home", next = 0x1044}
+ *  0x1044 - {element = "user", next = 0x1088}
  *  0x1088 - {element = "file.txt", next = 0x0000}
  */
 struct path_element {

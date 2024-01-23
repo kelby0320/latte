@@ -89,8 +89,8 @@ err_out:
 /**
  * @brief Attempt to bind an Ext2 filesystem to the disk
  *
- * @param partition Pointer to the disk
- * @return void *   Ponter to private Ext2 data structure
+ * @param block_device Pointer to the block device
+ * @return void *      Pointer to private Ext2 data structure
  */
 void *
 ext2_resolve(struct block_device *block_device)
@@ -132,11 +132,11 @@ err_out1:
 /**
  * @brief Open a file on an Ext2 filesystem
  *
- * @param disk  Pointer to the disk
- * @param path  Pointer to filepath
- * @param mode  Open file mode
- * @param out   Pointer to output private descriptor data
- * @return int  Status code
+ * @param fs_private    Pointer to the filesystem private data
+ * @param path          Pointer to filepath
+ * @param mode          Open file mode
+ * @param out           Pointer to output private descriptor data
+ * @return int          Status code
  */
 int
 ext2_open(void *fs_private, struct path *path, file_mode_t mode, void **out)

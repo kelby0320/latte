@@ -14,6 +14,13 @@
 static struct filesystem *filesystems[LATTE_MAX_FILESYSTEMS];
 static int filesystems_len;
 
+/**
+ * @brief Try to resolve a filesystem on a block device
+ *
+ * @param filesystem    Pointer to the filesystem
+ * @param block_device  Pointer to the block device
+ * @return void*        Pointer to private filesystem structure
+ */
 static void *
 fs_try_resolve(struct filesystem *filesystem, struct block_device *block_device)
 {

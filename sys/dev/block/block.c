@@ -12,6 +12,15 @@
 
 static unsigned int block_device_number = 0;
 
+/**
+ * @brief Block device read file operation
+ *
+ * @param device        Pointer to the device
+ * @param offset        LBA to read from
+ * @param buf           Read buffer
+ * @param sector_count  Number of sectors to read
+ * @return int          Status code
+ */
 static int
 block_device_read(struct device *device, size_t offset, char *buf, size_t sector_count)
 {
@@ -23,6 +32,15 @@ block_device_read(struct device *device, size_t offset, char *buf, size_t sector
     return ata_bus->read(ata_bus, drive_no, lba, buf, sector_count);
 }
 
+/**
+ * @brief Block device write file operation
+ *
+ * @param device    Pointer to the device
+ * @param offset    LBA to write to
+ * @param buf       Buffer to write
+ * @param size      Size of the buffer
+ * @return int      Status code
+ */
 static int
 block_device_write(struct device *device, size_t offset, const char *buf, size_t size)
 {
