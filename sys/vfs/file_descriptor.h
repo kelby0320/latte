@@ -1,15 +1,15 @@
 #ifndef FILE_DESCRIPTOR_H
 #define FILE_DESCRIPTOR_H
 
-struct partition;
+struct mountpoint;
 
 /**
  * @brief Common file descriptor structure
  *
  */
 struct file_descriptor {
-    // Pointer to disk
-    struct partition *partition;
+    // Pointer to the mountpoint for this file
+    struct mountpoint *mountpoint;
 
     // Pointer to private descriptor data
     void *private;

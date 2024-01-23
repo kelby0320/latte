@@ -39,7 +39,7 @@ bus_add_bus(struct bus *bus)
 }
 
 int
-bus_get_new_bus_id()
+bus_get_next_bus_id()
 {
     return next_bus_id++;
 }

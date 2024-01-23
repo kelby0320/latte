@@ -32,6 +32,7 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/libk/kheap.o \
 	./sys/libk/libk.o \
 	./sys/libk/memory.o \
+	./sys/libk/print.o \
 	./sys/libk/string.o \
 	./sys/mem/heap.o \
 	./sys/mem/vm.o \
@@ -43,7 +44,6 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/task/task.o \
 	./sys/vfs/file_descriptor.o \
 	./sys/vfs/mountpoint.o \
-	./sys/vfs/partition.o \
 	./sys/vfs/vfs.o \
 	./sys/kernel.o \
 

@@ -5,6 +5,7 @@
 #include "dev/device.h"
 #include "errno.h"
 #include "libk/kheap.h"
+#include "libk/memory.h"
 #include "libk/string.h"
 #include "port/io.h"
 
@@ -73,41 +74,115 @@ ata_bus_identify(struct ata_bus *ata_bus, int drive_no)
     outb(lba_hi_reg, 0);
     outb(cmd_reg, ATA_PIO_CMD_IDENTIFY);
 
-    char buf[512];
-    for (int b = 0; b < 512; b++) {
-        char c = insb(status_reg);
-        if (c == 0) {
-            // The drive does not exist
-            return -EEXIST;
+    char c = insb(status_reg);
+    if (c == 0) {
+        // The drive does not exist
+        return -EEXIST;
+    }
+
+    // Wait for busy to clear
+    while (c & ATA_PIO_STATUS_BSY) {
+        c = insb(status_reg);
+    }
+
+    c = insb(lba_mid_reg);
+    if (c != 0) {
+        // Not an ATA drive
+        return -EEXIST;
+    }
+
+    c = insb(lba_hi_reg);
+    if (c != 0) {
+        // Not an ATA drive
+        return -EEXIST;
+    }
+
+    // Wait for the buffer to be ready
+    while (!(c & ATA_PIO_STATUS_DRQ)) {
+        c = insb(status_reg);
+    }
+
+    // Copy from identify structure to memory
+    unsigned short buf[256];
+    for (int i = 0; i < 256; i++) {
+        buf[i] = insw(data_reg);
+    }
+
+    return 0;
+}
+
+/**
+ * @brief Add a block device to the system
+ *
+ * @param ata_bus           Pointer to the bus
+ * @param type              Type of block device
+ * @param drive_no          Drive number of the block device
+ * @param lba_offset        LBA offset of the block device
+ * @param block_device_out  Pointer to new block device
+ * @return int              Status code
+ */
+static int
+add_block_device(struct ata_bus *ata_bus, block_device_type_t type, unsigned int drive_no,
+                 unsigned int lba_offset, struct block_device **block_device_out)
+{
+    struct device *device = kzalloc(sizeof(struct device));
+    if (!device) {
+        return -ENOMEM;
+    }
+
+    device->type = DEVICE_TYPE_BLOCK;
+    device->bus = (struct bus *)ata_bus;
+    device->id = device_get_next_device_id();
+
+    int res = block_device_init((struct block_device *)device, type, drive_no, lba_offset);
+    if (res < 0) {
+        goto err_out;
+    }
+
+    res = device_add_device(device);
+    if (res < 0) {
+        goto err_out;
+    }
+
+    *block_device_out = (struct block_device *)device;
+
+    return 0;
+
+err_out:
+    kfree(device);
+    return res;
+}
+
+/**
+ * @brief Add a block device for each partition on a disk block device
+ *
+ * @param block_device_disk Pointer to block device of type disk
+ * @return int              Status code
+ */
+static int
+add_block_device_partitions(struct block_device *block_device_disk)
+{
+    struct partition_table_entry partition_table[4];
+    int res = block_device_read_partitions(block_device_disk, partition_table);
+    if (res < 0) {
+        return res;
+    }
+
+    struct ata_bus *ata_bus = (struct ata_bus *)block_device_disk->device.bus;
+    unsigned int drive_no = block_device_disk->drive_no;
+
+    for (int i = 0; i < 4; i++) {
+        if (partition_table[i].sector_count == 0) {
+            continue; // Table entry doesn't correspond to a partition
         }
 
-        // Wait for busy to clear
-        while (!(c & ATA_PIO_STATUS_BSY)) {
-            c = insb(status_reg);
-        }
+        unsigned int lba_offset = partition_table[i].lba_start;
+        struct block_device *block_device_part;
 
-        c = insb(lba_mid_reg);
-        if (c != 0) {
-            // Not an ATA drive
-            return -EEXIST;
-        }
-
-        c = insb(lba_hi_reg);
-        if (c != 0) {
-            // Not an ATA drive
-            return -EEXIST;
-        }
-
-        // Wait for the buffer to be ready
-        while (!(c & ATA_PIO_STATUS_DRQ)) {
-            c = insb(status_reg);
-        }
-
-        // Copy from identify structure to memory
-        char *ptr = buf;
-        for (int i = 0; i < 256; i++) {
-            *ptr = insw(data_reg);
-            ptr++;
+        res = add_block_device(ata_bus, BLOCK_DEVICE_TYPE_PART, drive_no, lba_offset,
+                               &block_device_part);
+        if (res < 0) {
+            return res;
         }
     }
 }
@@ -120,31 +195,20 @@ ata_bus_identify(struct ata_bus *ata_bus, int drive_no)
  * @return int      Status code
  */
 static int
-add_block_device(struct ata_bus *ata_bus, int drive_no)
+add_block_devices(struct ata_bus *ata_bus, int drive_no)
 {
-    struct device *device = kzalloc(sizeof(struct device));
-    if (!device) {
-        return -ENOMEM;
+    struct block_device *block_device_disk;
+    int res = add_block_device(ata_bus, BLOCK_DEVICE_TYPE_DISK, drive_no, 0, &block_device_disk);
+    if (res < 0) {
+        return res;
     }
 
-    device->bus = (struct bus *)ata_bus;
-    device->id = drive_no;
-
-    int res = block_device_init(device);
+    res = add_block_device_partitions(block_device_disk);
     if (res < 0) {
-        goto err_out;
-    }
-
-    res = device_add_device(device);
-    if (res < 0) {
-        goto err_out;
+        return res;
     }
 
     return 0;
-
-err_out:
-    kfree(device);
-    return res;
 }
 
 /**
@@ -160,8 +224,8 @@ ata_probe_drive(struct bus *bus, int drive_no)
     struct ata_bus *ata_bus = (struct ata_bus *)bus;
 
     int res = ata_bus_identify(ata_bus, drive_no);
-    if (res) {
-        return add_block_device(ata_bus, drive_no);
+    if (res == 0) {
+        return add_block_devices(ata_bus, drive_no);
     }
 
     return 0;
@@ -297,18 +361,15 @@ ata_init_bus(unsigned int base_addr, const char *name, unsigned int id)
 int
 ata_init()
 {
-    unsigned int bus_id = bus_get_new_bus_id();
+    unsigned int bus_id = bus_get_next_bus_id();
     int res = ata_init_bus(ATA_PIO_PRIMARY_BUS_BASE_ADDR, "ata0", bus_id);
     if (res < 0) {
-        goto err_out;
+        return res;
     }
 
-    bus_id = bus_get_new_bus_id();
+    bus_id = bus_get_next_bus_id();
     res = ata_init_bus(ATA_PIO_SECONDARY_BUS_BASE_ADDR, "ata1", bus_id);
     if (res < 0) {
-        goto err_out;
+        return res;
     }
-
-err_out:
-    return res;
 }

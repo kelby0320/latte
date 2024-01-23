@@ -11,6 +11,6 @@ PointerAlignment: Right
 BinPackArguments: true
 BinPackParameters: true
 AlignAfterOpenBracket: Align
-ColumnLimit: 120
+ColumnLimit: 100
 IncludeBlocks: Preserve
 AlignConsecutiveMacros: true

@@ -92,7 +92,7 @@
 #define MULTIBOOT2_FRAMEBUFFER_TYPE_RGB      1
 #define MULTIBOOT2_FRAMEBUFFER_TYPE_EGA_TEXT 2
 
-struct header {
+struct multiboot2_header {
     /*  Must be MULTIBOOT2_MAGIC - see above. */
     uint32_t magic;
 
@@ -106,20 +106,20 @@ struct header {
     uint32_t checksum;
 } __attribute__((packed));
 
-struct header_tag {
+struct multiboot2_header_tag {
     uint16_t type;
     uint16_t flags;
     uint32_t size;
 } __attribute__((packed));
 
-struct header_tag_information_request {
+struct multiboot2_header_tag_information_request {
     uint16_t type;
     uint16_t flags;
     uint32_t size;
     uint32_t requests[0];
 } __attribute__((packed));
 
-struct header_tag_address {
+struct multiboot2_header_tag_address {
     uint16_t type;
     uint16_t flags;
     uint32_t size;
@@ -129,21 +129,21 @@ struct header_tag_address {
     uint32_t bss_end_addr;
 } __attribute__((packed));
 
-struct header_tag_entry_address {
+struct multiboot2_header_tag_entry_address {
     uint16_t type;
     uint16_t flags;
     uint32_t size;
     uint32_t entry_addr;
 } __attribute__((packed));
 
-struct header_tag_console_flags {
+struct multiboot2_header_tag_console_flags {
     uint16_t type;
     uint16_t flags;
     uint32_t size;
     uint32_t console_flags;
 } __attribute__((packed));
 
-struct header_tag_framebuffer {
+struct multiboot2_header_tag_framebuffer {
     uint16_t type;
     uint16_t flags;
     uint32_t size;
@@ -152,13 +152,13 @@ struct header_tag_framebuffer {
     uint32_t depth;
 } __attribute__((packed));
 
-struct header_tag_module_align {
+struct multiboot2_header_tag_module_align {
     uint16_t type;
     uint16_t flags;
     uint32_t size;
 } __attribute__((packed));
 
-struct header_tag_relocatable {
+struct multiboot2_header_tag_relocatable {
     uint16_t type;
     uint16_t flags;
     uint32_t size;
@@ -168,32 +168,32 @@ struct header_tag_relocatable {
     uint32_t preference;
 } __attribute__((packed));
 
-struct color {
+struct multiboot2_color {
     uint8_t red;
     uint8_t green;
     uint8_t blue;
 } __attribute__((packed));
 
-struct mmap_entry {
+struct multiboot2_mmap_entry {
     uint64_t addr;
     uint64_t len;
     uint32_t type;
     uint32_t zero;
 } __attribute__((packed));
-typedef struct mmap_entry memory_map_t;
+typedef struct multiboot2_mmap_entry memory_map_t;
 
-struct tag {
+struct multiboot2_tag {
     uint32_t type;
     uint32_t size;
 } __attribute__((packed));
 
-struct tag_string {
+struct multiboot2_tag_string {
     uint32_t type;
     uint32_t size;
     char string[0];
 } __attribute__((packed));
 
-struct tag_module {
+struct multiboot2_tag_module {
     uint32_t type;
     uint32_t size;
     uint32_t mod_start;
@@ -201,14 +201,14 @@ struct tag_module {
     char cmdline[0];
 } __attribute__((packed));
 
-struct tag_basic_meminfo {
+struct multiboot2_tag_basic_meminfo {
     uint32_t type;
     uint32_t size;
     uint32_t mem_lower;
     uint32_t mem_upper;
 } __attribute__((packed));
 
-struct tag_bootdev {
+struct multiboot2_tag_bootdev {
     uint32_t type;
     uint32_t size;
     uint32_t biosdev;
@@ -216,23 +216,23 @@ struct tag_bootdev {
     uint32_t part;
 } __attribute__((packed));
 
-struct tag_mmap {
+struct multiboot2_tag_mmap {
     uint32_t type;
     uint32_t size;
     uint32_t entry_size;
     uint32_t entry_version;
-    struct mmap_entry entries[0];
+    struct multiboot2_mmap_entry entries[0];
 } __attribute__((packed));
 
-struct vbe_info_block {
+struct multiboot2_vbe_info_block {
     uint8_t external_specification[512];
 } __attribute__((packed));
 
-struct vbe_mode_info_block {
+struct multiboot2_vbe_mode_info_block {
     uint8_t external_specification[256];
 } __attribute__((packed));
 
-struct tag_vbe {
+struct multiboot2_tag_vbe {
     uint32_t type;
     uint32_t size;
 
@@ -241,11 +241,11 @@ struct tag_vbe {
     uint16_t vbe_interface_off;
     uint16_t vbe_interface_len;
 
-    struct vbe_info_block vbe_control_info;
-    struct vbe_mode_info_block vbe_mode_info;
+    struct multiboot2_vbe_info_block vbe_control_info;
+    struct multiboot2_vbe_mode_info_block vbe_mode_info;
 } __attribute__((packed));
 
-struct tag_framebuffer_common {
+struct multiboot2_tag_framebuffer_common {
     uint32_t type;
     uint32_t size;
 
@@ -259,13 +259,13 @@ struct tag_framebuffer_common {
     uint16_t reserved;
 } __attribute__((packed));
 
-struct tag_framebuffer {
-    struct tag_framebuffer_common common;
+struct multiboot2_tag_framebuffer {
+    struct multiboot2_tag_framebuffer_common common;
 
     union {
         struct {
             uint16_t framebuffer_palette_num_colors;
-            struct color framebuffer_palette[0];
+            struct multiboot2_color framebuffer_palette[0];
         } __attribute__((packed));
         struct {
             uint8_t framebuffer_red_field_position;
@@ -278,7 +278,7 @@ struct tag_framebuffer {
     };
 } __attribute__((packed));
 
-struct tag_elf_sections {
+struct multiboot2_tag_elf_sections {
     uint32_t type;
     uint32_t size;
     uint32_t num;
@@ -287,7 +287,7 @@ struct tag_elf_sections {
     char sections[0];
 } __attribute__((packed));
 
-struct tag_apm {
+struct multiboot2_tag_apm {
     uint32_t type;
     uint32_t size;
     uint16_t version;
@@ -301,19 +301,19 @@ struct tag_apm {
     uint16_t dseg_len;
 } __attribute__((packed));
 
-struct tag_efi32 {
+struct multiboot2_tag_efi32 {
     uint32_t type;
     uint32_t size;
     uint32_t pointer;
 } __attribute__((packed));
 
-struct tag_efi64 {
+struct multiboot2_tag_efi64 {
     uint32_t type;
     uint32_t size;
     uint64_t pointer;
 } __attribute__((packed));
 
-struct tag_smbios {
+struct multiboot2_tag_smbios {
     uint32_t type;
     uint32_t size;
     uint8_t major;
@@ -322,25 +322,25 @@ struct tag_smbios {
     uint8_t tables[0];
 } __attribute__((packed));
 
-struct tag_old_acpi {
+struct multiboot2_tag_old_acpi {
     uint32_t type;
     uint32_t size;
     uint8_t rsdp[0];
 } __attribute__((packed));
 
-struct tag_new_acpi {
+struct multiboot2_tag_new_acpi {
     uint32_t type;
     uint32_t size;
     uint8_t rsdp[0];
 } __attribute__((packed));
 
-struct tag_network {
+struct multiboot2_tag_network {
     uint32_t type;
     uint32_t size;
     uint8_t dhcpack[0];
 } __attribute__((packed));
 
-struct tag_efi_mmap {
+struct multiboot2_tag_efi_mmap {
     uint32_t type;
     uint32_t size;
     uint32_t descr_size;
@@ -348,19 +348,19 @@ struct tag_efi_mmap {
     uint8_t efi_mmap[0];
 } __attribute__((packed));
 
-struct tag_efi32_ih {
+struct multiboot2_tag_efi32_ih {
     uint32_t type;
     uint32_t size;
     uint32_t pointer;
 } __attribute__((packed));
 
-struct tag_efi64_ih {
+struct multiboot2_tag_efi64_ih {
     uint32_t type;
     uint32_t size;
     uint64_t pointer;
 } __attribute__((packed));
 
-struct tag_load_base_addr {
+struct multiboot2_tag_load_base_addr {
     uint32_t type;
     uint32_t size;
     uint32_t load_base_addr;
@@ -368,5 +368,8 @@ struct tag_load_base_addr {
 
 int
 multiboot2_verify_magic_number(unsigned long magic);
+
+int
+multiboot2_get_boot_device(void *addr, uint32_t *biosdev, uint32_t *part_no);
 
 #endif

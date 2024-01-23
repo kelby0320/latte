@@ -6,11 +6,53 @@
 #include "errno.h"
 #include "fs/fs.h"
 #include "fs/path.h"
+#include "kernel.h"
 #include "libk/kheap.h"
 #include "libk/memory.h"
 #include "libk/string.h"
 #include "vfs/file_descriptor.h"
 #include "vfs/mountpoint.h"
+
+static bool
+is_boot_device(struct device *device)
+{
+    if (device->type == DEVICE_TYPE_BLOCK) {
+        struct block_device *block_device = (struct block_device *)device;
+        if (block_device->type == BLOCK_DEVICE_TYPE_PART) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static int
+vfs_find_boot_block_device(struct block_device **block_device_out)
+{
+    struct device_iterator *iter;
+    int res = device_iterator_init(&iter);
+    if (res < 0) {
+        return res;
+    }
+
+    while (true) {
+        struct device *device = device_iterator_val(iter);
+        if (!device) {
+            break;
+        }
+
+        if (is_boot_device(device)) {
+            *block_device_out = (struct block_device *)device;
+            return 0;
+        }
+
+        device_iterator_next(iter);
+    }
+
+    device_iterator_free(iter);
+
+    return -EEXIST;
+}
 
 int
 vfs_init()
@@ -18,12 +60,25 @@ vfs_init()
     file_descriptor_init();
     mountpoint_init();
 
-    // TODO - find and mount root filesystem
+    struct block_device *boot_block_device;
+    int res = vfs_find_boot_block_device(&boot_block_device);
+    if (res < 0) {
+        goto err_out;
+    }
+
+    res = vfs_mount("/", boot_block_device->device.name);
+    if (res < 0) {
+        goto err_out;
+    }
+
     return 0;
+
+err_out:
+    panic("Unable to mount root filesystem");
 }
 
 int
-vfs_mount(const char *path, const char *blk_dev_name, unsigned int part_no)
+vfs_mount(const char *path, const char *blk_dev_name)
 {
     struct device *device = device_find(blk_dev_name);
     if (!device) {
@@ -31,24 +86,19 @@ vfs_mount(const char *path, const char *blk_dev_name, unsigned int part_no)
     }
 
     struct block_device *block_device = (struct block_device *)device;
-    struct partition_table_entry *part_entry = &block_device->partition_table[part_no];
 
     struct mountpoint *mountpoint = kzalloc(sizeof(struct mountpoint));
     if (!mountpoint) {
         return -ENOMEM;
     }
 
-    int res = partition_init(&mountpoint->partition, block_device, part_entry);
-    if (res < 0) {
-        goto err_out;
-    }
-
-    res = partition_bind_fs(&mountpoint->partition);
-    if (res < 0) {
-        goto err_out;
-    }
-
     strncpy(mountpoint->path, path, LATTE_MAX_PATH_LEN);
+    mountpoint->block_device = block_device;
+
+    int res = fs_resolve(mountpoint);
+    if (res < 0) {
+        goto err_out;
+    }
 
     res = mountpoint_add(mountpoint);
     if (res < 0) {
@@ -90,15 +140,17 @@ vfs_open(const char *filename, const char *mode_str)
         goto err_out2;
     }
 
-    struct partition *partition = &mountpoint->partition;
-    struct filesystem *filesystem = partition->filesystem;
+    struct filesystem *filesystem = mountpoint->filesystem;
+    void *fs_private = mountpoint->fs_private;
 
-    res = filesystem->open(partition, path, mode, descriptor->private);
+    res = filesystem->open(fs_private, path, mode, &descriptor->private);
     if (res < 0) {
         goto err_out2;
     }
 
-    descriptor->partition = partition;
+    descriptor->mountpoint = mountpoint;
+
+    path_free(path);
 
     return descriptor->index;
 
@@ -126,8 +178,7 @@ vfs_read(int fd, char *ptr, size_t count)
         return -EINVAL;
     }
 
-    struct partition *partition = descriptor->partition;
-    struct filesystem *filesystem = partition->filesystem;
+    struct filesystem *filesystem = descriptor->mountpoint->filesystem;
 
     return filesystem->read(descriptor, ptr, count);
 }
@@ -147,8 +198,7 @@ vfs_stat(int fd, struct file_stat *stat)
         return -EINVAL;
     }
 
-    struct partition *partition = descriptor->partition;
-    struct filesystem *filesystem = partition->filesystem;
+    struct filesystem *filesystem = descriptor->mountpoint->filesystem;
 
     return filesystem->stat(descriptor, stat);
 }
@@ -161,8 +211,7 @@ vfs_seek(int fd, int offset, file_seek_mode_t seek_mode)
         return -EINVAL;
     }
 
-    struct partition *partition = descriptor->partition;
-    struct filesystem *filesystem = partition->filesystem;
+    struct filesystem *filesystem = descriptor->mountpoint->filesystem;
 
     return filesystem->seek(descriptor, offset, seek_mode);
 }

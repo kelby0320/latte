@@ -1,6 +1,7 @@
 #include "fs/fs.h"
 
 #include "config.h"
+#include "dev/block/block.h"
 #include "errno.h"
 #include "fs/ext2/ext2.h"
 #include "fs/fat32/fat32.h"
@@ -8,19 +9,19 @@
 #include "kernel.h"
 #include "libk/memory.h"
 #include "libk/string.h"
-#include "vfs/partition.h"
+#include "vfs/mountpoint.h"
 
 static struct filesystem *filesystems[LATTE_MAX_FILESYSTEMS];
 static int filesystems_len;
 
 static void *
-fs_try_resolve(struct filesystem *filesystem, struct partition *partition)
+fs_try_resolve(struct filesystem *filesystem, struct block_device *block_device)
 {
     if (!filesystem) {
         return NULL;
     }
 
-    return filesystem->resolve(partition);
+    return filesystem->resolve(block_device);
 }
 
 /**
@@ -63,14 +64,14 @@ fs_init()
 }
 
 int
-fs_resolve(struct partition *partition)
+fs_resolve(struct mountpoint *mountpoint)
 {
     for (int i = 0; i < LATTE_MAX_FILESYSTEMS; i++) {
         struct filesystem *filesystem = filesystems[i];
-        void *fs_private = fs_try_resolve(filesystem, partition);
+        void *fs_private = fs_try_resolve(filesystem, mountpoint->block_device);
         if (fs_private) {
-            partition->filesystem = filesystem;
-            partition->fs_private = fs_private;
+            mountpoint->filesystem = filesystem;
+            mountpoint->fs_private = fs_private;
             return 0;
         }
     }

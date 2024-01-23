@@ -30,9 +30,6 @@ struct path_element {
  *
  */
 struct path {
-    // Id of the disk
-    char disk_id[LATTE_DISK_ID_MAX_SIZE];
-
     // Linked list of path elements
     struct path_element *root;
 };

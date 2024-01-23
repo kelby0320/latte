@@ -4,61 +4,56 @@
 #include "dev/device.h"
 #include "errno.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "libk/string.h"
 
 #define PARTITION_TABLE_OFFSET 0x1be
 #define PARTITION_TABLE_SIZE   64
 
+static unsigned int block_device_number = 0;
+
 static int
 block_device_read(struct device *device, size_t offset, char *buf, size_t sector_count)
 {
+    struct block_device *block_device = (struct block_device *)device;
     struct ata_bus *ata_bus = (struct ata_bus *)device->bus;
-    unsigned int dev_id = device->id;
+    unsigned int drive_no = block_device->drive_no;
     unsigned int lba = offset;
 
-    return ata_bus->read(ata_bus, dev_id, lba, buf, sector_count);
+    return ata_bus->read(ata_bus, drive_no, lba, buf, sector_count);
 }
 
 static int
 block_device_write(struct device *device, size_t offset, const char *buf, size_t size)
 {
+    struct block_device *block_device = (struct block_device *)device;
     struct ata_bus *ata_bus = (struct ata_bus *)device->bus;
-    unsigned int dev_id = device->id;
+    unsigned int drive_no = block_device->drive_no;
     unsigned int lba = offset;
 
-    return ata_bus->write(ata_bus, dev_id, lba, buf, size);
-}
-
-static int
-read_partitions(struct block_device *block_device)
-{
-    struct ata_bus *ata_bus = (struct ata_bus *)block_device->device.bus;
-    unsigned int device_id = block_device->device.id;
-    char buf[512];
-
-    int res = ata_bus->read(ata_bus, device_id, 0, buf, 1);
-    if (res < 0) {
-        return res;
-    }
-
-    char *partition_tables_start = buf + PARTITION_TABLE_OFFSET;
-
-    memcpy(block_device->partition_table, partition_tables_start, PARTITION_TABLE_SIZE);
-
-    return 0;
+    return ata_bus->write(ata_bus, drive_no, lba, buf, size);
 }
 
 int
-block_device_init(struct block_device *block_device)
+block_device_init(struct block_device *block_device, block_device_type_t type,
+                  unsigned int drive_no, unsigned int lba_offset)
 {
-    strcpy(block_device->device.name, "block"); // TODO - Append block number
+    if (type > BLOCK_DEVICE_TYPE_PART) {
+        return -EINVAL;
+    }
+
+    if (type == BLOCK_DEVICE_TYPE_DISK) {
+        if (lba_offset != 0) {
+            return -EINVAL;
+        }
+    }
+
+    sprintk(block_device->device.name, "block%d", block_device_number++);
+    block_device->type = type;
+    block_device->drive_no = drive_no;
+    block_device->lba_offset = lba_offset;
     block_device->device.file_operations.read = block_device_read;
     block_device->device.file_operations.write = block_device_write;
-
-    int res = read_partitions(block_device);
-    if (res < 0) {
-        return res;
-    }
 
     return 0;
 }
@@ -75,4 +70,29 @@ block_device_write_sectors(struct block_device *block_device, unsigned int lba, 
                            size_t size)
 {
     return block_device_write((struct device *)block_device, lba, buf, size);
+}
+
+int
+block_device_read_partitions(struct block_device *block_device,
+                             struct partition_table_entry *partition_table)
+{
+    // The partition table can only be read from the disk itself
+    if (block_device->type != BLOCK_DEVICE_TYPE_DISK) {
+        return -EINVAL;
+    }
+
+    struct ata_bus *ata_bus = (struct ata_bus *)block_device->device.bus;
+    unsigned int drive_no = block_device->drive_no;
+    char buf[512];
+
+    int res = ata_bus->read(ata_bus, drive_no, 0, buf, 1);
+    if (res < 0) {
+        return res;
+    }
+
+    char *partition_tables_start = buf + PARTITION_TABLE_OFFSET;
+
+    memcpy(partition_table, partition_tables_start, PARTITION_TABLE_SIZE);
+
+    return 0;
 }

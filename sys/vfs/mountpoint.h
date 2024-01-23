@@ -2,14 +2,18 @@
 #define MOUNTPOINT_H
 
 #include "config.h"
-#include "vfs/partition.h"
+
+struct block_device;
+struct filesystem;
 
 /**
  * @brief Mountpoint structure
  *
  */
 struct mountpoint {
-    struct partition partition;
+    struct block_device *block_device;
+    struct filesystem *filesystem;
+    void *fs_private;
     char path[LATTE_MAX_PATH_LEN];
 };
 

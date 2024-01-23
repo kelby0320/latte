@@ -1,33 +1,28 @@
 #include "kernel.h"
 
 #include "boot/multiboot2.h"
+#include "bus/bus.h"
 #include "config.h"
+#include "dev/device.h"
 #include "dev/term/term.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "gdt/tss.h"
 #include "irq/irq.h"
 #include "libk/libk.h"
+#include "libk/print.h"
 #include "libk/string.h"
 #include "mem/vm.h"
 #include "task/process.h"
 #include "task/sched.h"
+#include "vfs/vfs.h"
 
 static struct vm_area kernel_area;
 
 void
-print(const char *str)
-{
-    size_t len = strlen(str);
-    for (size_t i = 0; i < len; i++) {
-        terminal_writechar(str[i]);
-    }
-}
-
-void
 panic(const char *str)
 {
-    print(str);
+    printk(str);
     while (1) {}
 }
 
@@ -60,9 +55,6 @@ kernel_main(unsigned long magic, void *addr)
     // Initialize libk
     libk_init();
 
-    // Initialize filesystem drivers
-    fs_init();
-
     // Initialize IRQs
     irq_init();
 
@@ -78,13 +70,28 @@ kernel_main(unsigned long magic, void *addr)
     // Enable virtual memory
     enable_paging();
 
-    // char buf[1024];
-    // int fd = fopen("hdd0:/latte.txt", "r");
-    // fread(fd, buf, 32);
-    // print(buf);
+    // Initialize the bus subsystem
+    bus_init();
 
-    // process_spawn("hdd0:/bin/testprog");
-    // schedule_first_task();
+    // Initialize the device subsystem
+    device_init();
+
+    // Probe for devices
+    bus_probe();
+
+    // Initialize filesystem drivers
+    fs_init();
+
+    // Initialize the virtual filesystem
+    vfs_init();
+
+    char buf[1024];
+    int fd = vfs_open("/latte.txt", "r");
+    vfs_read(fd, buf, 32);
+    printk(buf);
+
+    process_spawn("/bin/testprog");
+    schedule_first_task();
 
     while (1) {}
 }

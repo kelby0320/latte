@@ -28,7 +28,8 @@ struct file_stat {
 
 struct path;
 struct file_descriptor;
-struct partition;
+struct mountpoint;
+struct block_device;
 
 /**
  * @brief Filesystem interface structure
@@ -36,13 +37,13 @@ struct partition;
  */
 struct filesystem {
     // Pointer to function to resolve the filesystem
-    void *(*resolve)(struct partition *partition);
+    void *(*resolve)(struct block_device *block_device);
 
     // Pointer to function to open a file
-    int (*open)(struct partition *partition, struct path *path, file_mode_t mode, void **out);
+    int (*open)(void *fs_private, struct path *path, file_mode_t mode, void **out);
 
     // Pointer to function to close a file
-    int (*close)(void *private);
+    int (*close)(void *fs_private);
 
     // Pointer to function to seek in a file
     int (*seek)(struct file_descriptor *file_descriptor, uint32_t offset,
@@ -75,7 +76,7 @@ fs_init();
  * @return int          Status code
  */
 int
-fs_resolve(struct partition *partition);
+fs_resolve(struct mountpoint *mountpoint);
 
 /**
  * @brief Convert string to FILE_MODE

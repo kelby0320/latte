@@ -6,9 +6,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define BLOCK_DEVICE_TYPE_DISK 0
+#define BLOCK_DEVICE_TYPE_PART 1
+
 /**
  * @brief MBR Partition Table Entry
- * 
+ *
  */
 struct partition_table_entry {
     uint8_t attrib;
@@ -19,32 +22,38 @@ struct partition_table_entry {
     uint32_t sector_count;
 } __attribute__((packed));
 
+typedef unsigned int block_device_type_t;
+
 /**
  * @brief Block device structure
- * 
+ *
  */
 struct block_device {
     struct device device;
-    struct partition_table_entry partition_table[4];
+    block_device_type_t type;
+    unsigned int drive_no;
+    unsigned int lba_offset;
 };
 
 /**
  * @brief Initialize a block device
- * 
+ *
  * @param block_device  Pointer to a block device
+ * @param drive_no      Driver number
  * @return int          Status code
  */
 int
-block_device_init(struct block_device *block_device);
+block_device_init(struct block_device *block_device, block_device_type_t type,
+                  unsigned int drive_no, unsigned int lba_offset);
 
 /**
  * @brief Read sectors from a block device
- * 
+ *
  * @param block_device  Pointer to the block device
  * @param lba           LBA to read from
  * @param buf           Buffer to read into
  * @param sector_count     Sector count to read
- * @return int 
+ * @return int
  */
 int
 block_device_read_sectors(struct block_device *block_device, unsigned int lba, char *buf,
@@ -52,15 +61,26 @@ block_device_read_sectors(struct block_device *block_device, unsigned int lba, c
 
 /**
  * @brief Write data to a block device
- * 
+ *
  * @param block_device  Pointer to the block device
  * @param lba           LBA to write to
  * @param buf           Buffer to write
  * @param size          Size of the buffer
- * @return int 
+ * @return int
  */
 int
 block_device_write_sectors(struct block_device *block_device, unsigned int lba, const char *buf,
                            size_t size);
+
+/**
+ * @brief Read the partition table from a block device (must by a block device of type DISK)
+ *
+ * @param block_device      Pointer to the block device
+ * @param partition_table   Pointer to the partition table
+ * @return int              Status code
+ */
+int
+block_device_read_partitions(struct block_device *block_device,
+                             struct partition_table_entry *partition_table);
 
 #endif

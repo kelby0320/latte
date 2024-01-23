@@ -4,10 +4,13 @@
 #include "fs/fs.h"
 
 #include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief Initialize Virtual File System
  *
+ * @param biosdev   Bios boot device
+ * @param part_no   Boot partition number
  * @return int  Status code
  */
 int
@@ -22,7 +25,7 @@ vfs_init();
  * @return int          Status code
  */
 int
-vfs_mount(const char *path, const char *blk_dev_name, unsigned int part_no);
+vfs_mount(const char *path, const char *blk_dev_name);
 
 /**
  * @brief Open a file

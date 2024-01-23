@@ -13,7 +13,7 @@
 #include "libk/memory.h"
 #include "libk/string.h"
 #include "vfs/file_descriptor.h"
-#include "vfs/partition.h"
+#include "vfs/mountpoint.h"
 
 #include <stdint.h>
 
@@ -27,7 +27,8 @@ static int
 ext2_read_superblock(struct ext2_private *fs_private)
 {
     bufferedreader_seek(fs_private->reader, EXT2_FS_START + EXT2_SUPERBLOCK_OFFSET);
-    int res = bufferedreader_read(fs_private->reader, &fs_private->superblock, EXT2_SUPERBLOCK_SIZE);
+    int res =
+        bufferedreader_read(fs_private->reader, &fs_private->superblock, EXT2_SUPERBLOCK_SIZE);
     return res;
 }
 
@@ -92,7 +93,7 @@ err_out:
  * @return void *   Ponter to private Ext2 data structure
  */
 void *
-ext2_resolve(struct partition *partition)
+ext2_resolve(struct block_device *block_device)
 {
     struct ext2_private *fs_private = kzalloc(sizeof(struct ext2_private));
     if (!fs_private) {
@@ -100,7 +101,7 @@ ext2_resolve(struct partition *partition)
     }
 
     struct bufferedreader *reader;
-    int res = bufferedreader_new(&reader, partition);
+    int res = bufferedreader_new(&reader, block_device);
     if (res < 0) {
         goto err_out1;
     }
@@ -138,18 +139,19 @@ err_out1:
  * @return int  Status code
  */
 int
-ext2_open(struct partition *partition, struct path *path, file_mode_t mode, void **out)
+ext2_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
 {
     if (mode != FILE_MODE_READ) {
         return -EACCES;
     }
 
-    struct ext2_descriptor_private *descriptor_private = kzalloc(sizeof(struct ext2_descriptor_private));
+    struct ext2_descriptor_private *descriptor_private =
+        kzalloc(sizeof(struct ext2_descriptor_private));
     if (!descriptor_private) {
         return -ENOMEM;
     }
 
-    struct ext2_inode *inode = ext2_path_to_inode(path, partition->fs_private);
+    struct ext2_inode *inode = ext2_path_to_inode(path, (struct ext2_private *)fs_private);
     if (!inode) {
         kfree(descriptor_private);
         return -EEXIST;
@@ -176,7 +178,7 @@ ext2_open(struct partition *partition, struct path *path, file_mode_t mode, void
  * @return int      Status code
  */
 int
-ext2_close(void *private)
+ext2_close(void *fs_private)
 {
     return 0;
 }
@@ -193,7 +195,7 @@ int
 ext2_read(struct file_descriptor *file_descriptor, char *buf, uint32_t count)
 {
     struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
-    struct ext2_private *fs_private = file_descriptor->partition->fs_private;
+    struct ext2_private *fs_private = file_descriptor->mountpoint->fs_private;
 
     struct ext2_inode *inode = descriptor_private->inode;
     int blk_offset = descriptor_private->blk_offset;
@@ -228,7 +230,7 @@ int
 ext2_seek(struct file_descriptor *file_descriptor, uint32_t offset, file_seek_mode_t seek_mode)
 {
     struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
-    struct ext2_private *fs_private = file_descriptor->partition->fs_private;
+    struct ext2_private *fs_private = file_descriptor->mountpoint->fs_private;
     uint32_t block_size = fs_private->block_size;
 
     switch (seek_mode) {

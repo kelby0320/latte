@@ -42,98 +42,6 @@ is_path_char(char c)
 }
 
 /**
- * @brief Ensures disk id is valid
- *
- * @param str   Disk id string
- * @return int  Status code
- */
-static int
-validate_disk_id(const char *str)
-{
-    size_t len = strlen(str);
-    for (size_t i = 0; i < len; i++) {
-        if (!is_path_char(str[i])) {
-            return -EINVAL;
-        }
-    }
-
-    return 0;
-}
-
-/**
- * @brief Ensure disk id separator is valid
- *
- * @param str   Separator string
- * @return int  Status code
- */
-static int
-validate_disk_id_sep(const char *str)
-{
-    if (str[0] != ':') {
-        return -EINVAL;
-    }
-
-    if (str[1] != '/') {
-        return -EINVAL;
-    }
-
-    return 0;
-}
-
-/**
- * @brief Get the index just past the end of the disk id
- *
- * @param path_str  Path string
- * @return int      Status code
- */
-static int
-disk_id_end_idx(const char *path_str)
-{
-    for (int idx = 0; idx < LATTE_DISK_ID_MAX_SIZE; idx++) {
-        if (path_str[idx] == DISK_ID_SEPARATOR) {
-            return idx - 1; // return end of disk_id index
-        }
-    }
-
-    return -EINVAL;
-}
-
-/**
- * @brief Read and validate the disk id from a path string
- *
- * @param buf       Output buffer to store the disk id
- * @param path_str  Path string
- * @return int      Status code
- */
-static int
-parse_disk_id(char *buf, const char **path_str)
-{
-    int end_disk_id = disk_id_end_idx(*path_str);
-    if (end_disk_id < 0) {
-        return -EINVAL;
-    }
-
-    int disk_id_strlen = end_disk_id + 1;
-    strncpy(buf, *path_str, disk_id_strlen);
-    buf[disk_id_strlen] = 0; // Ensure string is null terminated
-
-    int res = validate_disk_id(buf);
-    if (res < 0) {
-        return -EINVAL;
-    }
-
-    *path_str += end_disk_id + 1; // point to drive_id separator ":/"
-    res = validate_disk_id_sep(*path_str);
-    if (res < 0) {
-        return -EINVAL;
-    }
-
-    *path_str += 2; // point to next character after the drive_id separator
-
-    return 0;
-}
-
-/**
  * @brief Get the element from path object
  *
  * @param path_buf  Output buffer
@@ -141,7 +49,7 @@ parse_disk_id(char *buf, const char **path_str)
  * @return int      Element length
  */
 static int
-get_element_from_path(char *path_buf, char **path_str)
+get_element_from_path(char *path_buf, const char **path_str)
 {
     int i;
     for (i = 0; is_path_char(**path_str) && i < LATTE_MAX_PATH_ELEM_SIZE - 1; i++) {
@@ -168,7 +76,7 @@ get_element_from_path(char *path_buf, char **path_str)
  */
 static int
 parse_next_element(struct path_element **next_element, struct path_element *prev_element,
-                   char **path_str)
+                   const char **path_str)
 {
     struct path_element *element = kzalloc(sizeof(struct path_element));
     if (!element) {
@@ -194,18 +102,21 @@ parse_next_element(struct path_element **next_element, struct path_element *prev
 int
 path_from_str(struct path **path_out, const char *path_str)
 {
+    // The path string should start with '/'
+    if (*path_str != '/') {
+        return -EINVAL;
+    }
+
+    // Skip initial '/'
+    path_str++;
+
     struct path *path = kzalloc(sizeof(struct path));
     if (!path) {
         return -ENOMEM;
     }
 
-    int res = parse_disk_id(path->disk_id, &path_str);
-    if (res < 0) {
-        goto err_out;
-    }
-
     struct path_element *root_element;
-    res = parse_next_element(&root_element, NULL, &path_str);
+    int res = parse_next_element(&root_element, NULL, &path_str);
     if (res < 0) {
         goto err_out;
     }
@@ -228,5 +139,11 @@ err_out:
 void
 path_free(struct path *path)
 {
-    // TODO
+    for (struct path_element *p = path->root; p != NULL;) {
+        struct path_element *temp = p->next;
+        kfree(p);
+        p = temp;
+    }
+
+    kfree(path);
 }

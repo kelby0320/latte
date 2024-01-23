@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-struct partition;
+struct block_device;
 
 /**
  * @brief Data buffer for reading from a disk.
@@ -14,7 +14,7 @@ struct partition;
  */
 struct bufferedreader {
     // Pointer to the disk
-    struct partition *partition;
+    struct block_device *block_device;
 
     // Read position on the disk
     unsigned int pos;
@@ -28,7 +28,7 @@ struct bufferedreader {
  * @return int          Status code
  */
 int
-bufferedreader_new(struct bufferedreader **reader_out, struct partition *partition);
+bufferedreader_new(struct bufferedreader **reader_out, struct block_device *block_device);
 
 /**
  * @brief Seek to a position on the disk

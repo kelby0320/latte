@@ -44,11 +44,11 @@ int
 bus_add_bus(struct bus *bus);
 
 /**
- * @brief Get a new bus id number
+ * @brief Get the next bus id number
  *
  * @return int  Bus Id
  */
 int
-bus_get_new_bus_id();
+bus_get_next_bus_id();
 
 #endif

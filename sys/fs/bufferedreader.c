@@ -4,10 +4,9 @@
 #include "dev/block/block.h"
 #include "errno.h"
 #include "libk/kheap.h"
-#include "vfs/partition.h"
 
 int
-bufferedreader_new(struct bufferedreader **reader_out, struct partition *partition)
+bufferedreader_new(struct bufferedreader **reader_out, struct block_device *block_device)
 {
     struct bufferedreader *reader = kzalloc(sizeof(struct bufferedreader));
     if (!reader) {
@@ -15,7 +14,7 @@ bufferedreader_new(struct bufferedreader **reader_out, struct partition *partiti
     }
 
     reader->pos = 0;
-    reader->partition = partition;
+    reader->block_device = block_device;
 
     *reader_out = reader;
     return 0;
@@ -38,7 +37,7 @@ bufferedreader_read(struct bufferedreader *reader, void *out, int count)
     unsigned int bytes_read = 0;
     int out_idx = 0;
 
-    struct block_device *block_device = reader->partition->block_device;
+    struct block_device *block_device = reader->block_device;
 
     while (bytes_read < count) {
         // Read a sector of data
