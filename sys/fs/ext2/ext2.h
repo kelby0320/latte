@@ -1,7 +1,7 @@
 #ifndef EXT2_H
 #define EXT2_H
 
-#include "fs/fs.h"
+struct filesystem;
 
 /**
  * @brief Initialize an Ext2 filesystem

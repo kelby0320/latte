@@ -18,11 +18,11 @@ vfs_init();
  * @brief Mount a partition
  *
  * @param path          Path to mount in the VFS
- * @param blk_dev_name  Block device to mount
+ * @param block_device  Pointer to the block device
  * @return int          Status code
  */
 int
-vfs_mount(const char *path, const char *blk_dev_name);
+vfs_mount(const char *path, struct block_device *block_device);
 
 /**
  * @brief Open a file

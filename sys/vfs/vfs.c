@@ -79,7 +79,7 @@ vfs_init()
         goto err_out;
     }
 
-    res = vfs_mount("/", boot_block_device->device.name);
+    res = vfs_mount("/", boot_block_device);
     if (res < 0) {
         goto err_out;
     }
@@ -91,15 +91,8 @@ err_out:
 }
 
 int
-vfs_mount(const char *path, const char *blk_dev_name)
+vfs_mount(const char *path, struct block_device *block_device)
 {
-    struct device *device = device_find(blk_dev_name);
-    if (!device) {
-        return -ENOENT;
-    }
-
-    struct block_device *block_device = (struct block_device *)device;
-
     struct mountpoint *mountpoint = kzalloc(sizeof(struct mountpoint));
     if (!mountpoint) {
         return -ENOMEM;

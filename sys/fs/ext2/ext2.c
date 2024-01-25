@@ -87,12 +87,154 @@ err_out:
 }
 
 /**
+ * @brief Open a file on an Ext2 filesystem
+ *
+ * @param fs_private    Pointer to the filesystem private data
+ * @param path          Pointer to filepath
+ * @param mode          Open file mode
+ * @param out           Pointer to output private descriptor data
+ * @return int          Status code
+ */
+static int
+ext2_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
+{
+    if (mode != FILE_MODE_READ) {
+        return -EACCES;
+    }
+
+    struct ext2_descriptor_private *descriptor_private =
+        kzalloc(sizeof(struct ext2_descriptor_private));
+    if (!descriptor_private) {
+        return -ENOMEM;
+    }
+
+    struct ext2_inode *inode = ext2_path_to_inode(path, (struct ext2_private *)fs_private);
+    if (!inode) {
+        kfree(descriptor_private);
+        return -EEXIST;
+    }
+
+    if (!(inode->i_mode & EXT2_S_IFREG)) {
+        kfree(descriptor_private);
+        return -EACCES;
+    }
+
+    descriptor_private->inode = inode;
+    descriptor_private->blk_offset = 0;
+    descriptor_private->byte_offset = 0;
+
+    *out = descriptor_private;
+
+    return 0;
+}
+
+/**
+ * @brief Close an Ext2 open file
+ *
+ * @param private   Pointer to private fs data
+ * @return int      Status code
+ */
+static int
+ext2_close(void *fs_private)
+{
+    return 0;
+}
+
+/**
+ * @brief Read data from an Ext2 open file
+ *
+ * @param file_descriptor   Pointer to the file descriptor
+ * @param buf               Pointer to the output buffer
+ * @param count             Number of bytes to read
+ * @return int              Number of bytes actually read
+ */
+static int
+ext2_read(struct file_descriptor *file_descriptor, char *buf, size_t count)
+{
+    struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
+    struct ext2_private *fs_private = file_descriptor->mountpoint->fs_private;
+
+    struct ext2_inode *inode = descriptor_private->inode;
+    int blk_offset = descriptor_private->blk_offset;
+    int byte_offset = descriptor_private->byte_offset;
+
+    return ext2_read_inode_data(fs_private, inode, buf, count, blk_offset, byte_offset);
+}
+
+/**
+ * @brief Write data to an Ext2 open file
+ *
+ * @param file_descriptor   Pointer to the file descriptor
+ * @param buf               Pointer to the input buffer
+ * @param count             Number of bytes to write
+ * @return int              Number of bytes actually written
+ */
+static int
+ext2_write(struct file_descriptor *file_descriptor, const char *buf, size_t count)
+{
+    return 0;
+}
+
+/**
+ * @brief Read the status of an Ext2 open file
+ *
+ * @param file_descriptor   Pointer to the file descriptor
+ * @param stat  Pointer to output stat structure
+ * @return int  Status code
+ */
+static int
+ext2_stat(struct file_descriptor *file_descriptor, struct file_stat *stat)
+{
+    struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
+
+    stat->size = descriptor_private->inode->i_size;
+    stat->mode = descriptor_private->inode->i_mode;
+
+    return 0;
+}
+
+/**
+ * @brief Seek to a location in an Ext2 open file
+ *
+ * @param file_descriptor   Pointer to the file descriptor
+ * @param offset            Seek offset
+ * @param seek_mode         Seek mode
+ * @return int              Status code
+ */
+static int
+ext2_seek(struct file_descriptor *file_descriptor, uint32_t offset, file_seek_mode_t seek_mode)
+{
+    struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
+    struct ext2_private *fs_private = file_descriptor->mountpoint->fs_private;
+    uint32_t block_size = fs_private->block_size;
+
+    switch (seek_mode) {
+    case SEEK_SET:
+        descriptor_private->blk_offset = offset / block_size;
+        descriptor_private->byte_offset = offset % block_size;
+        break;
+    case SEEK_CUR:
+        descriptor_private->blk_offset = descriptor_private->blk_offset + offset / block_size;
+        descriptor_private->byte_offset = offset % block_size;
+        break;
+    case SEEK_END:
+        descriptor_private->blk_offset = descriptor_private->inode->i_size + offset / block_size;
+        descriptor_private->byte_offset = offset % block_size;
+        break;
+    default:
+        return -EINVAL;
+    }
+
+    return 0;
+}
+
+/**
  * @brief Attempt to bind an Ext2 filesystem to the disk
  *
  * @param block_device Pointer to the block device
  * @return void *      Pointer to private Ext2 data structure
  */
-void *
+static void *
 ext2_resolve(struct block_device *block_device)
 {
     struct ext2_private *fs_private = kzalloc(sizeof(struct ext2_private));
@@ -127,148 +269,6 @@ err_out2:
 err_out1:
     kfree(fs_private);
     return NULL;
-}
-
-/**
- * @brief Open a file on an Ext2 filesystem
- *
- * @param fs_private    Pointer to the filesystem private data
- * @param path          Pointer to filepath
- * @param mode          Open file mode
- * @param out           Pointer to output private descriptor data
- * @return int          Status code
- */
-int
-ext2_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
-{
-    if (mode != FILE_MODE_READ) {
-        return -EACCES;
-    }
-
-    struct ext2_descriptor_private *descriptor_private =
-        kzalloc(sizeof(struct ext2_descriptor_private));
-    if (!descriptor_private) {
-        return -ENOMEM;
-    }
-
-    struct ext2_inode *inode = ext2_path_to_inode(path, (struct ext2_private *)fs_private);
-    if (!inode) {
-        kfree(descriptor_private);
-        return -EEXIST;
-    }
-
-    if (!(inode->i_mode & EXT2_S_IFREG)) {
-        kfree(descriptor_private);
-        return -EACCES;
-    }
-
-    descriptor_private->inode = inode;
-    descriptor_private->blk_offset = 0;
-    descriptor_private->byte_offset = 0;
-
-    *out = (void *)descriptor_private;
-
-    return 0;
-}
-
-/**
- * @brief Close an Ext2 open file
- *
- * @param private   Pointer to private fs data
- * @return int      Status code
- */
-int
-ext2_close(void *fs_private)
-{
-    return 0;
-}
-
-/**
- * @brief Read data from an Ext2 open file
- *
- * @param file_descriptor   Pointer to the file descriptor
- * @param buf               Pointer to the output buffer
- * @param count             Number of bytes to read
- * @return int              Number of bytes actually read
- */
-int
-ext2_read(struct file_descriptor *file_descriptor, char *buf, uint32_t count)
-{
-    struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
-    struct ext2_private *fs_private = file_descriptor->mountpoint->fs_private;
-
-    struct ext2_inode *inode = descriptor_private->inode;
-    int blk_offset = descriptor_private->blk_offset;
-    int byte_offset = descriptor_private->byte_offset;
-
-    return ext2_read_inode_data(fs_private, inode, buf, count, blk_offset, byte_offset);
-}
-
-/**
- * @brief Write data to an Ext2 open file
- *
- * @param file_descriptor   Pointer to the file descriptor
- * @param buf               Pointer to the input buffer
- * @param count             Number of bytes to write
- * @return int              Number of bytes actually written
- */
-int
-ext2_write(struct file_descriptor *file_descriptor, const char *buf, uint32_t count)
-{
-    return 0;
-}
-
-/**
- * @brief Seek to a location in an Ext2 open file
- *
- * @param file_descriptor   Pointer to the file descriptor
- * @param offset            Seek offset
- * @param seek_mode         Seek mode
- * @return int              Status code
- */
-int
-ext2_seek(struct file_descriptor *file_descriptor, uint32_t offset, file_seek_mode_t seek_mode)
-{
-    struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
-    struct ext2_private *fs_private = file_descriptor->mountpoint->fs_private;
-    uint32_t block_size = fs_private->block_size;
-
-    switch (seek_mode) {
-    case SEEK_SET:
-        descriptor_private->blk_offset = offset / block_size;
-        descriptor_private->byte_offset = offset % block_size;
-        break;
-    case SEEK_CUR:
-        descriptor_private->blk_offset = descriptor_private->blk_offset + offset / block_size;
-        descriptor_private->byte_offset = offset % block_size;
-        break;
-    case SEEK_END:
-        descriptor_private->blk_offset = descriptor_private->inode->i_size + offset / block_size;
-        descriptor_private->byte_offset = offset % block_size;
-        break;
-    default:
-        return -EINVAL;
-    }
-
-    return 0;
-}
-
-/**
- * @brief Read the status of an Ext2 open file
- *
- * @param file_descriptor   Pointer to the file descriptor
- * @param stat  Pointer to output stat structure
- * @return int  Status code
- */
-int
-ext2_stat(struct file_descriptor *file_descriptor, struct file_stat *stat)
-{
-    struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
-
-    stat->size = descriptor_private->inode->i_size;
-    stat->mode = descriptor_private->inode->i_mode;
-
-    return 0;
 }
 
 struct filesystem *

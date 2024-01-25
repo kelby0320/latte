@@ -46,14 +46,13 @@ struct filesystem {
     int (*close)(void *fs_private);
 
     // Pointer to function to seek in a file
-    int (*seek)(struct file_descriptor *file_descriptor, uint32_t offset,
-                file_seek_mode_t seek_mode);
+    int (*seek)(struct file_descriptor *file_descriptor, size_t offset, file_seek_mode_t seek_mode);
 
     // Pointer to function to read from a file
-    int (*read)(struct file_descriptor *file_descriptor, char *buf, uint32_t count);
+    int (*read)(struct file_descriptor *file_descriptor, char *buf, size_t count);
 
     // Pointer to function to write to a file
-    int (*write)(struct file_descriptor *file_descriptor, const char *buf, uint32_t count);
+    int (*write)(struct file_descriptor *file_descriptor, const char *buf, size_t count);
 
     // Pointer to function to read file status
     int (*stat)(struct file_descriptor *file_descriptor, struct file_stat *stat);
