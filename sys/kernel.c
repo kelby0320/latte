@@ -4,7 +4,6 @@
 #include "bus/bus.h"
 #include "config.h"
 #include "dev/device.h"
-#include "dev/term/term.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "gdt/tss.h"
@@ -36,8 +35,6 @@ switch_to_kernel_vm_area()
 void
 kernel_main(unsigned long magic, void *addr)
 {
-    terminal_initialize();
-
     int res = multiboot2_verify_magic_number(magic);
     if (!res) {
         panic("Invalid multiboot magic number");

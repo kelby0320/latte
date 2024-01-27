@@ -1,29 +1,66 @@
 #ifndef TERM_H
 #define TERM_H
 
-enum vga_color {
-    VGA_COLOR_BLACK = 0,
-    VGA_COLOR_BLUE = 1,
-    VGA_COLOR_GREEN = 2,
-    VGA_COLOR_CYAN = 3,
-    VGA_COLOR_RED = 4,
-    VGA_COLOR_MAGENTA = 5,
-    VGA_COLOR_BROWN = 6,
-    VGA_COLOR_LIGHT_GREY = 7,
-    VGA_COLOR_DARK_GREY = 8,
-    VGA_COLOR_LIGHT_BLUE = 9,
-    VGA_COLOR_LIGHT_GREEN = 10,
-    VGA_COLOR_LIGHT_CYAN = 11,
-    VGA_COLOR_LIGHT_RED = 12,
-    VGA_COLOR_LIGHT_MAGENTA = 13,
-    VGA_COLOR_LIGHT_BROWN = 14,
-    VGA_COLOR_WHITE = 15
+#include "dev/device.h"
+
+struct vga_device;
+
+/**
+ * @brief
+ *
+ */
+struct term_device {
+    // Base device structure
+    struct device device;
+
+    // Pointer to underlying VGA device
+    struct vga_device *vga_device;
+
+    // Pointer to the VGA framebuffer memory
+    uint16_t *framebuffer;
+
+    // Terminal width in columns
+    size_t term_width;
+
+    // Terminal height in rows
+    size_t term_height;
+
+    // Current row position
+    size_t current_row;
+
+    // Current column position
+    size_t current_col;
+
+    // Character color
+    uint8_t char_color;
 };
 
-void
-terminal_initialize();
+/**
+ * @brief Initialize a terminal device
+ *
+ * @param device    Pointer to the device
+ * @return int      Status code
+ */
+int
+term_device_init(struct term_device *device);
 
+/**
+ * @brief Write to the terminal
+ *
+ * @param term_device   Pointer to the device
+ * @param buf           Buffer to write
+ * @param count         Number of characters to write
+ * @return int          Number of characters written
+ */
+int
+term_device_write(struct term_device *term_device, const char *buf, size_t count);
+
+/**
+ * @brief Clear the terminal
+ *
+ * @param term_device   Pointer to the device
+ */
 void
-terminal_writechar(char c);
+term_device_clear_screen(struct term_device *term_device);
 
 #endif
