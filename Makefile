@@ -16,6 +16,7 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/bus/bus.o \
 	./sys/dev/block/block.o \
 	./sys/dev/term/term.o \
+	./sys/dev/vga/vga.o \
 	./sys/dev/device.o \
 	./sys/fs/bufferedreader.o \
 	./sys/fs/fs.o \
@@ -30,7 +31,6 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/irq/irq.o \
 	./sys/irq/isr.o \
 	./sys/libk/kheap.o \
-	./sys/libk/libk.o \
 	./sys/libk/memory.o \
 	./sys/libk/print.o \
 	./sys/libk/string.o \
@@ -46,6 +46,7 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/vfs/mountpoint.o \
 	./sys/vfs/vfs.o \
 	./sys/kernel.o \
+	./sys/msgbuf.o
 
 AS_OBJECTS = ./sys/boot/boot.s.o \
 	./sys/gdt/gdt.s.o \

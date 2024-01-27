@@ -1,7 +1,8 @@
 #include "libk/print.h"
 
-#include "dev/term/term.h"
+#include "errno.h"
 #include "libk/string.h"
+#include "msgbuf.h"
 
 static int
 int_to_str(int i, char *buf, size_t buf_size)
@@ -116,9 +117,7 @@ printk(const char *fmt, ...)
     va_start(args, fmt);
     char buf[128];
 
-    int len = vsprintk(buf, fmt, args);
+    vsprintk(buf, fmt, args);
 
-    for (int i = 0; i < len; i++) {
-        terminal_writechar(buf[i]);
-    }
+    msgbuf_write(buf);
 }
