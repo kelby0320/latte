@@ -38,11 +38,11 @@ struct term_device {
 /**
  * @brief Initialize a terminal device
  *
- * @param device    Pointer to the device
- * @return int      Status code
+ * @param term_device   Pointer to the device
+ * @return int          Status code
  */
 int
-term_device_init(struct term_device *device);
+term_device_init(struct term_device *term_device);
 
 /**
  * @brief Write to the terminal

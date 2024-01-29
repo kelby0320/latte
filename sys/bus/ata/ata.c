@@ -48,6 +48,8 @@
 
 #define lba_drive(lba, drive_no) (lba >> 24) | 0b11100000 | (drive_no << 4)
 
+static unsigned int ata_bus_id = 0;
+
 /**
  * @brief Identify a drive on an ATA bus
  *
@@ -134,7 +136,6 @@ add_block_device(struct ata_bus *ata_bus, block_device_type_t type, unsigned int
 
     device->type = DEVICE_TYPE_BLOCK;
     device->bus = (struct bus *)ata_bus;
-    device->id = device_get_next_device_id();
 
     int res = block_device_init((struct block_device *)device, type, drive_no, lba_offset);
     if (res < 0) {
@@ -190,6 +191,8 @@ add_block_device_partitions(struct block_device *block_device_disk)
             return res;
         }
     }
+
+    return 0;
 }
 
 /**
@@ -358,7 +361,6 @@ ata_init_bus(unsigned int base_addr, const char *name, unsigned int id)
     ata_bus->base_addr = base_addr;
 
     strcpy(ata_bus->mass_storage_bus.bus.name, name);
-    ata_bus->mass_storage_bus.bus.id = id;
 
     ata_bus->mass_storage_bus.bus.probe = ata_bus_probe;
     ata_bus->mass_storage_bus.read = ata_bus_read;
@@ -376,21 +378,22 @@ ata_init_bus(unsigned int base_addr, const char *name, unsigned int id)
 int
 ata_bus_init()
 {
-    unsigned int bus_id = bus_get_next_bus_id();
     char name[LATTE_BUS_NAME_MAX_SIZE];
-    sprintk(name, "ata%d", bus_id);
-    int res = ata_init_bus(ATA_PIO_PRIMARY_BUS_BASE_ADDR, name, bus_id);
+    sprintk(name, "ata%d", ata_bus_id);
+    int res = ata_init_bus(ATA_PIO_PRIMARY_BUS_BASE_ADDR, name, ata_bus_id);
+    ata_bus_id++;
     if (res < 0) {
         return res;
     }
+
     printk("%s bus initialized successfully\n", name);
 
-    bus_id = bus_get_next_bus_id();
-    sprintk(name, "ata%d", bus_id);
-    res = ata_init_bus(ATA_PIO_SECONDARY_BUS_BASE_ADDR, name, bus_id);
+    sprintk(name, "ata%d", ata_bus_id);
+    res = ata_init_bus(ATA_PIO_SECONDARY_BUS_BASE_ADDR, name, ata_bus_id);
     if (res < 0) {
         return res;
     }
+
     printk("%s bus initialized successfully\n", name);
 
     return 0;

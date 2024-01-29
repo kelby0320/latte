@@ -9,6 +9,8 @@
 #include "libk/print.h"
 #include "libk/string.h"
 
+static unsigned int devfs_bus_id = 0;
+
 /**
  * @brief Probe the devfs virtual bus
  *
@@ -25,7 +27,6 @@ devfs_bus_probe(struct bus *bus)
 
     device->type = DEVICE_TYPE_BLOCK;
     device->bus = bus;
-    device->id = device_get_next_device_id();
 
     int res = block_device_init((struct block_device *)device, BLOCK_DEVICE_TYPE_VIRT, 0, 0);
     if (res < 0) {
@@ -97,12 +98,11 @@ devfs_bus_init()
         return -ENOMEM;
     }
 
-    unsigned int bus_id = bus_get_next_bus_id();
     char name[LATTE_BUS_NAME_MAX_SIZE];
-    sprintk(name, "devfs%d", bus_id);
+    sprintk(name, "devfs%d", devfs_bus_id);
     strcpy(devfs_bus->mass_storage_bus.bus.name, name);
+    devfs_bus_id++;
 
-    devfs_bus->mass_storage_bus.bus.id = bus_id;
     devfs_bus->mass_storage_bus.bus.probe = devfs_bus_probe;
     devfs_bus->mass_storage_bus.read = devfs_bus_read;
     devfs_bus->mass_storage_bus.write = devfs_bus_write;

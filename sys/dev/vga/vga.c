@@ -6,6 +6,8 @@ int
 vga_device_init(struct vga_device *vga_device)
 {
     strcpy(vga_device->device.name, "vga0");
+
+    return 0;
 }
 
 int

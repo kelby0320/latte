@@ -37,9 +37,6 @@ struct device {
     // Type identifier
     device_type_t type;
 
-    // Device id
-    unsigned int id;
-
     // Pointer to the bus the device is on
     struct bus *bus;
 
@@ -61,14 +58,6 @@ struct device_iterator {
     // Current index of the device iterator
     int current_idx;
 };
-
-/**
- * @brief Get the next device id number
- *
- * @return int  Device Id
- */
-int
-device_get_next_device_id();
 
 /**
  * @brief Add a device to the system

@@ -13,9 +13,6 @@ struct bus {
     // The name of the bus
     char name[LATTE_BUS_NAME_MAX_SIZE];
 
-    // Bus Id
-    unsigned int id;
-
     // Function to probe this bus for devices
     int (*probe)(struct bus *bus);
 };
@@ -42,13 +39,5 @@ bus_init();
  */
 int
 bus_add_bus(struct bus *bus);
-
-/**
- * @brief Get the next bus id number
- *
- * @return int  Bus Id
- */
-int
-bus_get_next_bus_id();
 
 #endif

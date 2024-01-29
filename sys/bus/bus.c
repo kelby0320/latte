@@ -8,7 +8,6 @@
 
 static struct bus *bus_list[LATTE_MAX_BUSES] = {0};
 static int bus_list_len = 0;
-static unsigned int next_bus_id = 0;
 
 void
 bus_probe()
@@ -45,10 +44,4 @@ bus_add_bus(struct bus *bus)
 
     bus_list[bus_list_len] = bus;
     bus_list_len++;
-}
-
-int
-bus_get_next_bus_id()
-{
-    return next_bus_id++;
 }

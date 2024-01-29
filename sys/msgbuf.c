@@ -52,4 +52,6 @@ msgbuf_add_output_fd(int fd)
 
     output_fds[outfds_len] = fd;
     outfds_len++;
+
+    return 0;
 }

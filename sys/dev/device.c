@@ -8,13 +8,6 @@
 
 static struct device *device_list[LATTE_MAX_DEVICES] = {0};
 static int device_list_len = 0;
-static unsigned int next_device_id = 0;
-
-int
-device_get_next_device_id()
-{
-    return next_device_id++;
-}
 
 int
 device_add_device(struct device *device)
