@@ -56,7 +56,7 @@ int
 block_device_init(struct block_device *block_device, block_device_type_t type,
                   unsigned int drive_no, unsigned int lba_offset)
 {
-    if (type > BLOCK_DEVICE_TYPE_PART) {
+    if (type > BLOCK_DEVICE_TYPE_VIRT) {
         return -EINVAL;
     }
 

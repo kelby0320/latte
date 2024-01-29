@@ -52,7 +52,7 @@ kernel_early_init(unsigned long magic)
 {
     int res = multiboot2_verify_magic_number(magic);
     if (!res) {
-        panic("Invalid multiboot magic number");
+        panic("Invalid multiboot magic number\n");
     }
 
     gdt_init();
@@ -77,7 +77,7 @@ kernel_late_init()
 
     int res = vm_area_init(&kernel_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
     if (res < 0) {
-        panic("Failed to initialize kernel vm area");
+        panic("Failed to initialize kernel vm area\n");
     }
 
     switch_to_kernel_vm_area();
@@ -88,9 +88,15 @@ kernel_late_init()
 
     bus_probe();
 
-    fs_init();
+    res = fs_init();
+    if (res < 0) {
+        panic("Failed to initialize filesystem drivers\n");
+    }
 
-    vfs_init();
+    res = vfs_init();
+    if (res < 0) {
+        panic("Failed to initialize virtual filesystem\n");
+    }
 }
 
 /**

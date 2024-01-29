@@ -19,13 +19,6 @@ struct file_descriptor {
 };
 
 /**
- * @brief Initialize global file descriptor table
- *
- */
-void
-file_descriptor_init();
-
-/**
  * @brief Retrieve a file descriptor
  *
  * @param fd    The file descritpor index

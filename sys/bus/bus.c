@@ -14,7 +14,11 @@ void
 bus_probe()
 {
     for (int i = 0; i < bus_list_len; i++) {
-        bus_list[i]->probe(bus_list[i]);
+        struct bus *bus = bus_list[i];
+        int res = bus->probe(bus);
+        if (res < 0) {
+            printk("Failed to probe bus %s\n", bus);
+        }
     }
 }
 

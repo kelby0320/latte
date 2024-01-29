@@ -1,6 +1,5 @@
 #include "fs/devfs/devfs.h"
 
-#include "bus/mass_storage.h"
 #include "config.h"
 #include "dev/block/block.h"
 #include "dev/device.h"
@@ -52,15 +51,14 @@ struct devfs_descriptor_private {
 static bool
 is_devfs_block_device(struct block_device *block_device)
 {
-    struct mass_storage_bus *bus = (struct mass_storage_bus *)block_device->device.bus;
-    char bus_name[LATTE_BUS_NAME_MAX_SIZE];
+    char buf[LATTE_SECTOR_SIZE];
 
-    int num_read = bus->read(bus, 0, 0, bus_name, LATTE_BUS_NAME_MAX_SIZE);
-    if (num_read <= 0) {
+    int num_read = block_device_read_sectors(block_device, 0, buf, 1);
+    if (num_read < 0) {
         return false;
     }
 
-    if (strncmp(bus_name, "devfs", 5) == 0) {
+    if (strncmp(buf, "devfs", 5) == 0) {
         return true;
     }
 

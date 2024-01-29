@@ -47,7 +47,7 @@ append_int_to_buf(char **buf, int ival)
 {
     char int_buf[16];
     int int_buf_len = int_to_str(ival, int_buf, 16);
-    strcat(*buf, int_buf);
+    strcpy(*buf, int_buf);
     *buf += int_buf_len;
     return int_buf_len;
 }
@@ -56,7 +56,7 @@ static int
 append_str_to_buf(char **buf, char *sval)
 {
     int sval_len = strlen(sval);
-    strcat(*buf, sval);
+    strcpy(*buf, sval);
     *buf += sval_len;
     return sval_len;
 }

@@ -5,13 +5,7 @@
 #include "libk/kheap.h"
 #include "libk/memory.h"
 
-struct file_descriptor *global_file_descriptor_table[LATTE_GLOBAL_FILE_DESCRITPOR_TABLE_SIZE];
-
-void
-file_descriptor_init()
-{
-    memset(global_file_descriptor_table, 0, sizeof(global_file_descriptor_table));
-}
+struct file_descriptor *global_file_descriptor_table[LATTE_GLOBAL_FILE_DESCRITPOR_TABLE_SIZE] = {0};
 
 struct file_descriptor *
 file_descriptor_get(int fd)

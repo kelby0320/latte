@@ -9,28 +9,12 @@
 #include "fs/path.h"
 #include "kernel.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "libk/string.h"
 #include "vfs/mountpoint.h"
 
-static struct filesystem *filesystems[LATTE_MAX_FILESYSTEMS];
-static int filesystems_len;
-
-/**
- * @brief Try to resolve a filesystem on a block device
- *
- * @param filesystem    Pointer to the filesystem
- * @param block_device  Pointer to the block device
- * @return void*        Pointer to private filesystem structure
- */
-static void *
-fs_try_resolve(struct filesystem *filesystem, struct block_device *block_device)
-{
-    if (!filesystem) {
-        return NULL;
-    }
-
-    return filesystem->resolve(block_device);
-}
+static struct filesystem *filesystems[LATTE_MAX_FILESYSTEMS] = {0};
+static int filesystems_len = 0;
 
 /**
  * @brief Add a filesystem to the filesystems list
@@ -47,6 +31,7 @@ fs_insert_filesystem(struct filesystem *filesystem)
 
     struct filesystem **fs = &filesystems[filesystems_len];
     *fs = filesystem;
+    filesystems_len++;
 
     return 0;
 }
@@ -55,29 +40,37 @@ fs_insert_filesystem(struct filesystem *filesystem)
  * @brief Load filesystem drivers
  *
  */
-static void
+static int
 fs_load()
 {
     // fs_insert_filesystem(fat32_init());
-    fs_insert_filesystem(ext2_init());
-    fs_insert_filesystem(devfs_init());
+    int res = fs_insert_filesystem(ext2_init());
+    if (res < 0) {
+        printk("Failed to load EXT2 filesystem driver\n");
+    }
+
+    res = fs_insert_filesystem(devfs_init());
+    if (res < 0) {
+        printk("Failed to load DEVFS filesystem driver\n");
+    }
+
+    return res;
 }
 
-void
+int
 fs_init()
 {
-    memset(filesystems, 0, sizeof(filesystems));
-    filesystems_len = 0;
-
-    fs_load();
+    return fs_load();
 }
 
 int
 fs_resolve(struct mountpoint *mountpoint)
 {
-    for (int i = 0; i < LATTE_MAX_FILESYSTEMS; i++) {
+    for (int i = 0; i < filesystems_len; i++) {
         struct filesystem *filesystem = filesystems[i];
-        void *fs_private = fs_try_resolve(filesystem, mountpoint->block_device);
+        struct block_device *block_device = mountpoint->block_device;
+
+        void *fs_private = filesystem->resolve(block_device);
         if (fs_private) {
             mountpoint->filesystem = filesystem;
             mountpoint->fs_private = fs_private;

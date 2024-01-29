@@ -25,13 +25,6 @@ struct mountpoint {
 };
 
 /**
- * @brief Initialize the mount point table
- *
- */
-void
-mountpoint_init();
-
-/**
  * @brief Add a mountpoint
  *
  * @param mountpoint    Pointer to the mountpoint

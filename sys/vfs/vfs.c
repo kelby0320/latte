@@ -1,5 +1,6 @@
 #include "vfs/vfs.h"
 
+#include "bus/bus.h"
 #include "config.h"
 #include "dev/block/block.h"
 #include "dev/device.h"
@@ -9,12 +10,14 @@
 #include "kernel.h"
 #include "libk/kheap.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "libk/string.h"
 #include "vfs/file_descriptor.h"
 #include "vfs/mountpoint.h"
+#include <stdbool.h>
 
 /**
- * @brief Determine whether a device is a boot device
+ * @brief Predicate to determine whether a device is a boot device
  *
  * @param device    Pointer to the device
  * @return true
@@ -34,13 +37,34 @@ is_boot_device(struct device *device)
 }
 
 /**
- * @brief Find a bootable block device
+ * @brief Predicate to determine whether a device is a virutal block device
  *
- * @param block_device_out  Output pointer to boot block device
+ * @param device    Pointer to a device
+ * @return true
+ * @return false
+ */
+static bool
+is_virtual_block_device(struct device *device)
+{
+    if (device->type == DEVICE_TYPE_BLOCK) {
+        struct block_device *block_device = (struct block_device *)device;
+        if (block_device->type == BLOCK_DEVICE_TYPE_VIRT) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @brief Find a specific block device using the give predicate function
+ *
+ * @param predicate         Pointer to predicate function
+ * @param block_device_out  Output pointer to block device
  * @return int              Status code
  */
 static int
-vfs_find_boot_block_device(struct block_device **block_device_out)
+vfs_find_block_device(bool (*predicate)(struct device *), struct block_device **block_device_out)
 {
     struct device_iterator *iter;
     int res = device_iterator_init(&iter);
@@ -54,7 +78,7 @@ vfs_find_boot_block_device(struct block_device **block_device_out)
             break;
         }
 
-        if (is_boot_device(device)) {
+        if (predicate(device)) {
             *block_device_out = (struct block_device *)device;
             return 0;
         }
@@ -67,27 +91,44 @@ vfs_find_boot_block_device(struct block_device **block_device_out)
     return -EEXIST;
 }
 
-int
-vfs_init()
+/**
+ * @brief Find a block device and mount it
+ *
+ * @param mount_path    Path to mount device
+ * @param predicate     Predicate function to identify the device
+ * @return int          Status code
+ */
+static int
+vfs_find_and_mount(const char *mount_path, bool (*predicate)(struct device *))
 {
-    file_descriptor_init();
-    mountpoint_init();
-
-    struct block_device *boot_block_device;
-    int res = vfs_find_boot_block_device(&boot_block_device);
+    struct block_device *block_device;
+    int res = vfs_find_block_device(predicate, &block_device);
     if (res < 0) {
-        goto err_out;
+        return res;
     }
 
-    res = vfs_mount("/", boot_block_device);
+    res = vfs_mount(mount_path, block_device);
     if (res < 0) {
-        goto err_out;
+        return res;
     }
 
     return 0;
+}
 
-err_out:
-    panic("Unable to mount root filesystem");
+int
+vfs_init()
+{
+    int res = vfs_find_and_mount("/", is_boot_device);
+    if (res < 0) {
+        panic("Unable to mount root filesystem\n");
+    }
+
+    res = vfs_find_and_mount("/dev", is_virtual_block_device);
+    if (res < 0) {
+        panic("Unable to mount devfs filesystem\n");
+    }
+
+    return 0;
 }
 
 int
@@ -106,10 +147,15 @@ vfs_mount(const char *path, struct block_device *block_device)
         goto err_out;
     }
 
+    printk("Found %s filesystem on %s\n", mountpoint->filesystem->name,
+           mountpoint->block_device->device.name);
+
     res = mountpoint_add(mountpoint);
     if (res < 0) {
         goto err_out;
     }
+
+    printk("Mounted %s filesystem on %s\n", mountpoint->filesystem->name, path);
 
     return 0;
 

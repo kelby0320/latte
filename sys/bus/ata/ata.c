@@ -181,6 +181,9 @@ add_block_device_partitions(struct block_device *block_device_disk)
         unsigned int lba_offset = partition_table[i].lba_start;
         struct block_device *block_device_part;
 
+        printk("Found partition starting at %d on %s\n", lba_offset,
+               block_device_disk->device.name);
+
         res = add_block_device(ata_bus, BLOCK_DEVICE_TYPE_PART, drive_no, lba_offset,
                                &block_device_part);
         if (res < 0) {
@@ -205,6 +208,9 @@ add_block_devices(struct ata_bus *ata_bus, int drive_no)
         return res;
     }
 
+    printk("Added block device %s of type %d\n", block_device_disk->device.name,
+           BLOCK_DEVICE_TYPE_DISK);
+
     res = add_block_device_partitions(block_device_disk);
     if (res < 0) {
         return res;
@@ -227,6 +233,8 @@ ata_probe_drive(struct bus *bus, int drive_no)
 
     int res = ata_bus_identify(ata_bus, drive_no);
     if (res == 0) {
+        printk("Found hard drive on %s\n", ata_bus->mass_storage_bus.bus.name);
+
         return add_block_devices(ata_bus, drive_no);
     }
 
@@ -375,6 +383,7 @@ ata_bus_init()
     if (res < 0) {
         return res;
     }
+    printk("%s bus initialized successfully\n", name);
 
     bus_id = bus_get_next_bus_id();
     sprintk(name, "ata%d", bus_id);
@@ -382,6 +391,7 @@ ata_bus_init()
     if (res < 0) {
         return res;
     }
+    printk("%s bus initialized successfully\n", name);
 
     return 0;
 }

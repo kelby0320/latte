@@ -5,15 +5,8 @@
 #include "libk/memory.h"
 #include "libk/string.h"
 
-static struct mountpoint *mountpoint_list[LATTE_MAX_MOUNTPOINTS];
-static int mountpoint_list_len;
-
-void
-mountpoint_init()
-{
-    memset(mountpoint_list, 0, sizeof(mountpoint_list));
-    mountpoint_list_len = 0;
-}
+static struct mountpoint *mountpoint_list[LATTE_MAX_MOUNTPOINTS] = {0};
+static int mountpoint_list_len = 0;
 
 int
 mountpoint_add(struct mountpoint *mountpoint)

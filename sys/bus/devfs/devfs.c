@@ -37,6 +37,8 @@ devfs_bus_probe(struct bus *bus)
         goto err_out;
     }
 
+    printk("Added block device %s of type %d\n", device->name, BLOCK_DEVICE_TYPE_VIRT);
+
     return 0;
 
 err_out:
@@ -110,6 +112,8 @@ devfs_bus_init()
         kfree(devfs_bus);
         return -EAGAIN;
     }
+
+    printk("%s bus initialized successfully\n", name);
 
     return 0;
 }

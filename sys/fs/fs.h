@@ -64,14 +64,15 @@ struct filesystem {
 /**
  * @brief Initialize the fileystem subsystem
  *
+ * @return int  Status code
  */
-void
+int
 fs_init();
 
 /**
  * @brief Resolve a filesystem to a mountpoint
  *
- * @param mountpoint     Pointer to the mountpoint
+ * @param mountpoint    Pointer to the mountpoint
  * @return int          Status code
  */
 int
