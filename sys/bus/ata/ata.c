@@ -1,6 +1,7 @@
 #include "bus/ata/ata.h"
 
 #include "bus/bus.h"
+#include "bus/mass_storage.h"
 #include "dev/block/block.h"
 #include "dev/device.h"
 #include "errno.h"
@@ -256,7 +257,7 @@ ata_bus_probe(struct bus *bus)
 /**
  * @brief Read from an ATA bus
  *
- * @param ata_bus           Pointer to the ATA bus
+ * @param mass_storage_bus  Pointer to the mass storage bus
  * @param drive_no          Drive number
  * @param lba               LBA to read from
  * @param buf               Buffer to read into
@@ -264,10 +265,14 @@ ata_bus_probe(struct bus *bus)
  * @return int              Status code
  */
 static int
-ata_bus_read(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, char *buf,
-             size_t sector_count)
+ata_bus_read(struct mass_storage_bus *mass_storage_bus, unsigned int selector, uint64_t saddr,
+             char *buf, size_t sector_count)
 {
+    struct ata_bus *ata_bus = (struct ata_bus *)mass_storage_bus;
+
     unsigned int register_base = ata_bus->base_addr;
+    unsigned int drive_no = selector;
+    unsigned int lba = saddr;
 
     // drive_no must be either 0 or 1
     if (drive_no > 2) {
@@ -311,7 +316,7 @@ ata_bus_read(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, c
 /**
  * @brief Write to an ATA bus
  *
- * @param ata_bus           Pointer to the ATA bus
+ * @param mass_storage_bus  Pointer to the mass storage bus
  * @param drive_no
  * @param lba               LBA to write to
  * @param buf               Buffer to write
@@ -319,8 +324,8 @@ ata_bus_read(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, c
  * @return int              Status code
  */
 static int
-ata_bus_write(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, const char *buf,
-              size_t size)
+ata_bus_write(struct mass_storage_bus *mass_storage_bus, unsigned int selector, uint64_t saddr,
+              const char *buf, size_t size)
 {
     // TODO
     return 0;
@@ -328,7 +333,6 @@ ata_bus_write(struct ata_bus *ata_bus, unsigned int drive_no, unsigned int lba, 
 
 /**
  * @brief Initialize an ATA bus
- *
  * @param base_addr     Base address of the ATA registers
  * @param name          Name of the bus
  * @param id            Bus Id
@@ -344,12 +348,12 @@ ata_init_bus(unsigned int base_addr, const char *name, unsigned int id)
 
     ata_bus->base_addr = base_addr;
 
-    strcpy(ata_bus->bus.name, name);
-    ata_bus->bus.id = id;
+    strcpy(ata_bus->mass_storage_bus.bus.name, name);
+    ata_bus->mass_storage_bus.bus.id = id;
 
-    ata_bus->bus.probe = ata_bus_probe;
-    ata_bus->read = ata_bus_read;
-    ata_bus->write = ata_bus_write;
+    ata_bus->mass_storage_bus.bus.probe = ata_bus_probe;
+    ata_bus->mass_storage_bus.read = ata_bus_read;
+    ata_bus->mass_storage_bus.write = ata_bus_write;
 
     int res = bus_add_bus((struct bus *)ata_bus);
     if (!res) {

@@ -46,6 +46,13 @@ struct devfs_descriptor_private {
     size_t offset;
 };
 
+/**
+ * @brief Add a device to devfs
+ *
+ * @param devfs_private     Pointer to private devfs data
+ * @param device            Pointer to the device
+ * @return int              Status code
+ */
 static int
 devfs_private_add_device(struct devfs_private *devfs_private, struct device *device)
 {
@@ -63,6 +70,12 @@ devfs_private_add_device(struct devfs_private *devfs_private, struct device *dev
     }
 }
 
+/**
+ * @brief Initialize devfs private data
+ *
+ * @param devfs_private Pointer to devfs private data
+ * @return int          Status code
+ */
 static int
 devfs_private_init(struct devfs_private *devfs_private)
 {
@@ -91,6 +104,14 @@ devfs_private_init(struct devfs_private *devfs_private)
     return 0;
 }
 
+/**
+ * @brief Match a device in a device list
+ *
+ * @param device_list       Device list to match against
+ * @param device_list_len   Device list length
+ * @param path_element      Device path
+ * @return struct device*   Pointer to matched device or NULL
+ */
 static struct device *
 match_device_in_list(struct device **device_list, size_t device_list_len,
                      struct path_element *path_element)
@@ -105,6 +126,13 @@ match_device_in_list(struct device **device_list, size_t device_list_len,
     return NULL;
 }
 
+/**
+ * @brief Match a device path to a device
+ *
+ * @param devfs_private     Pointer to devfs private data
+ * @param path              Device path
+ * @return struct device*   Matched device or NULL
+ */
 static struct device *
 match_device(struct devfs_private *devfs_private, struct path *path)
 {

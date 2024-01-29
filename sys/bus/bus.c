@@ -1,13 +1,12 @@
 #include "bus/bus.h"
 
-#include "bus/ata/ata.h"
+#include "bus/mass_storage.h"
 #include "config.h"
 #include "errno.h"
-#include "libk/memory.h"
 
-static struct bus *bus_list[LATTE_MAX_BUSES];
-static int bus_list_len;
-static unsigned int next_bus_id;
+static struct bus *bus_list[LATTE_MAX_BUSES] = {0};
+static int bus_list_len = 0;
+static unsigned int next_bus_id = 0;
 
 void
 bus_probe()
@@ -20,11 +19,7 @@ bus_probe()
 void
 bus_init()
 {
-    memset(bus_list, 0, sizeof(bus_list));
-    bus_list_len = 0;
-    next_bus_id = 0;
-
-    ata_init();
+    mass_storage_bus_init();
 }
 
 int

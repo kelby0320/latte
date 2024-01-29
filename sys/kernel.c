@@ -3,7 +3,6 @@
 #include "boot/multiboot2.h"
 #include "bus/bus.h"
 #include "config.h"
-#include "dev/device.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "gdt/tss.h"
@@ -86,8 +85,6 @@ kernel_late_init()
     enable_paging();
 
     bus_init();
-
-    device_init();
 
     bus_probe();
 

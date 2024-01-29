@@ -8,6 +8,8 @@
 
 #define DEVICE_TYPE_RAW   0
 #define DEVICE_TYPE_BLOCK 1
+#define DEVICE_TYPE_VGA   2
+#define DEVICE_TYPE_TERM  3
 
 struct bus;
 struct device;
@@ -59,13 +61,6 @@ struct device_iterator {
     // Current index of the device iterator
     int current_idx;
 };
-
-/**
- * @brief Initialize the device subsystem
- *
- */
-void
-device_init();
 
 /**
  * @brief Get the next device id number

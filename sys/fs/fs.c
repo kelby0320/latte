@@ -3,6 +3,7 @@
 #include "config.h"
 #include "dev/block/block.h"
 #include "errno.h"
+#include "fs/devfs/devfs.h"
 #include "fs/ext2/ext2.h"
 #include "fs/fat32/fat32.h"
 #include "fs/path.h"
@@ -59,6 +60,7 @@ fs_load()
 {
     // fs_insert_filesystem(fat32_init());
     fs_insert_filesystem(ext2_init());
+    fs_insert_filesystem(devfs_init());
 }
 
 void

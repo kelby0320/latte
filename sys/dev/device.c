@@ -6,17 +6,9 @@
 #include "libk/memory.h"
 #include "libk/string.h"
 
-static struct device *device_list[LATTE_MAX_DEVICES];
-static int device_list_len;
-static unsigned int next_device_id;
-
-void
-device_init()
-{
-    memset(device_list, 0, sizeof(device_list));
-    device_list_len = 0;
-    next_device_id = 0;
-}
+static struct device *device_list[LATTE_MAX_DEVICES] = {0};
+static int device_list_len = 0;
+static unsigned int next_device_id = 0;
 
 int
 device_get_next_device_id()

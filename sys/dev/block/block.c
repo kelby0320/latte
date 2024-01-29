@@ -1,6 +1,6 @@
 #include "dev/block/block.h"
 
-#include "bus/ata/ata.h"
+#include "bus/mass_storage.h"
 #include "dev/device.h"
 #include "errno.h"
 #include "libk/memory.h"
@@ -25,11 +25,11 @@ static int
 block_device_read(struct device *device, size_t offset, char *buf, size_t sector_count)
 {
     struct block_device *block_device = (struct block_device *)device;
-    struct ata_bus *ata_bus = (struct ata_bus *)device->bus;
+    struct mass_storage_bus *mass_storage_bus = (struct mass_storage_bus *)device->bus;
     unsigned int drive_no = block_device->drive_no;
     unsigned int lba = offset;
 
-    return ata_bus->read(ata_bus, drive_no, lba, buf, sector_count);
+    return mass_storage_bus->read(mass_storage_bus, drive_no, lba, buf, sector_count);
 }
 
 /**
@@ -45,11 +45,11 @@ static int
 block_device_write(struct device *device, size_t offset, const char *buf, size_t size)
 {
     struct block_device *block_device = (struct block_device *)device;
-    struct ata_bus *ata_bus = (struct ata_bus *)device->bus;
+    struct mass_storage_bus *mass_storage_bus = (struct mass_storage_bus *)device->bus;
     unsigned int drive_no = block_device->drive_no;
     unsigned int lba = offset;
 
-    return ata_bus->write(ata_bus, drive_no, lba, buf, size);
+    return mass_storage_bus->write(mass_storage_bus, drive_no, lba, buf, size);
 }
 
 int
@@ -99,11 +99,11 @@ block_device_read_partitions(struct block_device *block_device,
         return -EINVAL;
     }
 
-    struct ata_bus *ata_bus = (struct ata_bus *)block_device->device.bus;
+    struct mass_storage_bus *mass_storage_bus = (struct mass_storage_bus *)block_device->device.bus;
     unsigned int drive_no = block_device->drive_no;
     char buf[512];
 
-    int res = ata_bus->read(ata_bus, drive_no, 0, buf, 1);
+    int res = mass_storage_bus->read(mass_storage_bus, drive_no, 0, buf, 1);
     if (res < 0) {
         return res;
     }

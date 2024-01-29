@@ -14,6 +14,7 @@ TEST_INCLUDES = -I./sys -I./test
 C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/bus/ata/ata.o \
 	./sys/bus/bus.o \
+	./sys/bus/mass_storage.o \
 	./sys/dev/block/block.o \
 	./sys/dev/term/term.o \
 	./sys/dev/vga/vga.o \
@@ -21,6 +22,7 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/fs/bufferedreader.o \
 	./sys/fs/fs.o \
 	./sys/fs/path.o \
+	./sys/fs/devfs/devfs.o \
 	./sys/fs/ext2/dir.o \
 	./sys/fs/ext2/ext2.o \
 	./sys/fs/ext2/inode.o \
