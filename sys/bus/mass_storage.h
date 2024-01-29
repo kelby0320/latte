@@ -5,7 +5,12 @@
 
 #include <stdint.h>
 
+/**
+ * @brief Mass storage bus interface
+ *
+ */
 struct mass_storage_bus {
+    // Bus structure
     struct bus bus;
 
     // Function to read from the bus
@@ -17,7 +22,7 @@ struct mass_storage_bus {
                  const char *buf, size_t count);
 };
 
-void
+int
 mass_storage_bus_init();
 
 #endif

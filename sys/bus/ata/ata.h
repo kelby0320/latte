@@ -8,7 +8,7 @@
  *
  */
 struct ata_bus {
-    // Bus structure
+    // Mass storage bus structure
     struct mass_storage_bus mass_storage_bus;
 
     // Base address of ATA bus
@@ -21,6 +21,6 @@ struct ata_bus {
  * @return int  Status code
  */
 int
-ata_init();
+ata_bus_init();
 
 #endif

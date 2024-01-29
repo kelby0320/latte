@@ -8,6 +8,7 @@
 
 #define BLOCK_DEVICE_TYPE_DISK 0
 #define BLOCK_DEVICE_TYPE_PART 1
+#define BLOCK_DEVICE_TYPE_VIRT 2
 
 /**
  * @brief MBR Partition Table Entry

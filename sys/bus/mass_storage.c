@@ -2,8 +2,8 @@
 
 #include "bus/ata/ata.h"
 
-void
+int
 mass_storage_bus_init()
 {
-    ata_init();
+    return ata_bus_init();
 }

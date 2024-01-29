@@ -1,5 +1,7 @@
 #include "fs/devfs/devfs.h"
 
+#include "bus/mass_storage.h"
+#include "config.h"
 #include "dev/block/block.h"
 #include "dev/device.h"
 #include "errno.h"
@@ -11,6 +13,7 @@
 #include "libk/string.h"
 #include "vfs/file_descriptor.h"
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -45,6 +48,24 @@ struct devfs_descriptor_private {
     // Read/Write offset
     size_t offset;
 };
+
+static bool
+is_devfs_block_device(struct block_device *block_device)
+{
+    struct mass_storage_bus *bus = (struct mass_storage_bus *)block_device->device.bus;
+    char bus_name[LATTE_BUS_NAME_MAX_SIZE];
+
+    int num_read = bus->read(bus, 0, 0, bus_name, LATTE_BUS_NAME_MAX_SIZE);
+    if (num_read <= 0) {
+        return false;
+    }
+
+    if (strncmp(bus_name, "devfs", 5) == 0) {
+        return true;
+    }
+
+    return false;
+}
 
 /**
  * @brief Add a device to devfs
@@ -279,8 +300,7 @@ devfs_seek(struct file_descriptor *file_descriptor, size_t offset, file_seek_mod
 static void *
 devfs_resolve(struct block_device *block_device)
 {
-    // Devfs is not associated with a block device
-    if (block_device != NULL) {
+    if (!is_devfs_block_device(block_device)) {
         return NULL;
     }
 

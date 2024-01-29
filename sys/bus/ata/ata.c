@@ -7,6 +7,7 @@
 #include "errno.h"
 #include "libk/kheap.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "libk/string.h"
 #include "port/io.h"
 
@@ -365,17 +366,22 @@ ata_init_bus(unsigned int base_addr, const char *name, unsigned int id)
 }
 
 int
-ata_init()
+ata_bus_init()
 {
     unsigned int bus_id = bus_get_next_bus_id();
-    int res = ata_init_bus(ATA_PIO_PRIMARY_BUS_BASE_ADDR, "ata0", bus_id);
+    char name[LATTE_BUS_NAME_MAX_SIZE];
+    sprintk(name, "ata%d", bus_id);
+    int res = ata_init_bus(ATA_PIO_PRIMARY_BUS_BASE_ADDR, name, bus_id);
     if (res < 0) {
         return res;
     }
 
     bus_id = bus_get_next_bus_id();
-    res = ata_init_bus(ATA_PIO_SECONDARY_BUS_BASE_ADDR, "ata1", bus_id);
+    sprintk(name, "ata%d", bus_id);
+    res = ata_init_bus(ATA_PIO_SECONDARY_BUS_BASE_ADDR, name, bus_id);
     if (res < 0) {
         return res;
     }
+
+    return 0;
 }
