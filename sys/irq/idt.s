@@ -7,25 +7,25 @@
 # void
 # load_idt(struct idtr *idtr) 
 load_idt:
-    push    %ebp
-    mov     %esp, %ebp
-    mov     8(%ebp), %ebx               # *idtr
+    pushl   %ebp
+    movl    %esp, %ebp
+    movl    8(%ebp), %ebx               # *idtr
     lidt    (%ebx)
-    pop     %ebp
-    ret
+    popl    %ebp
+    ret     
 
 .macro isr_wrapper num
     .global isr_wrapper_\num
 isr_wrapper_\num:
     # Start of struct isr_frame
-    pusha                               # Push general purpose registers
+    pusha                                # Push general purpose registers
     # End of struct isr_frame
 
-    push    %esp                        # Push pointer to isr_frame
-    push    \num                        # Push the interrupt number
+    pushl   %esp                         # Push pointer to isr_frame
+    pushl   $\num                        # Push the interrupt number
     call    isr_handler_wrapper
-    add     $8, %esp
-    popa
+    addl    $8, %esp
+    popa    
     iret
 .endm
 
@@ -66,13 +66,13 @@ syscall_wrapper:
     pusha
     # End of struct isr_frame
 
-    push    %esp                        # Push pointer to isr_frame
-    push    %eax                        # Push syscall number
+    pushl   %esp                        # Push pointer to isr_frame
+    pushl   %eax                        # Push syscall number
     call    isr_syscall_wrapper
-    mov     %eax, (syscall_result)      # Save syscall result
-    add     $8, %esp
+    movl    %eax, (syscall_result)      # Save syscall result
+    addl    $8, %esp
     popa
-    mov     (syscall_result), %eax
+    movl    (syscall_result), %eax
     iret
 
     .section .data
