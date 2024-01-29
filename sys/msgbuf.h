@@ -19,4 +19,7 @@ msgbuf_write(const char *msg);
 int
 msgbuf_add_output_fd(int fd);
 
+int
+msgbuf_flush();
+
 #endif

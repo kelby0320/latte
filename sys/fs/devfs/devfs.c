@@ -23,17 +23,11 @@
  *
  */
 struct devfs_private {
-    // List of block devices
-    struct device *block_devices[DEVFS_DEVICE_LIST_LENGTH];
-
-    // List of other device not of a known type
-    struct device *raw_devices[DEVFS_DEVICE_LIST_LENGTH];
+    // List of devices
+    struct device *devices[DEVFS_DEVICE_LIST_LENGTH];
 
     // Length of block device list
-    size_t block_devices_len;
-
-    // Length of raw device list
-    size_t raw_devices_len;
+    size_t devices_len;
 };
 
 /**
@@ -75,18 +69,11 @@ is_devfs_block_device(struct block_device *block_device)
 static int
 devfs_private_add_device(struct devfs_private *devfs_private, struct device *device)
 {
-    switch (device->type) {
-    case DEVICE_TYPE_RAW:
-        devfs_private->raw_devices[devfs_private->raw_devices_len] = device;
-        devfs_private->raw_devices_len++;
-        return 0;
-    case DEVICE_TYPE_BLOCK:
-        devfs_private->block_devices[devfs_private->block_devices_len] = device;
-        devfs_private->block_devices_len++;
-        return 0;
-    default:
-        return -EINVAL;
-    }
+
+    devfs_private->devices[devfs_private->devices_len] = device;
+    devfs_private->devices_len++;
+
+    return 0;
 }
 
 /**
@@ -124,28 +111,6 @@ devfs_private_init(struct devfs_private *devfs_private)
 }
 
 /**
- * @brief Match a device in a device list
- *
- * @param device_list       Device list to match against
- * @param device_list_len   Device list length
- * @param path_element      Device path
- * @return struct device*   Pointer to matched device or NULL
- */
-static struct device *
-match_device_in_list(struct device **device_list, size_t device_list_len,
-                     struct path_element *path_element)
-{
-    for (size_t i = 0; i < device_list_len; i++) {
-        struct device *device = device_list[i];
-        if (strcmp(device->name, path_element->element) == 0) {
-            return device;
-        }
-    }
-
-    return NULL;
-}
-
-/**
  * @brief Match a device path to a device
  *
  * @param devfs_private     Pointer to devfs private data
@@ -155,13 +120,39 @@ match_device_in_list(struct device **device_list, size_t device_list_len,
 static struct device *
 match_device(struct devfs_private *devfs_private, struct path *path)
 {
-    if (strcmp(path->root->element, "block") == 0) {
-        return match_device_in_list(devfs_private->block_devices, devfs_private->block_devices_len,
-                                    path->root->next);
+    struct device **device_list = devfs_private->devices;
+    size_t device_list_len = devfs_private->devices_len;
+    char *match_name = path->root->next->element; // Second elemnt in the path, e.g. /dev/device0
+
+    for (size_t i = 0; i < device_list_len; i++) {
+        struct device *device = device_list[i];
+        if (strcmp(device->name, match_name) == 0) {
+            return device;
+        }
     }
 
-    return match_device_in_list(devfs_private->raw_devices, devfs_private->raw_devices_len,
-                                path->root);
+    return NULL;
+}
+
+static bool
+is_valid_path(struct path *path)
+{
+    // First element must be dev
+    if (strcmp(path->root->element, "dev") != 0) {
+        return false;
+    }
+
+    // There must be a second element
+    if (path->root->next == NULL) {
+        return false;
+    }
+
+    // There must NOT be a third element
+    if (path->root->next->next != NULL) {
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -177,6 +168,10 @@ static int
 devfs_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
 {
     struct devfs_private *devfs_private = (struct devfs_private *)fs_private;
+
+    if (!is_valid_path(path)) {
+        return -EINVAL;
+    }
 
     struct device *device = match_device(devfs_private, path);
     if (!device) {

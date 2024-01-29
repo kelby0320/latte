@@ -28,5 +28,5 @@ void *
 vga_device_get_framebuffer(struct vga_device *vga_device)
 {
     // For now return the normal VGA framebuffer address
-    return (void *)0xB00000;
+    return (void *)0xB8000;
 }

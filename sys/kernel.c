@@ -11,6 +11,7 @@
 #include "libk/print.h"
 #include "libk/string.h"
 #include "mem/vm.h"
+#include "msgbuf.h"
 #include "task/process.h"
 #include "task/sched.h"
 #include "vfs/vfs.h"
@@ -110,6 +111,9 @@ kernel_main(unsigned long magic)
     kernel_early_init(magic);
 
     kernel_late_init();
+
+    int out_fd = vfs_open("/dev/term0", "w");
+    msgbuf_add_output_fd(out_fd);
 
     char buf[1024];
     int fd = vfs_open("/latte.txt", "r");

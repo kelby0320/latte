@@ -171,7 +171,8 @@ term_device_clear_screen(struct term_device *term_device)
 
     for (size_t y = 0; y < term_height; y++) {
         for (size_t x = 0; x < term_width; x++) {
-            term_device_put_char(term_device, ' ');
+            uint16_t ch = term_device_make_char(term_device, ' ');
+            term_device_set_char(term_device, x, y, ch);
         }
     }
 }

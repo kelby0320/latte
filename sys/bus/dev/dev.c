@@ -74,7 +74,7 @@ dev_bus_init()
     }
 
     char name[LATTE_BUS_NAME_MAX_SIZE];
-    sprintk(name, "devbus%d", dev_bus_id);
+    sprintk(name, "dev%d", dev_bus_id);
     strcpy(dev_bus->virtual_bus.bus.name, name);
     dev_bus->virtual_bus.bus.probe = dev_bus_probe;
     dev_bus_id++;

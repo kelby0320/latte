@@ -238,8 +238,14 @@ vfs_read(int fd, char *ptr, size_t count)
 int
 vfs_write(int fd, const char *ptr, size_t count)
 {
-    // TODO
-    return -1;
+    struct file_descriptor *descriptor = file_descriptor_get(fd);
+    if (!descriptor) {
+        return -EINVAL;
+    }
+
+    struct filesystem *filesystem = descriptor->mountpoint->filesystem;
+
+    return filesystem->write(descriptor, ptr, count);
 }
 
 int

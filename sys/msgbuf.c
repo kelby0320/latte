@@ -2,7 +2,9 @@
 
 #include "config.h"
 #include "errno.h"
+#include "libk/memory.h"
 #include "libk/string.h"
+#include "vfs/vfs.h"
 
 static char message_buffer[MSGBUF_BUFFER_SIZE] = {0};
 static unsigned int msgbuf_len = 0;
@@ -26,8 +28,8 @@ msgbuf_buffer_overflow()
     strncpy(dest, buffer_overflow_msg, msglen);
 }
 
-int
-msgbuf_write(const char *msg)
+static int
+msgbuf_write_to_buf(const char *msg)
 {
     size_t msglen = strlen(msg);
     if (msglen > (MSGBUF_BUFFER_SIZE - msgbuf_len)) {
@@ -43,6 +45,30 @@ msgbuf_write(const char *msg)
     return 0;
 }
 
+static int
+msgbuf_write_to_fds(const char *msg)
+{
+    size_t msglen = strlen(msg);
+    for (unsigned int i = 0; i < outfds_len; i++) {
+        int fd = output_fds[i];
+        vfs_write(fd, msg, msglen);
+    }
+
+    return 0;
+}
+
+int
+msgbuf_write(const char *msg)
+{
+    if (outfds_len == 0) {
+        msgbuf_write_to_buf(msg);
+    } else {
+        msgbuf_write_to_fds(msg);
+    }
+
+    return 0;
+}
+
 int
 msgbuf_add_output_fd(int fd)
 {
@@ -52,6 +78,20 @@ msgbuf_add_output_fd(int fd)
 
     output_fds[outfds_len] = fd;
     outfds_len++;
+
+    msgbuf_flush();
+
+    return 0;
+}
+
+int
+msgbuf_flush()
+{
+    if (msgbuf_len > 0) {
+        msgbuf_write_to_fds(message_buffer);
+        memset(message_buffer, 0, sizeof(message_buffer));
+        msgbuf_len = 0;
+    }
 
     return 0;
 }

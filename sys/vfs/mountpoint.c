@@ -24,7 +24,8 @@ mountpoint_add(struct mountpoint *mountpoint)
 struct mountpoint *
 mountpoint_find(const char *filename)
 {
-    for (int i = 0; i < LATTE_MAX_MOUNTPOINTS; i++) {
+    // Hacky reverse loop will work for now, but should really be DFS
+    for (int i = mountpoint_list_len - 1; i >= 0; i--) {
         struct mountpoint *mountpoint = mountpoint_list[i];
         size_t len = strlen(mountpoint->path);
         if (strncmp(mountpoint->path, filename, len) == 0) {

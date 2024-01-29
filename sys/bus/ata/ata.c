@@ -190,6 +190,9 @@ add_block_device_partitions(struct block_device *block_device_disk)
         if (res < 0) {
             return res;
         }
+
+        printk("Added block device %s of type %d\n", block_device_part->device.name,
+               BLOCK_DEVICE_TYPE_PART);
     }
 
     return 0;
