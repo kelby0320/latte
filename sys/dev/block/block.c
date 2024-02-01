@@ -24,8 +24,8 @@ static unsigned int block_device_number = 0;
 static int
 block_device_read(struct device *device, size_t offset, char *buf, size_t sector_count)
 {
-    struct block_device *block_device = (struct block_device *)device;
-    struct mass_storage_bus *mass_storage_bus = (struct mass_storage_bus *)device->bus;
+    struct block_device *block_device = as_block_device(device);
+    struct mass_storage_bus *mass_storage_bus = as_mass_storage_bus(device->bus);
     unsigned int drive_no = block_device->drive_no;
     unsigned int lba = offset;
 
@@ -44,8 +44,8 @@ block_device_read(struct device *device, size_t offset, char *buf, size_t sector
 static int
 block_device_write(struct device *device, size_t offset, const char *buf, size_t size)
 {
-    struct block_device *block_device = (struct block_device *)device;
-    struct mass_storage_bus *mass_storage_bus = (struct mass_storage_bus *)device->bus;
+    struct block_device *block_device = as_block_device(device);
+    struct mass_storage_bus *mass_storage_bus = as_mass_storage_bus(device->bus);
     unsigned int drive_no = block_device->drive_no;
     unsigned int lba = offset;
 
@@ -80,14 +80,14 @@ int
 block_device_read_sectors(struct block_device *block_device, unsigned int lba, char *buf,
                           size_t sector_count)
 {
-    return block_device_read((struct device *)block_device, lba, buf, sector_count);
+    return block_device_read(as_device(block_device), lba, buf, sector_count);
 }
 
 int
 block_device_write_sectors(struct block_device *block_device, unsigned int lba, const char *buf,
                            size_t size)
 {
-    return block_device_write((struct device *)block_device, lba, buf, size);
+    return block_device_write(as_device(block_device), lba, buf, size);
 }
 
 int
@@ -99,7 +99,7 @@ block_device_read_partitions(struct block_device *block_device,
         return -EINVAL;
     }
 
-    struct mass_storage_bus *mass_storage_bus = (struct mass_storage_bus *)block_device->device.bus;
+    struct mass_storage_bus *mass_storage_bus = as_mass_storage_bus(block_device->device.bus);
     unsigned int drive_no = block_device->drive_no;
     char buf[512];
 

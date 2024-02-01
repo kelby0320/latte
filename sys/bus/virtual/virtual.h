@@ -22,6 +22,9 @@ struct virtual_mass_storage_bus {
     struct mass_storage_bus mass_storage_bus;
 };
 
+#define as_virtual_bus(ptr)              ((struct virtual_bus *)ptr)
+#define as_virtual_mass_storage_bus(ptr) ((struct virtual_mass_storage_bus *)ptr)
+
 /**
  * @brief Initialize virtual buses
  *
@@ -29,5 +32,11 @@ struct virtual_mass_storage_bus {
  */
 int
 virtual_bus_init();
+
+struct virtual_bus *
+virtual_bus_new();
+
+struct virtual_mass_storage_bus *
+virtual_mass_storage_bus_new();
 
 #endif

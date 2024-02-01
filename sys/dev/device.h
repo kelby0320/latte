@@ -44,6 +44,8 @@ struct device {
     struct file_operations file_operations;
 };
 
+#define as_device(ptr) ((struct device *)ptr)
+
 /**
  * @brief Device iterator structure
  *
@@ -111,5 +113,29 @@ device_iterator_val(struct device_iterator *iter);
  */
 int
 device_iterator_next(struct device_iterator *iter);
+
+/**
+ * @brief A macro to all easy iteratation of devices
+ *
+ */
+#define for_each_device(dev)                                                                       \
+    struct device_iterator *iter;                                                                  \
+    device_iterator_init(&iter);                                                                   \
+                                                                                                   \
+    while (true) {                                                                                 \
+        struct device *dev = device_iterator_val(iter);                                            \
+        if (!dev) {                                                                                \
+            break;                                                                                 \
+        }
+
+/**
+ * @brief A macro that pairs with the for_each_device macro to end device iteration
+ *
+ */
+#define for_each_device_end()                                                                      \
+    device_iterator_next(iter);                                                                    \
+    }                                                                                              \
+                                                                                                   \
+    device_iterator_free(iter)
 
 #endif

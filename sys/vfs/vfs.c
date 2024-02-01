@@ -66,27 +66,14 @@ is_virtual_block_device(struct device *device)
 static int
 vfs_find_block_device(bool (*predicate)(struct device *), struct block_device **block_device_out)
 {
-    struct device_iterator *iter;
-    int res = device_iterator_init(&iter);
-    if (res < 0) {
-        return res;
-    }
-
-    while (true) {
-        struct device *device = device_iterator_val(iter);
-        if (!device) {
-            break;
-        }
-
+    for_each_device(device)
+    {
         if (predicate(device)) {
             *block_device_out = (struct block_device *)device;
             return 0;
         }
-
-        device_iterator_next(iter);
     }
-
-    device_iterator_free(iter);
+    for_each_device_end();
 
     return -EEXIST;
 }

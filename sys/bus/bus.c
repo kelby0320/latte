@@ -1,7 +1,7 @@
 #include "bus/bus.h"
 
 #include "bus/mass_storage.h"
-#include "bus/virtual.h"
+#include "bus/virtual/virtual.h"
 #include "config.h"
 #include "errno.h"
 #include "libk/print.h"

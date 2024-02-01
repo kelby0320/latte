@@ -42,6 +42,9 @@ struct devfs_descriptor_private {
     size_t offset;
 };
 
+#define as_devfs_private(ptr)            ((struct devfs_private *)ptr)
+#define as_devfs_descriptor_private(ptr) ((struct devfs_descriptor_private *)ptr)
+
 static bool
 is_devfs_block_device(struct block_device *block_device)
 {
@@ -85,27 +88,14 @@ devfs_private_add_device(struct devfs_private *devfs_private, struct device *dev
 static int
 devfs_private_init(struct devfs_private *devfs_private)
 {
-    struct device_iterator *device_iter;
-    int res = device_iterator_init(&device_iter);
-    if (res < 0) {
-        return res;
-    }
-
-    while (true) {
-        struct device *device = device_iterator_val(device_iter);
-        if (!device) {
-            break;
-        }
-
-        res = devfs_private_add_device(devfs_private, device);
+    for_each_device(device)
+    {
+        int res = devfs_private_add_device(devfs_private, device);
         if (res < 0) {
             printk("Unknown device with type %d\n", device->type);
         }
-
-        device_iterator_next(device_iter);
     }
-
-    device_iterator_free(device_iter);
+    for_each_device_end();
 
     return 0;
 }
@@ -167,7 +157,7 @@ is_valid_path(struct path *path)
 static int
 devfs_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
 {
-    struct devfs_private *devfs_private = (struct devfs_private *)fs_private;
+    struct devfs_private *devfs_private = as_devfs_private(fs_private);
 
     if (!is_valid_path(path)) {
         return -EINVAL;

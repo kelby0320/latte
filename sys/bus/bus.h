@@ -17,6 +17,8 @@ struct bus {
     int (*probe)(struct bus *bus);
 };
 
+#define as_bus(ptr) ((struct bus *)ptr)
+
 /**
  * @brief Probe system buses for devices
  *

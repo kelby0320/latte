@@ -122,7 +122,7 @@ term_device_handle_char(struct term_device *term_device, char c)
 static int
 term_device_fops_write(struct device *device, size_t offset, const char *buf, size_t count)
 {
-    struct term_device *term_device = (struct term_device *)device;
+    struct term_device *term_device = as_term_device(device);
 
     for (size_t i = 0; i < count; i++) {
         term_device_handle_char(term_device, buf[i]);
@@ -136,7 +136,7 @@ term_device_init(struct term_device *term_device)
 {
     strcpy(term_device->device.name, "term0");
 
-    struct vga_device *vga_device = (struct vga_device *)device_find("vga0");
+    struct vga_device *vga_device = as_vga_device(device_find("vga0"));
     if (!vga_device) {
         return -EEXIST;
     }
@@ -160,7 +160,7 @@ term_device_init(struct term_device *term_device)
 int
 term_device_write(struct term_device *term_device, const char *buf, size_t count)
 {
-    return term_device->device.file_operations.write((struct device *)term_device, 0, buf, count);
+    return term_device->device.file_operations.write(as_device(term_device), 0, buf, count);
 }
 
 void

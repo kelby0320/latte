@@ -22,6 +22,8 @@ struct mass_storage_bus {
                  const char *buf, size_t count);
 };
 
+#define as_mass_storage_bus(ptr) ((struct mass_storage_bus *)ptr)
+
 int
 mass_storage_bus_init();
 

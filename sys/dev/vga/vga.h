@@ -38,6 +38,8 @@ struct vga_device {
     struct device device;
 };
 
+#define as_vga_device(ptr) ((struct vga_device *)ptr)
+
 /**
  * @brief
  *

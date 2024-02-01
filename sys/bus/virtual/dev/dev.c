@@ -1,6 +1,7 @@
-#include "bus/dev/dev.h"
+#include "bus/virtual/dev/dev.h"
 
 #include "bus/bus.h"
+#include "bus/virtual/virtual.h"
 #include "dev/device.h"
 #include "dev/term/term.h"
 #include "dev/vga/vga.h"
@@ -8,8 +9,6 @@
 #include "libk/kheap.h"
 #include "libk/print.h"
 #include "libk/string.h"
-
-static unsigned int dev_bus_id = 0;
 
 static int
 add_term_device(struct bus *bus)
@@ -68,24 +67,20 @@ dev_bus_probe(struct bus *bus)
 int
 dev_bus_init()
 {
-    struct dev_bus *dev_bus = kzalloc(sizeof(struct dev_bus));
+    struct virtual_bus *dev_bus = virtual_bus_new();
     if (!dev_bus) {
         return -ENOMEM;
     }
 
-    char name[LATTE_BUS_NAME_MAX_SIZE];
-    sprintk(name, "dev%d", dev_bus_id);
-    strcpy(dev_bus->virtual_bus.bus.name, name);
-    dev_bus->virtual_bus.bus.probe = dev_bus_probe;
-    dev_bus_id++;
+    dev_bus->bus.probe = dev_bus_probe;
 
-    int res = bus_add_bus((struct bus *)dev_bus);
+    int res = bus_add_bus(as_bus(dev_bus));
     if (res < 0) {
         kfree(dev_bus);
         return -EAGAIN;
     }
 
-    printk("%s bus initialized successfully\n", name);
+    printk("%s bus initialized successfully\n", dev_bus->bus.name);
 
     return 0;
 }

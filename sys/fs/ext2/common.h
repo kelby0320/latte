@@ -166,4 +166,8 @@ struct ext2_descriptor_private {
     int byte_offset;
 };
 
+#define as_ext2_directory_entry(ptr)    ((struct ext2_directory_entry *)ptr)
+#define as_ext2_private(ptr)            ((struct ext2_private *)ptr)
+#define as_ext2_descriptor_private(ptr) ((struct ext2_descriptor_private *)ptr)
+
 #endif

@@ -13,11 +13,11 @@ TEST_INCLUDES = -I./sys -I./test
 
 C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/bus/ata/ata.o \
-	./sys/bus/dev/dev.o \
-	./sys/bus/devfs/devfs.o \
+	./sys/bus/virtual/dev/dev.o \
+	./sys/bus/virtual/devfs/devfs.o \
+	./sys/bus/virtual/virtual.o \
 	./sys/bus/bus.o \
 	./sys/bus/mass_storage.o \
-	./sys/bus/virtual.o \
 	./sys/dev/block/block.o \
 	./sys/dev/term/term.o \
 	./sys/dev/vga/vga.o \

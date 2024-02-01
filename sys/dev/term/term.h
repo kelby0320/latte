@@ -35,6 +35,8 @@ struct term_device {
     uint8_t char_color;
 };
 
+#define as_term_device(ptr) ((struct term_device *)ptr)
+
 /**
  * @brief Initialize a terminal device
  *

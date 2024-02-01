@@ -40,7 +40,8 @@ struct dir_iter {
  * @return int          Status code
  */
 static int
-dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private, const struct ext2_inode *dir_inode)
+dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private,
+              const struct ext2_inode *dir_inode)
 {
     char *buf = kzalloc(fs_private->block_size);
     if (!buf) {
@@ -54,7 +55,8 @@ dir_iter_init(struct dir_iter *iter, struct ext2_private *fs_private, const stru
     iter->block_no = 0;
 
     // Read inital block of data
-    int res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size, iter->block_no, 0);
+    int res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size,
+                                   iter->block_no, 0);
     if (res < 0) {
         return res;
     }
@@ -82,7 +84,8 @@ dir_iter_free(struct dir_iter *iter)
  * @return int          Status code
  */
 static int
-iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private, struct ext2_directory_entry *dir_entry_out)
+iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private,
+            struct ext2_directory_entry *dir_entry_out)
 {
     int res = 0;
 
@@ -90,14 +93,15 @@ iterate_dir(struct dir_iter *iter, struct ext2_private *fs_private, struct ext2_
         // Read next block of data
         iter->block_no++;
         iter->buf_offset = 0;
-        res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size, iter->block_no, 0);
+        res = ext2_read_inode_data(fs_private, iter->dir_inode, iter->buf, iter->buf_size,
+                                   iter->block_no, 0);
         if (res < 0) {
             return res;
         }
     }
 
     // Parse directory_entry from buffer
-    struct ext2_directory_entry *entry = (struct ext2_directory_entry *)(iter->buf + iter->buf_offset);
+    struct ext2_directory_entry *entry = as_ext2_directory_entry((iter->buf + iter->buf_offset));
     int rec_len = entry->rec_len;
     if (rec_len > sizeof(struct ext2_directory_entry)) {
         rec_len = sizeof(struct ext2_directory_entry);

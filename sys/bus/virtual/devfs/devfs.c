@@ -1,15 +1,13 @@
-#include "bus/devfs/devfs.h"
+#include "bus/virtual/devfs/devfs.h"
 
 #include "bus/bus.h"
-#include "bus/virtual.h"
+#include "bus/virtual/virtual.h"
 #include "dev/block/block.h"
 #include "dev/device.h"
 #include "errno.h"
 #include "libk/kheap.h"
 #include "libk/print.h"
 #include "libk/string.h"
-
-static unsigned int devfs_bus_id = 0;
 
 /**
  * @brief Probe the devfs virtual bus
@@ -64,10 +62,8 @@ static int
 devfs_bus_read(struct mass_storage_bus *mass_storage_bus, unsigned int selector, uint64_t saddr,
                char *buf, size_t sector_count)
 {
-    char *name = mass_storage_bus->bus.name;
-    size_t len = strlen(name);
-    sprintk(buf, name, len);
-    return len;
+    sprintk(buf, "devfs");
+    return 5;
 }
 
 /**
@@ -93,27 +89,22 @@ devfs_bus_write(struct mass_storage_bus *mass_storage_bus, unsigned int selector
 int
 devfs_bus_init()
 {
-    struct virtual_mass_storage_bus *devfs_bus = kzalloc(sizeof(struct virtual_mass_storage_bus));
+    struct virtual_mass_storage_bus *devfs_bus = virtual_mass_storage_bus_new();
     if (!devfs_bus) {
         return -ENOMEM;
     }
-
-    char name[LATTE_BUS_NAME_MAX_SIZE];
-    sprintk(name, "devfs%d", devfs_bus_id);
-    strcpy(devfs_bus->mass_storage_bus.bus.name, name);
-    devfs_bus_id++;
 
     devfs_bus->mass_storage_bus.bus.probe = devfs_bus_probe;
     devfs_bus->mass_storage_bus.read = devfs_bus_read;
     devfs_bus->mass_storage_bus.write = devfs_bus_write;
 
-    int res = bus_add_bus((struct bus *)devfs_bus);
+    int res = bus_add_bus(as_bus(devfs_bus));
     if (!res) {
         kfree(devfs_bus);
         return -EAGAIN;
     }
 
-    printk("%s bus initialized successfully\n", name);
+    printk("%s bus initialized successfully\n", devfs_bus->mass_storage_bus.bus.name);
 
     return 0;
 }

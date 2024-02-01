@@ -135,7 +135,7 @@ add_block_device(struct ata_bus *ata_bus, block_device_type_t type, unsigned int
     }
 
     device->type = DEVICE_TYPE_BLOCK;
-    device->bus = (struct bus *)ata_bus;
+    device->bus = as_bus(ata_bus);
 
     int res = block_device_init((struct block_device *)device, type, drive_no, lba_offset);
     if (res < 0) {
@@ -171,7 +171,7 @@ add_block_device_partitions(struct block_device *block_device_disk)
         return res;
     }
 
-    struct ata_bus *ata_bus = (struct ata_bus *)block_device_disk->device.bus;
+    struct ata_bus *ata_bus = as_ata_bus(block_device_disk->device.bus);
     unsigned int drive_no = block_device_disk->drive_no;
 
     for (int i = 0; i < 4; i++) {
@@ -235,7 +235,7 @@ add_block_devices(struct ata_bus *ata_bus, int drive_no)
 static int
 ata_probe_drive(struct bus *bus, int drive_no)
 {
-    struct ata_bus *ata_bus = (struct ata_bus *)bus;
+    struct ata_bus *ata_bus = as_ata_bus(bus);
 
     int res = ata_bus_identify(ata_bus, drive_no);
     if (res == 0) {
@@ -283,7 +283,7 @@ static int
 ata_bus_read(struct mass_storage_bus *mass_storage_bus, unsigned int selector, uint64_t saddr,
              char *buf, size_t sector_count)
 {
-    struct ata_bus *ata_bus = (struct ata_bus *)mass_storage_bus;
+    struct ata_bus *ata_bus = as_ata_bus(mass_storage_bus);
 
     unsigned int register_base = ata_bus->base_addr;
     unsigned int drive_no = selector;
@@ -354,7 +354,7 @@ ata_bus_write(struct mass_storage_bus *mass_storage_bus, unsigned int selector, 
  * @return int          Status code
  */
 int
-ata_init_bus(unsigned int base_addr, const char *name, unsigned int id)
+ata_init_bus(unsigned int base_addr, const char *name)
 {
     struct ata_bus *ata_bus = kzalloc(sizeof(struct ata_bus));
     if (!ata_bus) {
@@ -369,7 +369,7 @@ ata_init_bus(unsigned int base_addr, const char *name, unsigned int id)
     ata_bus->mass_storage_bus.read = ata_bus_read;
     ata_bus->mass_storage_bus.write = ata_bus_write;
 
-    int res = bus_add_bus((struct bus *)ata_bus);
+    int res = bus_add_bus(as_bus(ata_bus));
     if (!res) {
         kfree(ata_bus);
         return -EAGAIN;
@@ -383,7 +383,7 @@ ata_bus_init()
 {
     char name[LATTE_BUS_NAME_MAX_SIZE];
     sprintk(name, "ata%d", ata_bus_id);
-    int res = ata_init_bus(ATA_PIO_PRIMARY_BUS_BASE_ADDR, name, ata_bus_id);
+    int res = ata_init_bus(ATA_PIO_PRIMARY_BUS_BASE_ADDR, name);
     ata_bus_id++;
     if (res < 0) {
         return res;
@@ -392,7 +392,7 @@ ata_bus_init()
     printk("%s bus initialized successfully\n", name);
 
     sprintk(name, "ata%d", ata_bus_id);
-    res = ata_init_bus(ATA_PIO_SECONDARY_BUS_BASE_ADDR, name, ata_bus_id);
+    res = ata_init_bus(ATA_PIO_SECONDARY_BUS_BASE_ADDR, name);
     if (res < 0) {
         return res;
     }

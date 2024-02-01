@@ -43,6 +43,8 @@ struct block_device {
     unsigned int lba_offset;
 };
 
+#define as_block_device(ptr) ((struct block_device *)ptr)
+
 /**
  * @brief Initialize a block device
  *

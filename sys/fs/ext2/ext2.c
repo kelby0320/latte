@@ -108,7 +108,7 @@ ext2_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
         return -ENOMEM;
     }
 
-    struct ext2_inode *inode = ext2_path_to_inode(path, (struct ext2_private *)fs_private);
+    struct ext2_inode *inode = ext2_path_to_inode(path, as_ext2_private(fs_private));
     if (!inode) {
         kfree(descriptor_private);
         return -EEXIST;

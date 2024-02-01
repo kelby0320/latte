@@ -15,6 +15,8 @@ struct ata_bus {
     unsigned int base_addr;
 };
 
+#define as_ata_bus(ptr) ((struct ata_bus *)ptr)
+
 /**
  * @brief Initialize all ATA buses
  *
