@@ -41,6 +41,8 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/libk/string.o \
 	./sys/mem/heap.o \
 	./sys/mem/vm.o \
+	./sys/syscall/io.o \
+	./sys/syscall/mmap.o \
 	./sys/syscall/syscall.o \
 	./sys/task/elf.o \
 	./sys/task/loader.o \
@@ -138,12 +140,14 @@ test: $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 
 libs:
 	cd ./lib/libc && $(MAKE) all
+	cd ./lib/liblatte && $(MAKE) all
 
 bin: libs
 	cd ./bin/testprog && $(MAKE) all
 
 clean_libs:
 	cd ./lib/libc && $(MAKE) clean
+	cd ./lib/liblatte && $(MAKE) clean
 
 clean_bin:
 	cd ./bin/testprog && $(MAKE) clean

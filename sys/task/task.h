@@ -102,4 +102,14 @@ task_switch_and_return(struct task *task);
 void
 task_save_state(struct task *task, struct isr_frame *irq_frame);
 
+/**
+ * @brief Get an item from a task's stack
+ *
+ * @param task      Pointer to the task
+ * @param index     Index of the item on the task's stack
+ * @return void*    Stack item
+ */
+void *
+task_stack_item(struct task *task, int index);
+
 #endif

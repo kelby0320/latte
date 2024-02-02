@@ -3,5 +3,6 @@
     .section .text
 
 _start:
-    call libc_start
+    call libc_init
+    call main
     ret

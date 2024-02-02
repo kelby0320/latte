@@ -11,7 +11,7 @@
 #include "task/sched.h"
 #include "task/task.h"
 
-static struct process *pslots[LATTE_PROCESS_MAX_PROCESSES];
+static struct process *pslots[LATTE_PROCESS_MAX_PROCESSES] = {0};
 
 /**
  * @brief Get a free slot for a process
@@ -69,6 +69,19 @@ set_slot(int pid, struct process *process)
 
     pslots[pid] = process;
     return 0;
+}
+
+static struct process_allocation *
+process_get_allocation(struct process *process)
+{
+    for (int i = 0; i < LATTE_PROCESS_MAX_ALLOCATIONS; i++) {
+        struct process_allocation *palloc = &process->allocations[i];
+        if (palloc->ptr == NULL && palloc->size == 0) {
+            return palloc;
+        }
+    }
+
+    return NULL;
 }
 
 /**
@@ -174,11 +187,18 @@ err_out3:
     task_free(task);
 
 err_out2:
-    process_free(process);
+    process_terminate(process);
 
 err_out1:
     kfree(process);
     return res;
+}
+
+int
+process_terminate(struct process *process)
+{
+    // TODO
+    return 0;
 }
 
 int
@@ -199,6 +219,7 @@ process_add_task(struct process *process, struct task *task)
 int
 process_remove_task(struct process *process, uint16_t task_id)
 {
+    // TODO
     return 0;
 }
 
@@ -209,7 +230,41 @@ process_switch_to_vm_area(struct process *process)
     vm_area_switch_map(process->vm_area);
 }
 
-void
-process_free(struct process *process)
+void *
+process_mmap(struct process *process, size_t size)
 {
+    if (size % VM_PAGE_SIZE) {
+        size = (size + VM_PAGE_SIZE) - (size % VM_PAGE_SIZE);
+    }
+
+    struct process_allocation *palloc = process_get_allocation(process);
+    if (!palloc) {
+        goto err_out;
+    }
+
+    void *ptr = kzalloc(size);
+    if (!ptr) {
+        goto err_out;
+    }
+
+    int res = vm_area_map_to(process->vm_area, ptr, ptr, ptr + size,
+                             VM_PAGE_PRESENT | VM_PAGE_WRITABLE | VM_PAGE_USER);
+    if (res < 0) {
+        kfree(ptr);
+        goto err_out;
+    }
+
+    palloc->ptr = ptr;
+    palloc->size = size;
+
+    return ptr;
+
+err_out:
+    return NULL;
+}
+
+void
+process_munmap(struct process *process, void *ptr)
+{
+    // TODO
 }

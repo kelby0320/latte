@@ -3,6 +3,7 @@
 #include "config.h"
 #include "errno.h"
 #include "gdt/gdt.h"
+#include "kernel.h"
 #include "libk/kheap.h"
 #include "libk/memory.h"
 #include "mem/vm.h"
@@ -159,4 +160,19 @@ task_save_state(struct task *task, struct isr_frame *isr_frame)
     task->registers.flags = isr_frame->flags;
     task->registers.esp = isr_frame->esp;
     task->registers.ss = isr_frame->ss;
+}
+
+void *
+task_stack_item(struct task *task, int index)
+{
+    void *result = NULL;
+    uint32_t *stack_ptr = (uint32_t *)task->registers.esp;
+
+    process_switch_to_vm_area(task->process);
+
+    result = (void *)stack_ptr[index];
+
+    switch_to_kernel_vm_area();
+
+    return result;
 }

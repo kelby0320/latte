@@ -31,7 +31,7 @@ isr_syscall_wrapper(int syscall_no, struct isr_frame *isr_frame)
     struct task *current_task = sched_get_current();
     task_save_state(current_task, isr_frame);
 
-    void *res = do_syscall(syscall_no, isr_frame);
+    void *res = do_syscall(syscall_no);
 
     vm_area_switch_map(current_task->process->vm_area);
 

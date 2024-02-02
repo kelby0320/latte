@@ -47,9 +47,6 @@ struct process {
 
     // List of memory allocation for the process
     struct process_allocation allocations[LATTE_PROCESS_MAX_ALLOCATIONS];
-
-    // Number of allocations for the process
-    int num_allocations;
 };
 
 /**
@@ -60,6 +57,15 @@ struct process {
  */
 int
 process_spawn(const char *filename);
+
+/**
+ * @brief Terminate a process
+ *
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
+int
+process_terminate(struct process *process);
 
 /**
  * @brief Add a new tasks to a process
@@ -90,11 +96,22 @@ void
 process_switch_to_vm_area(struct process *process);
 
 /**
- * @brief Free a process
+ * @brief Map memory for a process
  *
  * @param process   Pointer to the process
+ * @param size      Number of bytes to allocate
+ * @return void*    Pointer to allocated memory
+ */
+void *
+process_mmap(struct process *process, size_t length);
+
+/**
+ * @brief Unmap memory for a process
+ *
+ * @param process   Pointer to the process
+ * @param ptr       Pointer to allocated memory
  */
 void
-process_free(struct process *process);
+process_munmap(struct process *process, void *ptr);
 
 #endif
