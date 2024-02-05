@@ -3,6 +3,7 @@
 
 #include "irq/isr.h"
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define TASK_STATE_RUNNING  0
@@ -111,5 +112,8 @@ task_save_state(struct task *task, struct isr_frame *irq_frame);
  */
 void *
 task_stack_item(struct task *task, int index);
+
+int
+task_copy_from_user(struct task *task, void *virt, void *buf, size_t size);
 
 #endif

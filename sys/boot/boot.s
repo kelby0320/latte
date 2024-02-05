@@ -25,13 +25,24 @@ stack_top:
 _start:
 	# Setup stack
 	mov		$stack_top, %esp
+
+	push 	%ebx						# Push pointer to multiboot info structure
+	push	%eax						# Push magic number
+
+	# Remap the master PIC
+	movb 	$0x11, %al
+	outb	%al, $0x20					# Tell master PIC
+
+	movb	$0x20, %al
+	outb	%al, $0x21					# Interrupt 0x20 is where master ISR should start
+
+	movb	$0x1, %al
+	outb	%al, $0x21
+	# End remap
 	
 	# Reset flags
 	push 	$0
 	popf	
-
-	push 	%ebx						# Push pointer to multiboot info structure
-	push	%eax						# Push magic number
 
 	call 	kernel_main
 

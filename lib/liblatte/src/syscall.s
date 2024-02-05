@@ -12,7 +12,7 @@
     .set MMAP_SYSCALL_NO,       4
     .set MUNMAP_SYSCALL_NO,     5
 
-    .set SYSCALL_INTERRUPT_NO,  80
+    .set SYSCALL_INTERRUPT_NO,  0x80
 
     .section .text
 
@@ -20,10 +20,10 @@ latte_open:
     pushl   %ebp
     movl    %esp, %ebp
 
-    movl    $OPEN_SYSCALL_NO, %eax
+    movl    $0, %eax
     pushl   8(%ebp)                     # Mode string
     pushl   12(%ebp)                    # Filename
-    int     $SYSCALL_INTERRUPT_NO
+    int     $0x80
 
     addl    $8, %esp
     popl    %ebp

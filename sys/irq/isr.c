@@ -24,7 +24,7 @@ isr_handler_wrapper(int interrupt_no, struct isr_frame *isr_frame)
 }
 
 void *
-isr_syscall_wrapper(int syscall_no, struct isr_frame *isr_frame)
+isr_syscall_handler_wrapper(int syscall_no, struct isr_frame *isr_frame)
 {
     switch_to_kernel_vm_area();
 

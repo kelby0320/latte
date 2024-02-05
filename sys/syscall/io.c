@@ -1,7 +1,9 @@
 #include "syscall/io.h"
 
+#include "config.h"
 #include "errno.h"
 #include "irq/isr.h"
+#include "libk/memory.h"
 #include "task/sched.h"
 #include "task/task.h"
 #include "vfs/vfs.h"
@@ -12,8 +14,18 @@ void *
 do_open()
 {
     struct task *current_task = sched_get_current();
-    const char *filename = (const char *)task_stack_item(current_task, 0);
-    const char *mode_str = (const char *)task_stack_item(current_task, 1);
+    const char *user_filename = (const char *)task_stack_item(current_task, 0);
+    const char *user_mode_str = (const char *)task_stack_item(current_task, 1);
+
+    char filename[LATTE_MAX_PATH_LEN];
+    memset(filename, 0, sizeof(filename));
+
+    char mode_str[8];
+    memset(mode_str, 0, sizeof(mode_str));
+
+    task_copy_from_user(current_task, (void *)user_filename, filename, sizeof(filename) - 1);
+    task_copy_from_user(current_task, (void *)user_mode_str, mode_str, sizeof(mode_str) - 1);
+
     return (void *)vfs_open(filename, mode_str);
 }
 

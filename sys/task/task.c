@@ -176,3 +176,43 @@ task_stack_item(struct task *task, int index)
 
     return result;
 }
+
+int
+task_copy_from_user(struct task *task, void *virt, void *buf, size_t size)
+{
+    if (size > VM_PAGE_SIZE) {
+        return -EINVAL;
+    }
+
+    char *tmp = kzalloc(size);
+    if (!tmp) {
+        return -ENOMEM;
+    }
+
+    uint32_t *task_page_dir = task->process->vm_area->page_directory;
+    uint32_t saved_entry = vm_area_get_page_entry(task_page_dir, tmp);
+
+    // Map the tmp buffer into the task's vm area
+    vm_area_map_page(task->process->vm_area, tmp, tmp,
+                     VM_PAGE_WRITABLE | VM_PAGE_PRESENT | VM_PAGE_USER);
+
+    vm_area_switch_map(task->process->vm_area);
+
+    // Copy data from virt to the shared tmp buffer
+    memcpy(tmp, virt, size);
+
+    switch_to_kernel_vm_area();
+
+    // Reset the task's page entry
+    int res = vm_area_set_page_entry(task_page_dir, tmp, saved_entry);
+    if (res < 0) {
+        goto out;
+    }
+
+    // Copy data from the tmp buffer to the output buffer
+    memcpy(tmp, buf, size);
+
+out:
+    kfree(tmp);
+    return res;
+}

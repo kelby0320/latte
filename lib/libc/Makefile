@@ -7,7 +7,8 @@ AR = i686-elf-ar
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
 ASFLAGS = -g
 
-C_OBJECTS = ./src/init.o \
+C_OBJECTS = ./src/ctype.o \
+	./src/init.o \
 	./src/stdio.o \
 	./src/stdlib.o \
 	./src/string.o 

@@ -45,6 +45,27 @@ void
 vm_area_free(struct vm_area *vm_area);
 
 /**
+ * @brief Get a page table entry
+ *
+ * @param page_dir  Pointer to the page table
+ * @param virt      Virtual address
+ * @return uint32_t Page table entry
+ */
+uint32_t
+vm_area_get_page_entry(uint32_t *page_dir, void *virt);
+
+/**
+ * @brief Set a page table entry
+ *
+ * @param page_dir  Pointer to the page table
+ * @param virt      Virtual address
+ * @param val       Value to set
+ * @return int      Status code
+ */
+int
+vm_area_set_page_entry(uint32_t *page_dir, void *virt, uint32_t val);
+
+/**
  * @brief Load the page directory from a vm area
  *
  * @param vm_area   Pointer to vm area

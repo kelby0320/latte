@@ -120,7 +120,7 @@ kernel_main(unsigned long magic)
     vfs_read(fd, buf, 32);
     printk(buf);
 
-    process_spawn("/bin/testprog");
+    process_spawn("/bin/hello");
     schedule_first_task();
 
     while (1) {}

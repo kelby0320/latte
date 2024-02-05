@@ -143,14 +143,14 @@ libs:
 	cd ./lib/liblatte && $(MAKE) all
 
 bin: libs
-	cd ./bin/testprog && $(MAKE) all
+	cd ./bin/hello && $(MAKE) all
 
 clean_libs:
 	cd ./lib/libc && $(MAKE) clean
 	cd ./lib/liblatte && $(MAKE) clean
 
 clean_bin:
-	cd ./bin/testprog && $(MAKE) clean
+	cd ./bin/hello && $(MAKE) clean
 
 clean: clean_libs clean_bin
 	-rm -r $(C_OBJECTS) $(AS_OBJECTS)

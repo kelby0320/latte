@@ -13,7 +13,7 @@ sudo grub-install --root-directory=/mnt/latte --target=i386-pc --no-floppy --mod
 sudo cp ./boot/grub/grub.cfg /mnt/latte/boot/grub
 sudo cp ./boot/latte-0.1 /mnt/latte/boot
 sudo mkdir /mnt/latte/bin
-sudo cp ./bin/testprog/testprog /mnt/latte/bin
+sudo cp ./bin/hello/hello /mnt/latte/bin
 sudo mkdir /mnt/latte/lib
 sudo cp ./lib/libc/libc.a /mnt/latte/lib
 sudo cp ./latte.txt /mnt/latte

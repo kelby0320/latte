@@ -11,7 +11,9 @@ struct idtr idtr;
 struct idt_entry int_desc_tbl[LATTE_TOTAL_IDT_ENTRIES];
 
 extern void *isr_wrapper_table[31];
-extern void *(*isr_syscall_wrapper)(int syscall_number, struct isr_frame *isr_frame);
+
+extern void
+isr_syscall_wrapper();
 
 /**
  * @brief Load the interrupt descriptor table
@@ -55,7 +57,7 @@ idt_init()
         idt_set_entry(i, isr_wrapper_table[i]);
     }
 
-    idt_set_entry(80, isr_syscall_wrapper);
+    idt_set_entry(0x80, isr_syscall_wrapper);
 
     load_idt(&idtr);
 }

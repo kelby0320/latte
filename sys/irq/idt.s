@@ -1,7 +1,7 @@
     .section .text
 
     .global load_idt
-    .global syscall_wrapper
+    .global isr_syscall_wrapper
     .global isr_wrapper_table
 
 # void
@@ -61,14 +61,14 @@ isr_wrapper 28
 isr_wrapper 29
 isr_wrapper 30
 
-syscall_wrapper:
+isr_syscall_wrapper:
     # Start of struct isr_frame
     pusha
     # End of struct isr_frame
 
     pushl   %esp                        # Push pointer to isr_frame
     pushl   %eax                        # Push syscall number
-    call    isr_syscall_wrapper
+    call    isr_syscall_handler_wrapper
     movl    %eax, (syscall_result)      # Save syscall result
     addl    $8, %esp
     popa

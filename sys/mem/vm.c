@@ -92,35 +92,6 @@ get_page_indices(void *virt, uint32_t *dir_idx_out, uint32_t *tbl_idx_out)
 }
 
 /**
- * @brief Set a page table entry
- *
- * @param page_dir  Pointer to page table
- * @param virt      Virtual address
- * @param val       Value to set
- * @return int      Status code
- */
-static int
-set_page_entry(uint32_t *page_dir, void *virt, uint32_t val)
-{
-    if (!is_aligned(virt)) {
-        return -EINVAL;
-    }
-
-    uint32_t dir_idx;
-    uint32_t tbl_idx;
-    int res = get_page_indices(virt, &dir_idx, &tbl_idx);
-    if (res < 0) {
-        return res;
-    }
-
-    uint32_t dir_entry = page_dir[dir_idx];
-    uint32_t *page_tbl = (uint32_t *)(dir_entry & 0xfffff000);
-    page_tbl[tbl_idx] = val;
-
-    return 0;
-}
-
-/**
  * @brief Load a new page directory
  *
  * Defined in vm.S
@@ -157,6 +128,46 @@ vm_area_free(struct vm_area *vm_area)
     kfree(vm_area->page_directory);
 }
 
+uint32_t
+vm_area_get_page_entry(uint32_t *page_dir, void *virt)
+{
+    if (!is_aligned(virt)) {
+        return -EINVAL;
+    }
+
+    uint32_t dir_idx;
+    uint32_t tbl_idx;
+    int res = get_page_indices(virt, &dir_idx, &tbl_idx);
+    if (res < 0) {
+        return res;
+    }
+
+    uint32_t dir_entry = page_dir[dir_idx];
+    uint32_t *page_tbl = (uint32_t *)(dir_entry & 0xfffff000);
+    return page_tbl[tbl_idx];
+}
+
+int
+vm_area_set_page_entry(uint32_t *page_dir, void *virt, uint32_t val)
+{
+    if (!is_aligned(virt)) {
+        return -EINVAL;
+    }
+
+    uint32_t dir_idx;
+    uint32_t tbl_idx;
+    int res = get_page_indices(virt, &dir_idx, &tbl_idx);
+    if (res < 0) {
+        return res;
+    }
+
+    uint32_t dir_entry = page_dir[dir_idx];
+    uint32_t *page_tbl = (uint32_t *)(dir_entry & 0xfffff000);
+    page_tbl[tbl_idx] = val;
+
+    return 0;
+}
+
 void
 vm_area_switch_map(struct vm_area *vm_area)
 {
@@ -172,7 +183,7 @@ vm_area_map_page(struct vm_area *vm_area, void *virt, void *phys, uint8_t flags)
 
     uint32_t val = (uint32_t)phys | flags;
 
-    int res = set_page_entry(vm_area->page_directory, virt, val);
+    int res = vm_area_set_page_entry(vm_area->page_directory, virt, val);
     if (res < 0) {
         return -EINVAL;
     }
