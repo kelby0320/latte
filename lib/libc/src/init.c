@@ -5,9 +5,9 @@ extern int stdout;
 extern int stderr;
 
 void
-libc_init(int argc, char **argv, int envc, char **envp)
+libc_init()
 {
-    stdout = open("dev/term0", "w");
+    stdout = open("/dev/term0", "w");
 
     return;
 }

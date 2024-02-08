@@ -1,16 +1,16 @@
 LIBLATTE = ./liblatte.a
 
 CC = i686-elf-gcc
-AS = i686-elf-as
+AS = nasm
 AR = i686-elf-ar
 
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
-ASFLAGS = -g
+ASFLAGS = -f elf -g
 
 C_OBJECTS = ./src/io.o \
 	./src/mmap.o
 
-AS_OBJECTS = ./src/syscall.s.o
+AS_OBJECTS = ./src/syscall.asm.o
 
 INCLUDES=-I../../include
 
@@ -22,7 +22,7 @@ $(LIBLATTE): $(C_OBJECTS) $(AS_OBJECTS)
 $(filter %.o,$(C_OBJECTS)): %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-$(filter %.s.o,$(AS_OBJECTS)): %.s.o: %.s
+$(filter %.asm.o,$(AS_OBJECTS)): %.asm.o: %.asm
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:

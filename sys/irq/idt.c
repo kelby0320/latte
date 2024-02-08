@@ -53,7 +53,7 @@ idt_init()
     idtr.size = sizeof(int_desc_tbl) - 1;
     idtr.offset = (uint32_t)int_desc_tbl;
 
-    for (int i = 0; i < 31; i++) {
+    for (int i = 0; i < LATTE_TOTAL_IDT_ENTRIES; i++) {
         idt_set_entry(i, isr_wrapper_table[i]);
     }
 

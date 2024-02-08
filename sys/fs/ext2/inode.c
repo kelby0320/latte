@@ -302,7 +302,7 @@ ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *i
     int bytes_read = 0;
     int bytes_remaining = count;
 
-    while (bytes_read < bytes_remaining) {
+    while (bytes_read < count) {
         ext2_read_block(&iter, fs_private, buf);
 
         int bytes_to_copy = fs_private->block_size - byte_offset;

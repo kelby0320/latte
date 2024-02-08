@@ -210,7 +210,7 @@ task_copy_from_user(struct task *task, void *virt, void *buf, size_t size)
     }
 
     // Copy data from the tmp buffer to the output buffer
-    memcpy(tmp, buf, size);
+    memcpy(buf, tmp, size);
 
 out:
     kfree(tmp);

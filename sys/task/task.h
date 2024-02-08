@@ -113,7 +113,17 @@ task_save_state(struct task *task, struct isr_frame *irq_frame);
 void *
 task_stack_item(struct task *task, int index);
 
+/**
+ * @brief Copy data from a user space buffer to a kernel space buffer
+ * 
+ * @param task      Pointer to the task
+ * @param virt      Pointer to the user space buffer
+ * @param buf       Pointer to the kernel space buffer
+ * @param size      Number of bytes to copy
+ * @return int      Status code
+ */
 int
 task_copy_from_user(struct task *task, void *virt, void *buf, size_t size);
+
 
 #endif

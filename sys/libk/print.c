@@ -4,6 +4,14 @@
 #include "libk/string.h"
 #include "msgbuf.h"
 
+/**
+ * @brief Convert an int to a string
+ *
+ * @param i         The int to be converted
+ * @param buf       The buffer where the convert int will be written
+ * @param buf_size  Size of the buffer
+ * @return int      Length of the converted string
+ */
 static int
 int_to_str(int i, char *buf, size_t buf_size)
 {
@@ -42,6 +50,13 @@ int_to_str(int i, char *buf, size_t buf_size)
     return buf_len;
 }
 
+/**
+ * @brief Append an int to a buffer
+ *
+ * @param buf       The buffer
+ * @param ival      The int to be appended
+ * @return int      Length of the string representation that was appended
+ */
 static int
 append_int_to_buf(char **buf, int ival)
 {
@@ -52,6 +67,13 @@ append_int_to_buf(char **buf, int ival)
     return int_buf_len;
 }
 
+/**
+ * @brief Append a string to a buffer
+ *
+ * @param buf       The buffer
+ * @param sval      The string to be appended
+ * @return int      Length of the appended string
+ */
 static int
 append_str_to_buf(char **buf, char *sval)
 {

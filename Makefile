@@ -3,10 +3,10 @@ MINOR_VERSION = 1
 KERNEL = ./boot/latte-$(MAJOR_VERSION).$(MINOR_VERSION)
 
 CC = i686-elf-gcc
-AS = i686-elf-as
+AS = nasm
 
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
-ASFLAGS = -g
+ASFLAGS = -f elf -g
 
 INCLUDES = -I./sys
 TEST_INCLUDES = -I./sys -I./test
@@ -55,14 +55,14 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/kernel.o \
 	./sys/msgbuf.o
 
-AS_OBJECTS = ./sys/boot/boot.s.o \
-	./sys/gdt/gdt.s.o \
-	./sys/gdt/tss.s.o \
-	./sys/irq/idt.s.o \
-	./sys/irq/irq.s.o \
-	./sys/mem/vm.s.o \
-	./sys/port/io.s.o \
-	./sys/task/task.s.o
+AS_OBJECTS = ./sys/boot/boot.asm.o \
+	./sys/gdt/gdt.asm.o \
+	./sys/gdt/tss.asm.o \
+	./sys/irq/idt.asm.o \
+	./sys/irq/irq.asm.o \
+	./sys/mem/vm.asm.o \
+	./sys/port/io.asm.o \
+	./sys/task/task.asm.o
 
 TEST_OBJECTS = ./test/test.o \
 	./test/sys/fs/path.o \
@@ -85,10 +85,10 @@ $(KERNEL): $(C_OBJECTS) $(AS_OBJECTS)
 	$(CC) -T ./sys/linker.ld -o $(KERNEL) -ffreestanding -O0 -nostdlib $(C_OBJECTS) $(AS_OBJECTS) -lgcc
 
 $(filter %.o,$(C_OBJECTS)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $<
 
-$(filter %.s.o,$(AS_OBJECTS)): %.s.o: %.s
-	$(AS) $(ASFLAGS) $< -o $@
+$(filter %.asm.o,$(AS_OBJECTS)): %.asm.o: %.asm
+	$(AS) $(ASFLAGS) -o $@ $<
 
 test: $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 	./test/sys/fs/test_path
