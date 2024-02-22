@@ -1,35 +1,35 @@
 extern kernel_main
+extern map_kernel_page_tables
+extern enable_paging
+extern unmap_low_mem
+extern load_gdt
 
-%define MULTIBOOT2_HEADER_MAGIC 0xE85250D6
-%define MULTIBOOT2_ARCH_I386 0
-
-; Multiboot header
-section .multiboot
-align 8
-
-multiboot_header_start:
-dd MULTIBOOT2_HEADER_MAGIC
-dd MULTIBOOT2_ARCH_I386
-dd ((multiboot_header_start + 16) - multiboot_header_start)
-dd -(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT2_ARCH_I386 + ((multiboot_header_start + 16) - multiboot_header_start))
-
-
-; Reserver kernel stack
-section .bss
-
-stack_bottom:
-	resb 16384							; 16 Kib
-stack_top:
+global _start
 
 ; Kernel entry point
-section .text
-global _start
+section .boot.text
+
 _start:
-	; Setup stack
-	mov 	esp, stack_top
+	; Setup boot stack segment
+	mov 	esp, boot_stack_top
 
 	push	ebx							; Push pointer to multiboot info structure
 	push	eax							; Push magic number
+
+	; Setup kernel page tables
+	call	map_kernel_page_table
+
+	; Enable paging
+	call	enable_paging
+
+	; Unmap lowmem
+	call 	unmap_low_mem
+
+	; Setup GDT
+	call 	load_gdt
+
+	; Switch to kernel stack
+	mov 	esp, kernel_stack_top
 
 	; Remap the master PIC
 	mov		al, 0x11
@@ -46,8 +46,22 @@ _start:
 	push	0
 	popf
 
-	call 	kernel_main
+	call	kernel_main
 
-; Hang if kernel returns
+	; Hang if kernel returns
 	cli
 	jmp $
+
+section .boot.bss
+
+; Reserve boot stack
+boot_stack_bottom:
+	resb 	4096						; 4 Kib
+boot_stack_top:
+
+section .bss
+
+; Reserve kernel stack
+kernel_stack_bottom:
+	resb 	16384						; 16 Kib
+kernel_stack_top:
