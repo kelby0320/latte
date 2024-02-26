@@ -23,5 +23,3 @@ load_page_directory:
     mov     cr3, eax
     pop     ebp
     ret
-
-

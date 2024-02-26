@@ -1,10 +1,14 @@
 extern kernel_main
-extern map_kernel_page_tables
+extern map_kernel_pages
 extern enable_paging
-extern unmap_low_mem
-extern load_gdt
+extern unmap_low_memory
+extern gdt_load
+extern kernel_page_directory
 
 global _start
+
+%define KERNEL_HIGH_HALF_START 0xC0000000
+%define to_phys(addr) ((addr - KERNEL_HIGH_HALF_START))
 
 ; Kernel entry point
 section .boot.text
@@ -17,19 +21,35 @@ _start:
 	push	eax							; Push magic number
 
 	; Setup kernel page tables
-	call	map_kernel_page_table
+	call	map_kernel_pages
+
+	; Load kernel page directory
+	push 	to_phys(kernel_page_directory)
+	call	load_page_directory
+	add		esp, 4
 
 	; Enable paging
 	call	enable_paging
 
-	; Unmap lowmem
-	call 	unmap_low_mem
+	; Long jump to higher half
+	lea 	ecx, _higher_half_start
+	jmp 	[ecx]
 
-	; Setup GDT
-	call 	load_gdt
+section .text
 
-	; Switch to kernel stack
+_higher_half_start:
+	; Setup kernel stack
 	mov 	esp, kernel_stack_top
+
+	; Unmap lowmem
+	call 	unmap_low_memory
+
+	; Force TLB flush for mapping change to take effect
+	mov		ecx, cr3
+	mov 	cr3, ecx
+
+	; Initialize the GDT
+	call gdt_load
 
 	; Remap the master PIC
 	mov		al, 0x11
