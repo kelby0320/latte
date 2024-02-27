@@ -1,12 +1,15 @@
+#include "gdt/gdt.h"
+#include "mem/vm.h"
+
 #include <stdint.h>
 
-#define KERNEL_HIGH_HALF_START 0xC0000000
-#define PAGE_DIRECTORY_ENTRIES 1024
-#define PAGE_TABLE_ENTRIES     1024
-#define PAGE_SIZE              1024
-#define PAGE_PRESENT           0b00000001
-#define PAGE_WRITABLE          0b00000010
-#define to_paddr(addr)         ((addr - KERNEL_HIGH_HALF_START))
+#define KERNEL_HIGHER_HALF_START 0xC0000000
+#define PAGE_DIRECTORY_ENTRIES   1024
+#define PAGE_TABLE_ENTRIES       1024
+#define PAGE_SIZE                1024
+#define PAGE_PRESENT             0b00000001
+#define PAGE_WRITABLE            0b00000010
+#define to_paddr(addr)           ((addr - KERNEL_HIGHER_HALF_START))
 
 uint32_t kernel_page_directory[PAGE_DIRECTORY_ENTRIES];
 uint32_t kernel_page_table_0[PAGE_TABLE_ENTRIES];
@@ -36,7 +39,7 @@ init_page_table_0()
  * @brief Setup initial higher half kernel page mapping
  *
  */
-__attribute__((section(".boot.text"))) void
+__attribute__((section(".boot.text"))) static void
 map_kernel_pages()
 {
     init_page_table_0();
@@ -59,8 +62,35 @@ map_kernel_pages()
  * @brief Remove the mapping for page directory entry 0
  *
  */
-void
+static void
 unmap_low_mem()
 {
     kernel_page_directory[0] = 0;
+}
+
+/**
+ * @brief Early boot initialization
+ *
+ * Setup higher half page table and enable paging
+ *
+ */
+__attribute__((section(".boot.text"))) void
+early_init()
+{
+    map_kernel_pages();
+    load_page_directory(to_paddr(kernel_page_directory));
+    enable_paging();
+}
+
+/**
+ * @brief Late boot initialization
+ *
+ * Unmap low memory and setup a GDT
+ */
+void
+late_init()
+{
+    unmap_low_mem();
+    flush_tlb();
+    gdt_init();
 }

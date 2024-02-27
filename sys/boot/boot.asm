@@ -1,14 +1,11 @@
 extern kernel_main
-extern map_kernel_pages
-extern enable_paging
-extern unmap_low_memory
-extern gdt_load
-extern kernel_page_directory
+extern early_init
+extern late_init
 
 global _start
 
-%define KERNEL_HIGH_HALF_START 0xC0000000
-%define to_phys(addr) ((addr - KERNEL_HIGH_HALF_START))
+%define KERNEL_HIGHER_HALF_START 0xC0000000
+%define to_paddr(addr) ((addr - KERNEL_HIGHER_HALF_START))
 
 ; Kernel entry point
 section .boot.text
@@ -20,16 +17,7 @@ _start:
 	push	ebx							; Push pointer to multiboot info structure
 	push	eax							; Push magic number
 
-	; Setup kernel page tables
-	call	map_kernel_pages
-
-	; Load kernel page directory
-	push 	to_phys(kernel_page_directory)
-	call	load_page_directory
-	add		esp, 4
-
-	; Enable paging
-	call	enable_paging
+	call 	early_init
 
 	; Long jump to higher half
 	lea 	ecx, _higher_half_start
@@ -41,15 +29,7 @@ _higher_half_start:
 	; Setup kernel stack
 	mov 	esp, kernel_stack_top
 
-	; Unmap lowmem
-	call 	unmap_low_memory
-
-	; Force TLB flush for mapping change to take effect
-	mov		ecx, cr3
-	mov 	cr3, ecx
-
-	; Initialize the GDT
-	call gdt_load
+	call 	late_init
 
 	; Remap the master PIC
 	mov		al, 0x11

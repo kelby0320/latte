@@ -23,3 +23,13 @@ load_page_directory:
     mov     cr3, eax
     pop     ebp
     ret
+
+; void
+; flush_tbl();
+flush_tlb:
+	push    ebp
+    mov     ebp, esp
+	mov		ecx, cr3
+	mov 	cr3, ecx
+    pop     ebp
+    ret

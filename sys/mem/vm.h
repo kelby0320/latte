@@ -114,10 +114,23 @@ vm_area_map_to(struct vm_area *vm_area, void *virt, void *phys, void *phys_end, 
 /**
  * @brief Enable paging
  *
- * Defined in vm.S
- *
  */
 void
 enable_paging();
+
+/**
+ * @brief Load a page directory
+ * 
+ * @param page_dir 
+ */
+void
+load_page_directory(uint32_t *page_dir);
+
+/**
+ * @brief Flush the TLB
+ * 
+ */
+void
+flush_tlb();
 
 #endif
