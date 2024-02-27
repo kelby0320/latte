@@ -11,7 +11,8 @@ ASFLAGS = -f elf -g
 INCLUDES = -I./sys
 TEST_INCLUDES = -I./sys -I./test
 
-C_OBJECTS = ./sys/boot/multiboot2.o \
+C_OBJECTS = ./sys/boot/boot.o \
+	./sys/boot/multiboot2.o \
 	./sys/bus/ata/ata.o \
 	./sys/bus/virtual/dev/dev.o \
 	./sys/bus/virtual/devfs/devfs.o \
@@ -56,6 +57,7 @@ C_OBJECTS = ./sys/boot/multiboot2.o \
 	./sys/msgbuf.o
 
 AS_OBJECTS = ./sys/boot/boot.asm.o \
+	./sys/boot/header.asm.o \
 	./sys/gdt/gdt.asm.o \
 	./sys/gdt/tss.asm.o \
 	./sys/irq/idt.asm.o \

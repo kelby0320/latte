@@ -2,6 +2,7 @@ section .text
 
 global enable_paging
 global load_page_directory
+global flush_tlb
 
 ; void
 ; enable_paging()
@@ -25,11 +26,12 @@ load_page_directory:
     ret
 
 ; void
-; flush_tbl();
+; flush_tlb()
 flush_tlb:
-	push    ebp
+    push    ebp
     mov     ebp, esp
-	mov		ecx, cr3
-	mov 	cr3, ecx
+    mov     eax, cr3
+    mov     cr3, eax
     pop     ebp
     ret
+

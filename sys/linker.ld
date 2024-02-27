@@ -5,13 +5,13 @@ SECTIONS
 	/* Begin loading sections at 1 MiB */
 	. = 0x100000;
 
-	.boot.text ALIGN(4K)
+	.boot.text : ALIGN(4K)
 	{
 		*(.multiboot)
 		*(.boot.text)
 	}
 
-	.boot.bss ALIGN(4K)
+	.boot.bss : ALIGN(4K)
 	{
 		*(.boot.bss)
 	}

@@ -6,10 +6,16 @@
 #define KERNEL_HIGHER_HALF_START 0xC0000000
 #define PAGE_DIRECTORY_ENTRIES   1024
 #define PAGE_TABLE_ENTRIES       1024
-#define PAGE_SIZE                1024
+#define PAGE_SIZE                4096
 #define PAGE_PRESENT             0b00000001
 #define PAGE_WRITABLE            0b00000010
-#define to_paddr(addr)           ((addr - KERNEL_HIGHER_HALF_START))
+#define to_paddr(addr)           ((void *)((uint32_t)addr - KERNEL_HIGHER_HALF_START))
+
+extern void
+boot_enable_paging();
+
+extern void
+boot_load_page_directory(uint32_t *page_dir);
 
 uint32_t kernel_page_directory[PAGE_DIRECTORY_ENTRIES];
 uint32_t kernel_page_table_0[PAGE_TABLE_ENTRIES];
@@ -55,7 +61,7 @@ map_kernel_pages()
     /* The same conversion must be done to kernel_page_directory */
     uint32_t *phys_kernel_page_directory = to_paddr(kernel_page_directory);
     phys_kernel_page_directory[0] = dir_entry;
-    phys_kernel_page_directory[3072] = dir_entry; // Map 0xC0000000 to the page table 0
+    phys_kernel_page_directory[768] = dir_entry; // Map 0xC0000000 to the page table 0
 }
 
 /**
@@ -72,14 +78,16 @@ unmap_low_mem()
  * @brief Early boot initialization
  *
  * Setup higher half page table and enable paging
+ * Note: Code in this function can only call functions with
+ * __attribute__(section(".boot.text")))
  *
  */
 __attribute__((section(".boot.text"))) void
 early_init()
 {
     map_kernel_pages();
-    load_page_directory(to_paddr(kernel_page_directory));
-    enable_paging();
+    boot_load_page_directory(to_paddr(kernel_page_directory));
+    boot_enable_paging();
 }
 
 /**

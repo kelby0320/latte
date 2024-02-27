@@ -3,9 +3,8 @@ extern early_init
 extern late_init
 
 global _start
-
-%define KERNEL_HIGHER_HALF_START 0xC0000000
-%define to_paddr(addr) ((addr - KERNEL_HIGHER_HALF_START))
+global boot_enable_paging
+global boot_load_page_directory
 
 ; Kernel entry point
 section .boot.text
@@ -14,14 +13,35 @@ _start:
 	; Setup boot stack segment
 	mov 	esp, boot_stack_top
 
-	push	ebx							; Push pointer to multiboot info structure
-	push	eax							; Push magic number
+	; push	ebx							; Push pointer to multiboot info structure
+	; push	eax							; Push magic number
 
 	call 	early_init
 
 	; Long jump to higher half
 	lea 	ecx, _higher_half_start
-	jmp 	[ecx]
+	jmp 	ecx
+
+; void
+; enable_paging()
+boot_enable_paging:
+    push    ebp
+    mov     ebp, esp
+    mov     eax, cr0
+    or      eax, 0x80000000
+    mov     cr0, eax
+    pop     ebp
+    ret
+
+; void
+; load_page_directory(uint32_t *page_dir)
+boot_load_page_directory:
+    push    ebp
+    mov     ebp, esp
+    mov     eax, [ebp+8]
+    mov     cr3, eax
+    pop     ebp
+    ret
 
 section .text
 
