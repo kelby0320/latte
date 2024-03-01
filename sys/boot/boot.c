@@ -101,4 +101,5 @@ late_init()
     unmap_low_mem();
     flush_tlb();
     gdt_init();
+    gdt_set_kernel_data_segment();
 }

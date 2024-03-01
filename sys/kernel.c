@@ -10,13 +10,15 @@
 #include "libk/kheap.h"
 #include "libk/print.h"
 #include "libk/string.h"
-#include "mem/vm.h"
+#include "mm/vm.h"
 #include "msgbuf.h"
 #include "task/process.h"
 #include "task/sched.h"
 #include "vfs/vfs.h"
 
-static struct vm_area kernel_area;
+extern uint32_t kernel_page_directory;
+
+static struct vm_area kernel_vm_area;
 
 /**
  * @brief Output a string and halt
@@ -38,7 +40,7 @@ void
 switch_to_kernel_vm_area()
 {
     gdt_set_kernel_data_segment();
-    vm_area_switch_map(&kernel_area);
+    vm_area_switch_map(&kernel_vm_area);
 }
 
 /**
@@ -51,18 +53,20 @@ switch_to_kernel_vm_area()
 void
 kernel_early_init(unsigned long magic)
 {
-    int res = multiboot2_verify_magic_number(magic);
-    if (!res) {
-        panic("Invalid multiboot magic number\n");
-    }
+    vm_area_from_page_directory(&kernel_vm_area, &kernel_page_directory);
 
-    gdt_init();
+    kheap_init();
+
+    // int res = multiboot2_verify_magic_number(magic);
+    // if (!res) {
+    //     panic("Invalid multiboot magic number\n");
+    // }
+
+    irq_init();
 
     tss_init();
 
     tss_load(LATTE_TSS_SEGMENT);
-
-    irq_init();
 }
 
 /**
@@ -74,22 +78,11 @@ kernel_early_init(unsigned long magic)
 void
 kernel_late_init()
 {
-    kheap_init();
-
-    int res = vm_area_init(&kernel_area, VM_PAGE_PRESENT | VM_PAGE_WRITABLE);
-    if (res < 0) {
-        panic("Failed to initialize kernel vm area\n");
-    }
-
-    switch_to_kernel_vm_area();
-
-    enable_paging();
-
     bus_init();
 
     bus_probe();
 
-    res = fs_init();
+    int res = fs_init();
     if (res < 0) {
         panic("Failed to initialize filesystem drivers\n");
     }

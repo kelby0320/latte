@@ -34,4 +34,3 @@ flush_tlb:
     mov     cr3, eax
     pop     ebp
     ret
-
