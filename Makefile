@@ -40,8 +40,12 @@ C_OBJECTS = ./sys/boot/boot.o \
 	./sys/libk/memory.o \
 	./sys/libk/print.o \
 	./sys/libk/string.o \
-	./sys/mem/heap.o \
-	./sys/mem/vm.o \
+	./sys/mm/alloc/buddy.o \
+	./sys/mm/alloc/slab.o \
+	./sys/mm/paging/page_dir.o \
+	./sys/mm/paging/page_tbl.o \
+	./sys/mm/alloc.o \
+	./sys/mm/vm.o \
 	./sys/syscall/io.o \
 	./sys/syscall/mmap.o \
 	./sys/syscall/syscall.o \
@@ -62,7 +66,7 @@ AS_OBJECTS = ./sys/boot/boot.asm.o \
 	./sys/gdt/tss.asm.o \
 	./sys/irq/idt.asm.o \
 	./sys/irq/irq.asm.o \
-	./sys/mem/vm.asm.o \
+	./sys/mm/paging/paging.asm.o \
 	./sys/port/io.asm.o \
 	./sys/task/task.asm.o
 

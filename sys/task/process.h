@@ -2,7 +2,7 @@
 #define PROCESS_H
 
 #include "config.h"
-#include "mem/vm.h"
+#include "mm/vm.h"
 #include "task/loader.h"
 
 #include <stddef.h>

@@ -2,9 +2,10 @@
 
 #include "errno.h"
 #include "libk/kheap.h"
-#include "mem/vm.h"
+#include "mm/vm.h"
 #include "task/elf.h"
 #include "vfs/vfs.h"
+#include "mm/paging/paging.h"
 
 #include <stdint.h>
 
@@ -21,8 +22,8 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
     size_t segment_size = phdr->p_memsz;
 
     // Ensure segment size aligned with the page size
-    if (segment_size % VM_PAGE_SIZE) {
-        segment_size += VM_PAGE_SIZE - (segment_size % VM_PAGE_SIZE);
+    if (segment_size % PAGING_PAGE_SIZE) {
+        segment_size += PAGING_PAGE_SIZE - (segment_size % PAGING_PAGE_SIZE);
     }
 
     if (elf_img_desc->num_seg_allocs == ELF_IMG_DESC_MAX_PHEADERS) {
@@ -49,9 +50,9 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
         goto err_out;
     }
 
-    uint8_t flags = VM_PAGE_PRESENT | VM_PAGE_USER;
+    uint8_t flags = PAGING_PAGE_PRESENT | PAGING_PAGE_USER;
     if (phdr->p_flags & PF_W) {
-        flags |= VM_PAGE_WRITABLE;
+        flags |= PAGING_PAGE_WRITABLE;
     }
 
     return vm_area_map_to(vm_area, (void *)phdr->p_vaddr, segment, segment + segment_size, flags);

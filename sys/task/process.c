@@ -6,10 +6,11 @@
 #include "libk/kheap.h"
 #include "libk/memory.h"
 #include "libk/string.h"
-#include "mem/vm.h"
+#include "mm/vm.h"
 #include "task/loader.h"
 #include "task/sched.h"
 #include "task/task.h"
+#include "mm/paging/paging.h"
 
 static struct process *pslots[LATTE_PROCESS_MAX_PROCESSES] = {0};
 
@@ -97,7 +98,7 @@ process_init(struct process *process, int pid)
     process->id = pid;
     process->vm_area = kzalloc(sizeof(struct vm_area));
 
-    int res = vm_area_init(process->vm_area, VM_PAGE_PRESENT | VM_PAGE_USER);
+    int res = vm_area_init(process->vm_area);
     if (res < 0) {
         kfree(process->vm_area);
         return res;
@@ -233,8 +234,8 @@ process_switch_to_vm_area(struct process *process)
 void *
 process_mmap(struct process *process, size_t size)
 {
-    if (size % VM_PAGE_SIZE) {
-        size = (size + VM_PAGE_SIZE) - (size % VM_PAGE_SIZE);
+    if (size % PAGING_PAGE_SIZE) {
+        size = (size + PAGING_PAGE_SIZE) - (size % PAGING_PAGE_SIZE);
     }
 
     struct process_allocation *palloc = process_get_allocation(process);
@@ -248,7 +249,7 @@ process_mmap(struct process *process, size_t size)
     }
 
     int res = vm_area_map_to(process->vm_area, ptr, ptr, ptr + size,
-                             VM_PAGE_PRESENT | VM_PAGE_WRITABLE | VM_PAGE_USER);
+                             PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
     if (res < 0) {
         kfree(ptr);
         goto err_out;

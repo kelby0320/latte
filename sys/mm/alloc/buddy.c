@@ -4,10 +4,10 @@
 #include "libk/memory.h"
 
 /**
- * @brief
+ * @brief Initialize a block list
  *
- * @param block_list
- * @param base_addr
+ * @param block_list    The block list
+ * @param base_addr     The base address of the block list
  */
 static void
 block_list_init(struct buddy_block *block_list, void *base_addr)
@@ -19,10 +19,10 @@ block_list_init(struct buddy_block *block_list, void *base_addr)
 }
 
 /**
- * @brief
+ * @brief   Find a free block
  *
- * @param block_list
- * @return struct buddy_block*
+ * @param block_list            The block list
+ * @return struct buddy_block*  The free block
  */
 static struct buddy_block *
 block_list_new_block(struct buddy_block *block_list)
@@ -37,10 +37,10 @@ block_list_new_block(struct buddy_block *block_list)
 }
 
 /**
- * @brief
+ * @brief   Remove a block from a block list
  *
- * @param block_list
- * @param block
+ * @param block_list    The block list
+ * @param block         The block to remove
  */
 static void
 block_list_remove_block(struct buddy_block *block_list, struct buddy_block *block)
@@ -54,11 +54,11 @@ block_list_remove_block(struct buddy_block *block_list, struct buddy_block *bloc
 }
 
 /**
- * @brief
+ * @brief   Find a block by its address
  *
- * @param block_list
- * @param addr
- * @return struct buddy_block*
+ * @param block_list            The block list
+ * @param addr                  The address to find
+ * @return struct buddy_block*  The block or NULL
  */
 static struct buddy_block *
 block_list_find_block(struct buddy_block *block_list, void *addr)
@@ -73,11 +73,11 @@ block_list_find_block(struct buddy_block *block_list, void *addr)
 }
 
 /**
- * @brief
+ * @brief   Find a free block of a given order
  *
- * @param allocator
- * @param order
- * @return struct buddy_block*
+ * @param block_list            The block list
+ * @param order                 The order of the block
+ * @return struct buddy_block*  The free block or NULL
  */
 static struct buddy_block *
 block_list_find_free_block(struct buddy_block *block_list, unsigned int order)
@@ -92,11 +92,11 @@ block_list_find_free_block(struct buddy_block *block_list, unsigned int order)
 }
 
 /**
- * @brief
+ * @brief   Split a block into a pair of buddy blocks
  *
- * @param allocator
- * @param block
- * @return int
+ * @param allocator The buddy allocator
+ * @param block     The block to split
+ * @return int      Status Code
  */
 static int
 split_block(struct buddy_allocator *allocator, struct buddy_block *block)
@@ -119,11 +119,11 @@ split_block(struct buddy_allocator *allocator, struct buddy_block *block)
 }
 
 /**
- * @brief
+ * @brief   Merge a block with its buddy
  *
- * @param allocator
- * @param block
- * @return struct buddy_block*
+ * @param allocator The buddy allocator
+ * @param block     The block to merge
+ * @return struct buddy_block*  The merged block
  */
 static struct buddy_block *
 merge_block(struct buddy_allocator *allocator, struct buddy_block *block)
@@ -150,11 +150,11 @@ merge_block(struct buddy_allocator *allocator, struct buddy_block *block)
 }
 
 /**
- * @brief
+ * @brief   Allocate a block of a given order
  *
- * @param allocator
- * @param order
- * @return struct buddy_block*
+ * @param allocator The buddy allocator
+ * @param order     The order of the block
+ * @return struct buddy_block*  The allocated block or NULL
  */
 static struct buddy_block *
 allocate_block_of_order(struct buddy_allocator *allocator, unsigned int order)
@@ -183,10 +183,10 @@ allocate_block_of_order(struct buddy_allocator *allocator, unsigned int order)
 }
 
 /**
- * @brief
+ * @brief   Deallocate a block
  *
- * @param allocator
- * @param block
+ * @param allocator     The buddy allocator
+ * @param block         The block to deallocate
  */
 static void
 deallocate_block(struct buddy_allocator *allocator, struct buddy_block *block)

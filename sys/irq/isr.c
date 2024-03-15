@@ -2,7 +2,7 @@
 
 #include "irq/irq.h"
 #include "kernel.h"
-#include "mem/vm.h"
+#include "mm/vm.h"
 #include "port/io.h"
 #include "syscall/syscall.h"
 #include "task/process.h"

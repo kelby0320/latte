@@ -4,7 +4,7 @@
 #include "errno.h"
 #include "kernel.h"
 #include "libk/memory.h"
-#include "mem/vm.h"
+#include "mm/vm.h"
 #include "task/task.h"
 
 /**

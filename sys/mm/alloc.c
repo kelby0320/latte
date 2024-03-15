@@ -5,11 +5,13 @@
 
 static struct buddy_allocator allocators[MAX_ALLOCATORS] = {0};
 static size_t allocators_len = 0;
+static size_t allocators_offset = 0;
 
 void
 alloc_init(void *saddr, size_t mem_size)
 {
-    allocators_len = (mem_size - (size_t)saddr) / BUDDY_BLOCK_MAX_SIZE;
+    allocators_offset = (size_t)saddr;
+    allocators_len = (mem_size - allocators_offset) / BUDDY_BLOCK_MAX_SIZE;
 
     for (size_t i = 0; i < allocators_len; i++) {
         buddy_allocator_init(&allocators[i], saddr + (i * BUDDY_BLOCK_MAX_SIZE));
@@ -31,4 +33,6 @@ alloc_get_phys_page()
 void
 alloc_free_phys_page(void *paddr)
 {
+    size_t buddy_alloc_idx = ((size_t)paddr - allocators_offset) / BUDDY_BLOCK_MAX_SIZE;
+    buddy_allocator_free(&allocators[buddy_alloc_idx], paddr);
 }

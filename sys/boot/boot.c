@@ -1,9 +1,10 @@
 #include "gdt/gdt.h"
-#include "mem/vm.h"
+#include "mm/vm.h"
 
 #include <stdint.h>
 
 #define KERNEL_HIGHER_HALF_START 0xC0000000
+#define NUM_KERNEL_PAGE_TABLES   8
 #define PAGE_DIRECTORY_ENTRIES   1024
 #define PAGE_TABLE_ENTRIES       1024
 #define PAGE_SIZE                4096
@@ -18,26 +19,63 @@ extern void
 boot_load_page_directory(uint32_t *page_dir);
 
 uint32_t kernel_page_directory[PAGE_DIRECTORY_ENTRIES];
-uint32_t kernel_page_table_0[PAGE_TABLE_ENTRIES];
+uint32_t kernel_page_tables[NUM_KERNEL_PAGE_TABLES][PAGE_TABLE_ENTRIES];
 
 /**
- * @brief Identity map page table 0
- *
+ * @brief Initialize a single kernel page table
+ * 
  */
 __attribute__((section(".boot.text"))) static void
-init_page_table_0()
+init_page_table(uint32_t *page_table, uint32_t tbl_offset)
 {
     for (int i = 0; i < PAGE_TABLE_ENTRIES; i++) {
-        uint32_t tbl_entry = (i * PAGE_SIZE) | PAGE_PRESENT | PAGE_WRITABLE;
+        uint32_t tbl_entry = (tbl_offset + i * PAGE_SIZE) | PAGE_PRESENT | PAGE_WRITABLE;
 
         /* kernel_page_table_0 is located in high memory (e.g above 0xC0100000).
          * The physical address it is loaded at however is above 0x00100000.
          * To correctly access the memory we need to convert the high mem address to
          * the real physical address.
          */
-        uint32_t *phys_kernel_page_table_0 = to_paddr(kernel_page_table_0);
+        uint32_t *phys_kernel_page_table = to_paddr(page_table);
 
-        phys_kernel_page_table_0[i] = tbl_entry;
+        phys_kernel_page_table[i] = tbl_entry;
+    }
+}
+
+/**
+ * @brief Initialize kernel page tables
+ * 
+ */
+__attribute__((section(".boot.text"))) static void
+init_kernel_page_tables()
+{
+    for (int i = 0; i < NUM_KERNEL_PAGE_TABLES; i++) {
+        uint32_t tbl_offset = i * PAGE_TABLE_ENTRIES * PAGE_SIZE;
+        init_page_table(kernel_page_tables[i], tbl_offset);
+    }
+}
+
+/**
+ * @brief Map kernel page tables
+ * 
+ */
+__attribute__((section(".boot.text"))) static void
+map_kernel_page_tables()
+{
+    for (int i = 0; i < NUM_KERNEL_PAGE_TABLES; i++) {
+        /* kernel_page_tables is located in high memory (e.g above 0xC0100000).
+        * The physical address it is loaded at however is above 0x00100000.
+        * To correctly access the memory we need to convert the high mem address to
+        * the real physical address.
+        */
+        uint32_t *phys_kernel_page_table = to_paddr(kernel_page_tables[i]);
+        uint32_t dir_entry = (uint32_t)phys_kernel_page_table | PAGE_PRESENT | PAGE_WRITABLE;
+
+        /* The same conversion must be done to kernel_page_directory */
+        uint32_t *phys_kernel_page_directory = to_paddr(kernel_page_directory);
+
+        phys_kernel_page_directory[i] = dir_entry;  // Identity map low mem
+        phys_kernel_page_directory[i+768] = dir_entry; // Map addresses above 0xC0000000 to low mem
     }
 }
 
@@ -48,30 +86,20 @@ init_page_table_0()
 __attribute__((section(".boot.text"))) static void
 map_kernel_pages()
 {
-    init_page_table_0();
-
-    /* kernel_page_table_0 is located in high memory (e.g above 0xC0100000).
-     * The physical address it is loaded at however is above 0x00100000.
-     * To correctly access the memory we need to convert the high mem address to
-     * the real physical address.
-     */
-    uint32_t *phys_kernel_page_table_0 = to_paddr(kernel_page_table_0);
-    uint32_t dir_entry = (uint32_t)phys_kernel_page_table_0 | PAGE_PRESENT | PAGE_WRITABLE;
-
-    /* The same conversion must be done to kernel_page_directory */
-    uint32_t *phys_kernel_page_directory = to_paddr(kernel_page_directory);
-    phys_kernel_page_directory[0] = dir_entry;
-    phys_kernel_page_directory[768] = dir_entry; // Map 0xC0000000 to the page table 0
+    init_kernel_page_tables();
+    map_kernel_page_tables();
 }
 
 /**
- * @brief Remove the mapping for page directory entry 0
+ * @brief Remove the mapping for low memory
  *
  */
 static void
 unmap_low_mem()
 {
-    kernel_page_directory[0] = 0;
+    for (int i = 0; i < NUM_KERNEL_PAGE_TABLES; i++) {
+        kernel_page_directory[i] = 0;
+    }
 }
 
 /**
