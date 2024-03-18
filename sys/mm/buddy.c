@@ -1,4 +1,4 @@
-#include "mm/alloc/buddy.h"
+#include "mm/buddy.h"
 
 #include "errno.h"
 #include "libk/memory.h"

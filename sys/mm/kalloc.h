@@ -1,7 +1,7 @@
 #ifndef ALLOC_H
 #define ALLOC_H
 
-#include "mm/alloc/buddy.h"
+#include "mm/buddy.h"
 
 #include <stddef.h>
 
@@ -10,6 +10,8 @@
 #define PHYS_PAGE_SIZE 4096
 #define PHYS_PAGE_ORDER 0
 
+#define kalloc_get_phys_page() (kalloc_get_phys_pages(PHYS_PAGE_ORDER))
+
 /**
  * @brief Initialize physical memory allocator
  * 
@@ -17,22 +19,23 @@
  * @param mem_size  Size of the memory region
  */
 void
-alloc_init(void *saddr, size_t mem_size);
+kalloc_init(void *saddr, size_t mem_size);
 
 /**
- * @brief Allocate a single physical page
+ * @brief Allocate physical pages of a given order
  * 
- * @return void*    Physical address of the allocated page
+ * @param order     Order of the pages to allocate
+ * @return void*    Physical address of the allocated pages
  */
 void *
-alloc_get_phys_page();
+kalloc_get_phys_pages(size_t order);
 
 /**
- * @brief Free a single physical page
+ * @brief Free physical memory at a given address
  * 
  * @param paddr     Physical address of the page to free
  */
 void
-alloc_free_phys_page(void *paddr);
+kalloc_free_phys_pages(void *paddr);
 
 #endif

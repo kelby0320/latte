@@ -1,7 +1,7 @@
 #include "mm/vm.h"
 
 #include "errno.h"
-#include "mm/alloc.h"
+#include "mm/kalloc.h"
 #include "mm/paging/page_dir.h"
 #include "mm/paging/page_tbl.h"
 

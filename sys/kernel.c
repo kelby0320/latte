@@ -7,9 +7,10 @@
 #include "gdt/gdt.h"
 #include "gdt/tss.h"
 #include "irq/irq.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 #include "libk/print.h"
 #include "libk/string.h"
+#include "mm/kalloc.h"
 #include "mm/vm.h"
 #include "msgbuf.h"
 #include "task/process.h"
@@ -55,7 +56,11 @@ kernel_early_init(unsigned long magic)
 {
     vm_area_from_page_directory(&kernel_vm_area, &kernel_page_directory);
 
-    kheap_init();
+    // 512 MB heap size for now
+    // Should be passed to kernel_main by boot code
+    kalloc_init(KALLOC_PADDR_START, (1024 * 1024 * 512));
+
+    libk_alloc_init(KERNEL_HEAP_VADDR_START);
 
     // int res = multiboot2_verify_magic_number(magic);
     // if (!res) {
