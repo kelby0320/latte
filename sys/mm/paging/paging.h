@@ -3,6 +3,9 @@
 
 #include "mm/paging/page_dir.h"
 
+#include <stdbool.h>
+#include <stddef.h>
+
 #define PAGING_PAGE_PRESENT        0b00000001
 #define PAGING_PAGE_WRITABLE       0b00000010
 #define PAGING_PAGE_USER           0b00000100
@@ -14,6 +17,7 @@
 #define PAGING_PAGE_SIZE        4096
 #define PAGING_PAGE_TBL_ENTRIES 1024
 #define PAGING_PAGE_DIR_ENTRIES 1024
+#define PAGING_LARGE_PAGE_SIZE  (PAGING_PAGE_SIZE * PAGING_PAGE_TBL_ENTRIES)
 
 #define is_aligned(addr) (((uint32_t)addr % PAGING_PAGE_SIZE) == 0)
 
@@ -22,7 +26,7 @@
  *
  */
 void
-enable_paging();
+paging_enable_paging();
 
 /**
  * @brief Load a new page directory
@@ -30,13 +34,34 @@ enable_paging();
  * @param page_dir  The page directory
  */
 void
-load_page_directory(page_dir_t page_dir);
+paging_load_page_directory(page_dir_t page_dir);
 
 /**
  * @brief Flush the TLB
- * 
+ *
  */
 void
-flush_tlb();
+paging_flush_tlb();
+
+/**
+ * @brief
+ *
+ * @param page_dir
+ * @param is_kernel_addr
+ * @return void*
+ */
+void *
+paging_find_free_page(page_dir_t page_dir, bool is_kernel_addr);
+
+/**
+ * @brief
+ *
+ * @param page_dir
+ * @param is_kernel_addr
+ * @param size
+ * @return void*
+ */
+void *
+paging_find_free_extent(page_dir_t page_dir, bool is_kernel_addr, size_t size);
 
 #endif

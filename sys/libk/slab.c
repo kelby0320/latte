@@ -1,5 +1,9 @@
 #include "mm/slab.h"
 
+#include "mm/buddy.h"
+#include "mm/kalloc.h"
+#include "mm/vm.h"
+
 int
 slab_cache_create(struct slab_cache *cache, size_t obj_size)
 {

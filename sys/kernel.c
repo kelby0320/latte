@@ -19,8 +19,6 @@
 
 extern uint32_t kernel_page_directory;
 
-static struct vm_area kernel_vm_area;
-
 /**
  * @brief Output a string and halt
  *
@@ -59,8 +57,6 @@ kernel_early_init(unsigned long magic)
     // 512 MB heap size for now
     // Should be passed to kernel_main by boot code
     kalloc_init(KALLOC_PADDR_START, (1024 * 1024 * 512));
-
-    libk_alloc_init(KERNEL_HEAP_VADDR_START);
 
     // int res = multiboot2_verify_magic_number(magic);
     // if (!res) {

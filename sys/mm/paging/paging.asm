@@ -1,12 +1,12 @@
 section .text
 
-global enable_paging
-global load_page_directory
-global flush_tlb
+global paging_enable_paging
+global paging_load_page_directory
+global paging_flush_tlb
 
 ; void
-; enable_paging()
-enable_paging:
+; paging_enable_paging()
+paging_enable_paging:
     push    ebp
     mov     ebp, esp
     mov     eax, cr0
@@ -16,8 +16,8 @@ enable_paging:
     ret
 
 ; void
-; load_page_directory(uint32_t *page_dir)
-load_page_directory:
+; paging_load_page_directory(uint32_t *page_dir)
+paging_load_page_directory:
     push    ebp
     mov     ebp, esp
     mov     eax, [ebp+8]
@@ -26,8 +26,8 @@ load_page_directory:
     ret
 
 ; void
-; flush_tlb()
-flush_tlb:
+; paging_flush_tlb()
+paging_flush_tlb:
     push    ebp
     mov     ebp, esp
     mov     eax, cr3

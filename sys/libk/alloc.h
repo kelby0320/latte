@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 void
-libk_alloc_init(void *saddr);
+libk_alloc_init();
 
 void *
 vmalloc(size_t size);
