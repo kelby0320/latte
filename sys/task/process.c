@@ -3,14 +3,14 @@
 #include "config.h"
 #include "errno.h"
 #include "gdt/gdt.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/string.h"
+#include "mm/paging/paging.h"
 #include "mm/vm.h"
 #include "task/loader.h"
 #include "task/sched.h"
 #include "task/task.h"
-#include "mm/paging/paging.h"
 
 static struct process *pslots[LATTE_PROCESS_MAX_PROCESSES] = {0};
 
@@ -248,8 +248,8 @@ process_mmap(struct process *process, size_t size)
         goto err_out;
     }
 
-    int res = vm_area_map_to(process->vm_area, ptr, ptr, ptr + size,
-                             PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
+    int res = vm_area_map_pages_to(process->vm_area, ptr, ptr, ptr + size,
+                                   PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
     if (res < 0) {
         kfree(ptr);
         goto err_out;

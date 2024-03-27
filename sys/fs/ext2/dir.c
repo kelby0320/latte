@@ -2,7 +2,7 @@
 
 #include "errno.h"
 #include "fs/ext2/inode.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/string.h"
 

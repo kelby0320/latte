@@ -6,7 +6,7 @@
 #include "dev/term/term.h"
 #include "dev/vga/vga.h"
 #include "errno.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 #include "libk/print.h"
 #include "libk/string.h"
 

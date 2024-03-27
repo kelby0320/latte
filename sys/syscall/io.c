@@ -3,7 +3,7 @@
 #include "config.h"
 #include "errno.h"
 #include "irq/isr.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 #include "libk/memory.h"
 #include "task/sched.h"
 #include "task/task.h"

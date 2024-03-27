@@ -44,22 +44,22 @@ void
 paging_flush_tlb();
 
 /**
- * @brief
+ * @brief   Find a free page in the page directory
  *
- * @param page_dir
- * @param is_kernel_addr
- * @return void*
+ * @param page_dir          The page directory
+ * @param is_kernel_addr    Whether the address is a kernel address
+ * @return void*            The address of the free page
  */
 void *
 paging_find_free_page(page_dir_t page_dir, bool is_kernel_addr);
 
 /**
- * @brief
+ * @brief   Find a free extent of pages in the page directory
  *
- * @param page_dir
- * @param is_kernel_addr
- * @param size
- * @return void*
+ * @param page_dir          The page directory
+ * @param is_kernel_addr    Whether the address is a kernel address
+ * @param size              The number of 4MB large pages to find
+ * @return void*            The address of the free extent
  */
 void *
 paging_find_free_extent(page_dir_t page_dir, bool is_kernel_addr, size_t size);

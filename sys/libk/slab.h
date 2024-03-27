@@ -1,30 +1,31 @@
 #ifndef SLAB_H
 #define SLAB_H
 
-#include "mm/paging/paging.h"
-
 #include <stddef.h>
+#include <stdint.h>
 
-// The size of the free list is determined by assuming a 4k allocation for the struct slab
-// minus the sizes of the other fields in the struct slab
-#define FREE_LIST_SIZE                                                                             \
-    (PAGING_PAGE_SIZE - sizeof(void *) - (3 * sizeof(size_t)) - sizeof(struct slab *))
+#define SLAB_SIZE 4096
+
+// The size of the free list is determined by subtracting the sizes of the
+// other fields in the struct slab from the SLAB_SIZE, e.g. 4096
+#define FREE_LIST_SIZE (SLAB_SIZE - sizeof(void *) - (4 * sizeof(size_t)) - sizeof(struct slab *))
 
 /**
- * @brief
+ * @brief   The slab structure
  *
  */
 struct slab {
-    void *slab_addr;
-    size_t slab_size;
+    void *slab_objs;
+    size_t slab_len;
+    size_t obj_size;
     size_t objs_used;
     size_t objs_free;
     struct slab *next;
-    unsigned int free_list[FREE_LIST_SIZE];
+    uint8_t free_list[FREE_LIST_SIZE];
 };
 
 /**
- * @brief
+ * @brief The slab cache structure
  *
  */
 struct slab_cache {
@@ -32,16 +33,40 @@ struct slab_cache {
     struct slab *slab_head;
 };
 
+/**
+ * @brief   Create a new slab cache
+ *
+ * @param cache     Pointer to the slab cache
+ * @param obj_size  The size of the objects in the cache
+ * @return int      Status code
+ */
 int
 slab_cache_create(struct slab_cache *cache, size_t obj_size);
 
+/**
+ * @brief   Destroy a slab cache
+ *
+ * @param cache     Pointer to the slab cache
+ */
 void
 slab_cache_destroy(struct slab_cache *cache);
 
+/**
+ * @brief   Allocate an object from the slab cache
+ *
+ * @param cache     Pointer to the slab cache
+ * @return void*    Pointer to the object
+ */
 void *
 slab_cache_alloc(struct slab_cache *cache);
 
-void
+/**
+ * @brief   Free an object from the slab cache
+ *
+ * @param cache     Pointer to the slab cache
+ * @param ptr       Pointer to the object
+ */
+int
 slab_cache_free(struct slab_cache *cache, void *ptr);
 
 #endif

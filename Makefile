@@ -36,15 +36,16 @@ C_OBJECTS = ./sys/boot/boot.o \
 	./sys/irq/idt.o \
 	./sys/irq/irq.o \
 	./sys/irq/isr.o \
-	./sys/libk/kheap.o \
+	./sys/libk/alloc.o \
 	./sys/libk/memory.o \
 	./sys/libk/print.o \
+	./sys/libk/slab.o \
 	./sys/libk/string.o \
-	./sys/mm/alloc/buddy.o \
-	./sys/mm/alloc/slab.o \
 	./sys/mm/paging/page_dir.o \
 	./sys/mm/paging/page_tbl.o \
-	./sys/mm/alloc.o \
+	./sys/mm/paging/paging.o \
+	./sys/mm/buddy.o \
+	./sys/mm/kalloc.o \
 	./sys/mm/vm.o \
 	./sys/syscall/io.o \
 	./sys/syscall/mmap.o \
@@ -114,8 +115,8 @@ test: $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 ./test/sys/fs/test_path: $(TEST_OBJECTS)
 	gcc -g ./test/test.o  ./test/sys/fs/path.o ./test/sys/fs/test_path.o -o ./test/sys/fs/test_path
 
-./test/sys/libk/kheap.o: ./sys/libk/kheap.c
-	gcc -g $(TEST_INCLUDES) -c ./sys/libk/kheap.c -o ./test/sys/libk/kheap.o
+./test/sys/libk/alloc.o: ./sys/libk/alloc.c
+	gcc -g $(TEST_INCLUDES) -c ./sys/libk/alloc.c -o ./test/sys/libk/alloc.o
 
 ./test/sys/libk/memory.o: ./sys/libk/memory.c
 	gcc -g $(TEST_INCLUDES) -c ./sys/libk/memory.c -o ./test/sys/libk/memory.o

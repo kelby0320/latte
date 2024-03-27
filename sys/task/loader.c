@@ -1,11 +1,11 @@
 #include "task/loader.h"
 
 #include "errno.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
+#include "mm/paging/paging.h"
 #include "mm/vm.h"
 #include "task/elf.h"
 #include "vfs/vfs.h"
-#include "mm/paging/paging.h"
 
 #include <stdint.h>
 
@@ -55,7 +55,8 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
         flags |= PAGING_PAGE_WRITABLE;
     }
 
-    return vm_area_map_to(vm_area, (void *)phdr->p_vaddr, segment, segment + segment_size, flags);
+    return vm_area_map_pages_to(vm_area, (void *)phdr->p_vaddr, segment, segment + segment_size,
+                                flags);
 
 err_out:
     kfree(segment);
@@ -76,7 +77,8 @@ loader_read_program_headers(struct elf_img_desc *img_desc)
         return -EINVAL;
     }
 
-    res = vfs_read(img_desc->fd, (char *)&img_desc->elf_pheaders, (sizeof(struct elf32_phdr) * num_pheaders));
+    res = vfs_read(img_desc->fd, (char *)&img_desc->elf_pheaders,
+                   (sizeof(struct elf32_phdr) * num_pheaders));
     if (res < 0) {
         return -EIO;
     }

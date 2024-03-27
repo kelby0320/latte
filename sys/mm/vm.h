@@ -37,14 +37,6 @@ int
 vm_area_init(struct vm_area *vm_area);
 
 /**
- * @brief Free a vm_area
- *
- * @param vm_area   Pointer to vm area
- */
-void
-vm_area_free(struct vm_area *vm_area);
-
-/**
  * @brief   Get the physical address of a virtual address
  *
  * @param vm_area   Pointer to vm area
@@ -103,43 +95,47 @@ vm_area_map_pages_to(struct vm_area *vm_area, void *virt, void *phys, void *phys
                      uint8_t flags);
 
 /**
- * @brief
+ * @brief   Map a single page of kernel memory
  *
- * @param vm_area
- * @param phys
- * @return void*
+ * @param vm_area   Pointer to vm area
+ * @param phys      Physical address
+ * @return void*    Virtual address of kernel page
  */
 void *
 vm_area_map_kernel_page(void *phys);
 
 /**
- * @brief
+ * @brief   Map a set of large pages of kernel memory
  *
- * @param vm_area
- * @param phys
- * @param num_large_pages
- * @return void*
+ * Note: A large page is an entire page table, e.g. 4MB
+ *
+ * @param vm_area           Pointer to vm area
+ * @param phys              Array of physical addresses
+ * @param num_large_pages   Length of the array
+ * @return void*            Virtual address of the start of contiguously allocated virtual memory
  */
 void *
 vm_area_map_kernel_large_pages(void **phys, size_t num_large_pages);
 
 /**
- * @brief
+ * @brief           Map a single page of user memory
  *
- * @param vm_area
- * @param phys
- * @return void*
+ * @param vm_area   Pointer to vm area
+ * @param phys      Physical address
+ * @return void*    Virtual address of user page
  */
 void *
 vm_area_map_user_page(struct vm_area *vm_area, void *phys);
 
 /**
- * @brief
+ * @brief                   Map a set of large pages of user memory
  *
- * @param vm_area
- * @param phys
- * @param num_large_pages
- * @return void*
+ * Note: A large page is an entire page table, e.g. 4MB
+ *
+ * @param vm_area           Pointer to vm area
+ * @param phys              Array of physical addresses
+ * @param num_large_pages   Length of the array
+ * @return void*            Virtual address of the start of contiguously allocated virtual memory
  */
 void *
 vm_area_map_user_large_pages(struct vm_area *vm_area, void **phys, size_t num_large_pages);

@@ -3,7 +3,7 @@
 #include "config.h"
 #include "dev/block/block.h"
 #include "errno.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 
 int
 bufferedreader_new(struct bufferedreader **reader_out, struct block_device *block_device)

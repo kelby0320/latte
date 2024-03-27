@@ -3,19 +3,57 @@
 #include "errno.h"
 #include "kernel.h"
 #include "libk/memory.h"
+#include "libk/slab.h"
 #include "mm/buddy.h"
 #include "mm/kalloc.h"
 #include "mm/vm.h"
 
+#define KMALLOC_SLAB_CACHE_MIN_SIZE    32
+#define KMALLOC_SLAB_CACHE_MAX_SIZE    2048
+#define KMALLOC_SLAB_CACHES            7
+#define KMALLOC_IDX_TO_CACHE_SIZE(idx) (KMALLOC_SLAB_CACHE_MIN_SIZE << idx)
+
+static struct slab_cache kmalloc_slab_cache[KMALLOC_SLAB_CACHES];
+
+extern struct vm_area kernel_vm_area;
+
+/**
+ * @brief   Converts a size to the number of extents required to allocate that size
+ *
+ * @param size  Size to convert
+ * @return int  Number of extents required
+ */
 static int
 size_to_max_order_extents(size_t size)
 {
     return (size + BUDDY_BLOCK_MAX_SIZE) / BUDDY_BLOCK_MAX_SIZE;
 }
 
+/**
+ * @brief   Converts a size to the index of the slab cache to use
+ *
+ * @param size  Size to convert
+ * @return int  Index of the slab cache
+ */
+static int
+size_to_cache_idx(size_t size)
+{
+    int idx = 0;
+    size_t slab_size = KMALLOC_SLAB_CACHE_MIN_SIZE;
+    while ((size / slab_size) != 0) {
+        idx++;
+        slab_size <<= 1;
+    }
+
+    return idx;
+}
+
 void
 libk_alloc_init()
 {
+    for (int i = 0; i < KMALLOC_SLAB_CACHES; i++) {
+        slab_cache_create(&kmalloc_slab_cache[i], KMALLOC_IDX_TO_CACHE_SIZE(i));
+    }
 }
 
 void *
@@ -95,14 +133,39 @@ vfree(void *ptr)
 void *
 kmalloc(size_t size)
 {
+    if (size > KMALLOC_SLAB_CACHE_MAX_SIZE) {
+        return NULL;
+    }
+
+    int idx = size_to_cache_idx(size);
+
+    return slab_cache_alloc(&kmalloc_slab_cache[idx]);
 }
 
 void *
 kzalloc(size_t size)
 {
+    if (size > KMALLOC_SLAB_CACHE_MAX_SIZE) {
+        return NULL;
+    }
+
+    int idx = size_to_cache_idx(size);
+
+    void *ptr = slab_cache_alloc(&kmalloc_slab_cache[idx]);
+
+    size_t slab_size = KMALLOC_IDX_TO_CACHE_SIZE(idx);
+    memset(ptr, 0, slab_size);
+
+    return ptr;
 }
 
 void
 kfree(void *ptr)
 {
+    for (int i = 0; i < KMALLOC_SLAB_CACHES; i++) {
+        int res = slab_cache_free(&kmalloc_slab_cache[i], ptr);
+        if (res == 0) {
+            return;
+        }
+    }
 }

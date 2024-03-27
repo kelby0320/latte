@@ -23,7 +23,7 @@ _start:
 	jmp 	ecx
 
 ; void
-; enable_paging()
+; boot_enable_paging()
 boot_enable_paging:
     push    ebp
     mov     ebp, esp
@@ -34,7 +34,7 @@ boot_enable_paging:
     ret
 
 ; void
-; load_page_directory(uint32_t *page_dir)
+; boot_load_page_directory(uint32_t *page_dir)
 boot_load_page_directory:
     push    ebp
     mov     ebp, esp

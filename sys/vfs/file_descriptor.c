@@ -2,7 +2,7 @@
 
 #include "config.h"
 #include "errno.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 #include "libk/memory.h"
 
 struct file_descriptor *global_file_descriptor_table[LATTE_GLOBAL_FILE_DESCRITPOR_TABLE_SIZE] = {0};

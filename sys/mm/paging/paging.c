@@ -9,6 +9,13 @@
 #define is_page_tbl_entry_free(page_tbl_entry) (((uint32_t)page_tbl_entry & 0xFFFFF000) == 0)
 #define is_page_free(page_vaddr)               (((uint32_t)page_vaddr & 0xFFFFF000) == 0)
 
+/**
+ * @brief   Finds a free page in the given page table
+ *
+ * @param page_tbl          Page table to search
+ * @param is_kernel_addr    Whether the page table is for kernel or user space
+ * @return void*            Virtual address of the free page
+ */
 static void *
 find_free_page_in_tbl(page_tbl_t page_tbl, bool is_kernel_addr)
 {

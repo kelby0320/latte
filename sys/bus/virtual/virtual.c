@@ -2,7 +2,7 @@
 
 #include "bus/virtual/dev/dev.h"
 #include "bus/virtual/devfs/devfs.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 #include "libk/print.h"
 #include "libk/string.h"
 

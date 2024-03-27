@@ -5,7 +5,7 @@
 #include "dev/block/block.h"
 #include "dev/device.h"
 #include "errno.h"
-#include "libk/kheap.h"
+#include "libk/alloc.h"
 #include "libk/print.h"
 #include "libk/string.h"
 

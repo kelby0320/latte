@@ -9,6 +9,17 @@
 
 #include <stdint.h>
 
+extern struct vm_area kernel_vm_area;
+
+/**
+ * @brief   Maps a page to a virtual address in the given VM area
+ *
+ * @param vm_area       Pointer to the vm area
+ * @param base_vaddr    Base virtual address to map the page to
+ * @param phys          Physical address of the page
+ * @param flags         Flags to set for the page
+ * @return void*        Virtual address of the mapped page
+ */
 static void *
 map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
 {
@@ -25,6 +36,16 @@ map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
     return free_page;
 }
 
+/**
+ * @brief   Maps large pages to a virtual address in the given VM area
+ *
+ * @param vm_area           Pointer to the vm area
+ * @param base_vaddr        Base virtual address to map the large pages to
+ * @param phys              Array of physical addresses of the large pages
+ * @param num_large_pages   Number of large pages to map
+ * @param flags             Flags to set for the large pages
+ * @return void*            Virtual address of the mapped large pages
+ */
 static void *
 map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys, size_t num_large_pages,
                 uint8_t flags)
@@ -68,15 +89,10 @@ vm_area_init(struct vm_area *vm_area)
     return 0;
 }
 
-void
-vm_area_free(struct vm_area *vm_area)
-{
-    // TODO: Free all page tables
-}
-
 void *
 vm_area_virt_to_phys(struct vm_area *vm_area, void *virt)
 {
+    // TODO
 }
 
 void

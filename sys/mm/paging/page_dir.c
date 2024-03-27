@@ -1,7 +1,7 @@
 #include "mm/paging/page_dir.h"
 
 #include "errno.h"
-#include "mm/alloc.h"
+#include "mm/kalloc.h"
 #include "mm/paging/paging.h"
 
 /**
@@ -39,7 +39,7 @@ page_dir_create_new_entry(page_dir_t page_dir, void *vaddr)
         return -EEXIST;
     }
 
-    page_dir_entry_t page_dir_entry = (page_dir_entry_t)alloc_get_phys_page();
+    page_dir_entry_t page_dir_entry = (page_dir_entry_t)kalloc_get_phys_page();
 
     page_dir_entry &= 0xFFFFF000;          // Clear flags
     page_dir_entry |= PAGING_PAGE_PRESENT; // Ensure the entry is marked as present
