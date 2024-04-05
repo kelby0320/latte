@@ -2,103 +2,103 @@
 
 #include "kernel.h"
 #include "libk/memory.h"
+#include "mm/kalloc.h"
 #include "mm/paging/page_dir.h"
 #include "mm/paging/page_tbl.h"
 
 #define is_page_dir_entry_free(page_dir_entry) (((uint32_t)page_dir_entry & 0xFFFFF000) == 0)
 #define is_page_tbl_entry_free(page_tbl_entry) (((uint32_t)page_tbl_entry & 0xFFFFF000) == 0)
-#define is_page_free(page_vaddr)               (((uint32_t)page_vaddr & 0xFFFFF000) == 0)
 
-/**
- * @brief   Finds a free page in the given page table
- *
- * @param page_tbl          Page table to search
- * @param is_kernel_addr    Whether the page table is for kernel or user space
- * @return void*            Virtual address of the free page
- */
+extern uint32_t kernel_page_tables[PAGING_PAGE_DIR_ENTRIES][PAGING_PAGE_TBL_ENTRIES];
+
 static void *
-find_free_page_in_tbl(page_tbl_t page_tbl, bool is_kernel_addr)
+paging_find_free_large_extent(page_dir_t page_dir, bool is_kernel_addr, size_t num_large_pages)
 {
-    void *search_vaddr = is_kernel_addr ? KERNEL_HEAP_VADDR_START : USER_HEAP_VADDR_START;
-    void *top_of_tbl_vaddr = search_vaddr + (PAGING_PAGE_TBL_ENTRIES * sizeof(page_tbl_entry_t));
-    page_tbl_entry_t page_tbl_entry = page_tbl_get_entry(page_tbl, search_vaddr);
-
-    while (search_vaddr < top_of_tbl_vaddr) {
-        if (is_page_tbl_entry_free(page_tbl_entry)) {
-            return search_vaddr;
-        }
-
-        search_vaddr += PAGING_PAGE_SIZE;
-        page_tbl_entry = page_tbl_get_entry(page_tbl, search_vaddr);
-    }
-
     return NULL;
 }
 
-void *
-paging_find_free_page(page_dir_t page_dir, bool is_kernel_addr)
+static void *
+find_free_extent_in_page_tbl(page_tbl_t page_tbl, void *starting_addr, size_t num_pages)
 {
-    void *search_vaddr = is_kernel_addr ? KERNEL_HEAP_VADDR_START : USER_HEAP_VADDR_START;
-    void *top_of_dir_vaddr = search_vaddr + (PAGING_PAGE_DIR_ENTRIES * sizeof(page_dir_entry_t));
-    page_dir_entry_t page_dir_entry = page_dir_get_entry(page_dir, search_vaddr);
+    void *search_vaddr = starting_addr;
+    size_t extent_pages = 0;
 
-    while (search_vaddr < top_of_dir_vaddr) {
+    for (size_t i = 0; i < PAGING_PAGE_TBL_ENTRIES && extent_pages < num_pages; i++) {
+        page_tbl_entry_t page_tbl_entry = page_tbl_get_entry(page_tbl, search_vaddr);
+        if (is_page_tbl_entry_free(page_tbl_entry)) {
+            extent_pages++;
+        } else {
+            search_vaddr += PAGING_PAGE_SIZE * (extent_pages + 1);
+            extent_pages = 0;
+        }
+    }
+
+    if (extent_pages != num_pages) {
+        search_vaddr = NULL;
+    }
+
+    return search_vaddr;
+}
+
+static void *
+find_free_extent_in_page_dir(page_dir_t page_dir, void *starting_addr, size_t num_pages)
+{
+
+    void *search_vaddr = starting_addr;
+    size_t total_num_pages = num_pages;
+    size_t num_page_dirs = (num_pages / PAGING_PAGE_TBL_ENTRIES) + 1;
+    size_t extent_dirs = 0;
+
+    for (size_t i = 0; i < PAGING_PAGE_DIR_ENTRIES && extent_dirs < num_page_dirs; i++) {
+        page_dir_entry_t page_dir_entry = page_dir_get_entry(page_dir, search_vaddr);
+
         if (is_page_dir_entry_free(page_dir_entry)) {
-            page_dir_create_new_entry(page_dir, search_vaddr);
+            page_tbl_t page_tbl = kalloc_get_phys_page();
+            page_dir_entry = page_dir_add_page_tbl(page_dir, search_vaddr, page_tbl,
+                                                   PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE);
         }
 
         page_tbl_t page_tbl = page_tbl_from_page_dir_entry(page_dir_entry);
-        void *page_vaddr = find_free_page_in_tbl(page_tbl, is_kernel_addr);
-        if (page_vaddr) {
-            return page_vaddr;
-        }
+        size_t num_pages_to_find =
+            total_num_pages < PAGING_PAGE_TBL_ENTRIES ? total_num_pages : PAGING_PAGE_TBL_ENTRIES;
 
-        search_vaddr += (PAGING_PAGE_TBL_ENTRIES * PAGING_PAGE_SIZE);
-        page_dir_entry = page_dir_get_entry(page_dir, search_vaddr);
+        void *extent_addr = find_free_extent_in_page_tbl(page_tbl, search_vaddr, num_pages_to_find);
+        if (!extent_addr) {
+            search_vaddr += PAGING_PAGE_TBL_ENTRIES * PAGING_PAGE_SIZE * (extent_dirs + 1);
+            extent_dirs = 0;
+            total_num_pages = num_pages;
+        } else {
+            if (extent_addr != search_vaddr) {
+                search_vaddr = extent_addr;
+            }
+
+            extent_dirs++;
+            total_num_pages -= num_pages_to_find;
+        }
     }
 
-    return NULL;
+    if (extent_dirs != num_page_dirs) {
+        search_vaddr = NULL;
+    }
+
+    return search_vaddr;
 }
 
 void *
-paging_find_free_extent(page_dir_t page_dir, bool is_kernel_addr, size_t size)
+paging_find_free_page(page_dir_t page_dir, void *base_vaddr)
 {
-    // Max number of large pages is the number of page directory entries
-    // i.e. 1024
-    if (size > PAGING_PAGE_DIR_ENTRIES) {
-        return NULL;
+    void *extent_addr = find_free_extent_in_page_dir(page_dir, base_vaddr, 1);
+    return extent_addr;
+}
+
+void *
+paging_find_free_extent(page_dir_t page_dir, void *base_vaddr, size_t num_pages)
+{
+    if (num_pages >= PAGING_PAGE_TBL_ENTRIES) {
+        size_t num_large_pages = (num_pages / PAGING_PAGE_TBL_ENTRIES) + 1;
+        return paging_find_free_large_extent(page_dir, base_vaddr, num_large_pages);
     }
 
-    void *search_vaddr = is_kernel_addr ? KERNEL_HEAP_VADDR_START : USER_HEAP_VADDR_START;
-    void *top_of_dir_vaddr = search_vaddr + (PAGING_PAGE_DIR_ENTRIES * sizeof(page_dir_entry_t));
-    page_dir_entry_t page_dir_entry = page_dir_get_entry(page_dir, search_vaddr);
-
-    // Stack allocated array, max size is 1024
-    void *large_pages[size];
-    memset(large_pages, 0, sizeof(large_pages));
-
-    for (size_t i = 0; i < size && search_vaddr < top_of_dir_vaddr; i++) {
-        if (is_page_dir_entry_free(page_dir_entry)) {
-            large_pages[i] = search_vaddr;
-        } else {
-            // reset search
-            memset(large_pages, 0, sizeof(large_pages));
-            i = 0;
-        }
-
-        search_vaddr += (PAGING_PAGE_TBL_ENTRIES * PAGING_PAGE_SIZE);
-        page_dir_entry = page_dir_get_entry(page_dir, search_vaddr);
-    }
-
-    // Create dir entries for each large page
-    if (large_pages[size - 1]) {
-        for (size_t i = 0; i < size; i++) {
-            page_dir_create_new_entry(page_dir, large_pages[i]);
-        }
-
-        // return the starting address of the large pages
-        return large_pages[0];
-    }
-
-    return NULL;
+    void *extent_addr = find_free_extent_in_page_dir(page_dir, base_vaddr, num_pages);
+    return extent_addr;
 }

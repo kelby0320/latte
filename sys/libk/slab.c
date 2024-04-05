@@ -93,7 +93,7 @@ slab_dealloc(struct slab *slab, void *ptr)
 {
     size_t idx = (ptr - slab->slab_objs) / slab->obj_size;
     if (idx >= FREE_LIST_SIZE) {
-        return -EINVAL;
+        return -ENOENT;
     }
 
     slab->free_list[idx] = SLAB_ITEM_FREE;

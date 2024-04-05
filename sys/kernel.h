@@ -3,8 +3,8 @@
 
 #include "mm/vm.h"
 
-#define KALLOC_PADDR_START      ((void *)0x2800000)  // 40MB
-#define KERNEL_HEAP_VADDR_START ((void *)0xC2800000) // 3GB + 40MB
+#define KALLOC_PADDR_START      ((void *)0x4400000)  // 68MB
+#define KERNEL_HEAP_VADDR_START ((void *)0xC4400000) // 3GB + 68MB
 #define USER_HEAP_VADDR_START   ((void *)0x01000000) // 16MB
 
 void

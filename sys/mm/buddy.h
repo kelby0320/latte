@@ -59,4 +59,7 @@ buddy_allocator_malloc(struct buddy_allocator *allocator, unsigned int order);
 void
 buddy_allocator_free(struct buddy_allocator *allocator, void *addr);
 
+int
+size_to_order(size_t size);
+
 #endif

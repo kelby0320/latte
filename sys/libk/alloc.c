@@ -48,19 +48,11 @@ size_to_cache_idx(size_t size)
     return idx;
 }
 
-void
-libk_alloc_init()
-{
-    for (int i = 0; i < KMALLOC_SLAB_CACHES; i++) {
-        slab_cache_create(&kmalloc_slab_cache[i], KMALLOC_IDX_TO_CACHE_SIZE(i));
-    }
-}
-
-void *
-vmalloc(size_t size)
+static void *
+vmalloc_large_pages(size_t size)
 {
     if (size < BUDDY_BLOCK_MAX_SIZE) {
-        return kmalloc(size);
+        return NULL;
     }
 
     int num_extents = size_to_max_order_extents(size);
@@ -99,10 +91,53 @@ err_out:
     return NULL;
 }
 
+void
+libk_alloc_init()
+{
+    for (int i = 0; i < KMALLOC_SLAB_CACHES; i++) {
+        slab_cache_create(&kmalloc_slab_cache[i], KMALLOC_IDX_TO_CACHE_SIZE(i));
+    }
+}
+
+void *
+vmalloc(size_t size)
+{
+    if (size <= KMALLOC_SLAB_CACHE_MAX_SIZE) {
+        return kmalloc(size);
+    }
+
+    if (size > BUDDY_BLOCK_MAX_SIZE) {
+        return vmalloc_large_pages(size);
+    }
+
+    int order = size_to_order(size);
+    if (order < 0) {
+        return NULL;
+    }
+
+    void *phys = kalloc_get_phys_pages(order);
+    if (!phys) {
+        goto err_out;
+    }
+
+    size_t mem_size = order_to_size(order);
+
+    void *vaddr = vm_area_map_kernel_pages(phys, mem_size);
+    if (!vaddr) {
+        goto err_out;
+    }
+
+    return vaddr;
+
+err_out:
+    kalloc_free_phys_pages(phys);
+    return NULL;
+}
+
 void *
 vzalloc(size_t size)
 {
-    if (size < BUDDY_BLOCK_MAX_SIZE) {
+    if (size <= KMALLOC_SLAB_CACHE_MAX_SIZE) {
         return kzalloc(size);
     }
 
@@ -111,7 +146,11 @@ vzalloc(size_t size)
         return NULL;
     }
 
-    memset(vaddr, 0, size);
+    // We need the actual allocation size, not the requested size
+    int order = size_to_order(size);
+    size_t mem_size = order_to_size(order);
+
+    memset(vaddr, 0, mem_size);
 }
 
 void
@@ -134,7 +173,7 @@ void *
 kmalloc(size_t size)
 {
     if (size > KMALLOC_SLAB_CACHE_MAX_SIZE) {
-        return NULL;
+        return vmalloc(size);
     }
 
     int idx = size_to_cache_idx(size);
@@ -146,7 +185,7 @@ void *
 kzalloc(size_t size)
 {
     if (size > KMALLOC_SLAB_CACHE_MAX_SIZE) {
-        return NULL;
+        return vzalloc(size);
     }
 
     int idx = size_to_cache_idx(size);

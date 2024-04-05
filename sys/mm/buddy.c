@@ -28,7 +28,7 @@ static struct buddy_block *
 block_list_new_block(struct buddy_block *block_list)
 {
     for (int i = 0; i < BUDDY_BLOCK_LIST_LEN; i++) {
-        if (block_list[i].addr == 0) {
+        if (block_list[i].addr == NULL) {
             return &block_list[i];
         }
     }
@@ -83,7 +83,8 @@ static struct buddy_block *
 block_list_find_free_block(struct buddy_block *block_list, unsigned int order)
 {
     for (int i = 0; i < BUDDY_BLOCK_LIST_LEN; i++) {
-        if (block_list[i].order == order && !block_list[i].is_allocated) {
+        if (block_list[i].addr != NULL && block_list[i].order == order &&
+            !block_list[i].is_allocated) {
             return &block_list[i];
         }
     }
@@ -112,7 +113,7 @@ split_block(struct buddy_allocator *allocator, struct buddy_block *block)
     buddy_block->addr = block->addr + (BUDDY_BLOCK_MIN_SIZE * (1 << new_order));
     buddy_block->buddy_list[new_order] = block;
 
-    block->order -= new_order;
+    block->order = new_order;
     block->buddy_list[new_order] = buddy_block;
 
     return 0;
@@ -246,4 +247,19 @@ buddy_allocator_free(struct buddy_allocator *allocator, void *addr)
     allocator->mem_available += order_to_size(block->order);
 
     deallocate_block(allocator, block);
+}
+
+int
+size_to_order(size_t size)
+{
+    int order;
+
+    for (order = 0; order <= BUDDY_BLOCK_MAX_ORDER; order++) {
+        size_t block_size = BUDDY_BLOCK_MIN_SIZE << order;
+        if ((size == block_size) || (size / block_size) == 0) {
+            return order;
+        }
+    }
+
+    return -EINVAL;
 }

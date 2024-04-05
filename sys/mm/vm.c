@@ -2,7 +2,7 @@
 
 #include "errno.h"
 #include "kernel.h"
-#include "mm/kalloc.h"
+#include "libk/alloc.h"
 #include "mm/paging/page_dir.h"
 #include "mm/paging/page_tbl.h"
 #include "mm/paging/paging.h"
@@ -30,10 +30,35 @@ map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
 
     int res = vm_area_map_page_to(vm_area, free_page, phys, flags);
     if (res < 0) {
+        // This needs to be cleaned up if it fails
         return NULL;
     }
 
     return free_page;
+}
+
+static void *
+map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size, uint8_t flags)
+{
+    // Size must be a multiple of the page size
+    if (size % PAGING_PAGE_SIZE != 0) {
+        return NULL;
+    }
+
+    size_t num_pages = size / PAGING_PAGE_SIZE;
+
+    void *free_extent = paging_find_free_extent(vm_area->page_directory, base_vaddr, num_pages);
+    if (!free_extent) {
+        return NULL;
+    }
+
+    int res = vm_area_map_pages_to(vm_area, free_extent, phys, phys + size, flags);
+    if (res < 0) {
+        // This needs to be cleaned up if it fails
+        return NULL;
+    }
+
+    return free_extent;
 }
 
 /**
@@ -50,15 +75,18 @@ static void *
 map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys, size_t num_large_pages,
                 uint8_t flags)
 {
-    void *free_extent = paging_find_free_extent(vm_area->page_directory, base_vaddr,
-                                                num_large_pages * PAGING_LARGE_PAGE_SIZE);
+    size_t num_pages = num_large_pages * PAGING_PAGE_TBL_ENTRIES;
+    void *free_extent = paging_find_free_extent(vm_area->page_directory, base_vaddr, num_pages);
     if (!free_extent) {
         return NULL;
     }
 
     for (size_t i = 0; i < num_large_pages; i++) {
-        int res = vm_area_map_pages_to(vm_area, free_extent, phys[i],
-                                       phys[i] + PAGING_LARGE_PAGE_SIZE, flags);
+        void *vaddr = free_extent + (i * PAGING_LARGE_PAGE_SIZE);
+        void *paddr = phys[i];
+        void *paddr_end = phys + PAGING_LARGE_PAGE_SIZE;
+
+        int res = vm_area_map_pages_to(vm_area, vaddr, paddr, paddr_end, flags);
         if (res < 0) {
             // This needs to be cleaned up if it fails
             return NULL;
@@ -77,22 +105,18 @@ vm_area_from_page_directory(struct vm_area *vm_area, uint32_t *page_dir)
 int
 vm_area_init(struct vm_area *vm_area)
 {
-    uint32_t *page_dir = kalloc_get_phys_page();
+    uint32_t *page_dir = vzalloc(PAGING_PAGE_SIZE);
     if (!page_dir) {
         return -ENOMEM;
     }
+
+    // TODO: Need to map kernel memory
 
     page_dir_init(page_dir);
 
     vm_area->page_directory = page_dir;
 
     return 0;
-}
-
-void *
-vm_area_virt_to_phys(struct vm_area *vm_area, void *virt)
-{
-    // TODO
 }
 
 void
@@ -110,8 +134,8 @@ vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t fla
 
     page_dir_entry_t page_dir_entry = page_dir_get_entry(vm_area->page_directory, virt);
     if (page_dir_entry == 0) {
-        // Page directory entry does not exist, create it
-        page_dir_entry = page_dir_create_new_entry(vm_area->page_directory, virt);
+        //  TODO: Create a new page directory entry (e.g. page table)
+        return -EINVAL;
     }
 
     page_tbl_t page_tbl = page_tbl_from_page_dir_entry(page_dir_entry);
@@ -172,6 +196,13 @@ vm_area_map_kernel_page(void *phys)
 }
 
 void *
+vm_area_map_kernel_pages(void *phys, size_t size)
+{
+    return map_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, size,
+                     PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE);
+}
+
+void *
 vm_area_map_kernel_large_pages(void **phys, size_t num_large_pages)
 {
     return map_large_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, num_large_pages,
@@ -183,6 +214,13 @@ vm_area_map_user_page(struct vm_area *vm_area, void *phys)
 {
     return map_page(vm_area, USER_HEAP_VADDR_START, phys,
                     PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
+}
+
+void *
+vm_area_map_user_pages(struct vm_area *vm_area, void *phys, size_t size)
+{
+    return map_pages(vm_area, USER_HEAP_VADDR_START, phys, size,
+                     PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
 }
 
 void *

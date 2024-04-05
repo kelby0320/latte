@@ -2,6 +2,7 @@
 #define PAGING_H
 
 #include "mm/paging/page_dir.h"
+#include "mm/paging/page_tbl.h"
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -13,6 +14,10 @@
 #define PAGING_PAGE_CACHE_DISABLED 0b00010000
 #define PAGING_PAGE_ACCESSED       0b00100000
 #define PAGING_PAGE_DIRTY          0b01000000
+
+#define PAGING_PAGE_DIR_MASK    0xFFC00000
+#define PAGING_PAGE_TBL_MASK    0x003FF000
+#define PAGING_PAGE_OFFSET_MASK 0x00000FFF
 
 #define PAGING_PAGE_SIZE        4096
 #define PAGING_PAGE_TBL_ENTRIES 1024
@@ -47,21 +52,21 @@ paging_flush_tlb();
  * @brief   Find a free page in the page directory
  *
  * @param page_dir          The page directory
- * @param is_kernel_addr    Whether the address is a kernel address
+ * @param base_vaddr        The virtual address to start the search from
  * @return void*            The address of the free page
  */
 void *
-paging_find_free_page(page_dir_t page_dir, bool is_kernel_addr);
+paging_find_free_page(page_dir_t page_dir, void *base_vaddr);
 
 /**
  * @brief   Find a free extent of pages in the page directory
  *
  * @param page_dir          The page directory
- * @param is_kernel_addr    Whether the address is a kernel address
- * @param size              The number of 4MB large pages to find
+ * @param base_vaddr        The virtual address to start the search from
+ * @param size              The number of pages to find
  * @return void*            The address of the free extent
  */
 void *
-paging_find_free_extent(page_dir_t page_dir, bool is_kernel_addr, size_t size);
+paging_find_free_extent(page_dir_t page_dir, void *base_vaddr, size_t num_pages);
 
 #endif

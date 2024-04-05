@@ -37,16 +37,6 @@ int
 vm_area_init(struct vm_area *vm_area);
 
 /**
- * @brief   Get the physical address of a virtual address
- *
- * @param vm_area   Pointer to vm area
- * @param virt      Virtual address
- * @return void*    Physical address
- */
-void *
-vm_area_virt_to_phys(struct vm_area *vm_area, void *virt);
-
-/**
  * @brief Load the page directory from a vm area
  *
  * @param vm_area   Pointer to vm area
@@ -105,6 +95,16 @@ void *
 vm_area_map_kernel_page(void *phys);
 
 /**
+ * @brief   Map a set of contiguous pages of kernel memory
+ *
+ * @param phys      Physical address
+ * @param size      Size of the memory to map (must be a multiple of page size)
+ * @return void*    Virtual address of the start of contiguously allocated virtual memory
+ */
+void *
+vm_area_map_kernel_pages(void *phys, size_t size);
+
+/**
  * @brief   Map a set of large pages of kernel memory
  *
  * Note: A large page is an entire page table, e.g. 4MB
@@ -126,6 +126,17 @@ vm_area_map_kernel_large_pages(void **phys, size_t num_large_pages);
  */
 void *
 vm_area_map_user_page(struct vm_area *vm_area, void *phys);
+
+/**
+ * @brief        Map a set of contiguous pages of user memory
+ *
+ * @param vm_area   Pointer to vm area
+ * @param phys      Physical address
+ * @param size      Size of the memory to map (must be a multiple of page size)
+ * @return void*    Virtual address of the start of contiguously allocated virtual memory
+ */
+void *
+vm_area_map_user_pages(struct vm_area *vm_area, void *phys, size_t size);
 
 /**
  * @brief                   Map a set of large pages of user memory

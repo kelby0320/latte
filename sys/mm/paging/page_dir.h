@@ -3,8 +3,12 @@
 
 #include <stdint.h>
 
+#include "mm/paging/page_tbl.h"
+
 typedef uint32_t *page_dir_t;
 typedef uint32_t page_dir_entry_t;
+
+#define page_dir_starting_addr(page_dir) ((void *)((uint32_t)page_dir & 0xfffff000))
 
 /**
  * @brief Initialize a page directory
@@ -27,11 +31,11 @@ page_dir_get_entry(page_dir_t page_dir, void *vaddr);
 /**
  * @brief Create a new page directory entry for the given virtual address
  *
- * @param page_dir  The page directory
- * @param vaddr     The virtual address
- * @return int      Status code
+ * @param page_dir          The page directory
+ * @param vaddr             The virtual address
+ * @return page_dir_entry_t The new page directory entry
  */
-int
-page_dir_create_new_entry(page_dir_t page_dir, void *vaddr);
+page_dir_entry_t
+page_dir_add_page_tbl(page_dir_t page_dir, void *vaddr, page_tbl_t page_tbl, uint8_t flags);
 
 #endif

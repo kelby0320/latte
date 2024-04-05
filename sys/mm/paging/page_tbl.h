@@ -1,14 +1,13 @@
 #ifndef PAGE_TBL_H
 #define PAGE_TBL_H
 
-#include "mm/paging/page_dir.h"
-
 #include <stdint.h>
 
 typedef uint32_t *page_tbl_t;
 typedef uint32_t page_tbl_entry_t;
 
-#define page_tbl_from_page_dir_entry(page_dir) ((page_tbl_t)(page_dir & 0xfffff000))
+#define page_tbl_from_page_dir_entry(page_dir_entry) ((page_tbl_t)(page_dir_entry & 0xfffff000))
+#define page_tbl_starting_addr(page_tbl)             ((void *)((uint32_t)page_tbl & 0xfffff000))
 
 /**
  * @brief Initialize a page table
