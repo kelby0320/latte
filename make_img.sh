@@ -1,7 +1,7 @@
 #!/bin/bash
 
-GRUB_LOOP=/dev/loop10
-EXT2_LOOP=/dev/loop11
+GRUB_LOOP=/dev/loop0
+EXT2_LOOP=/dev/loop1
 
 dd if=/dev/zero of=./latte.img bs=1M count=100
 echo -en 'n\np\n1\n\n\na\nw\n' | fdisk ./latte.img

@@ -87,3 +87,18 @@ kalloc_get_next_contiguous_allocation(void *paddr)
 
     return allocators[next_alloc].base_addr;
 }
+
+int
+kalloc_size_to_order(size_t size)
+{
+    int order;
+
+    for (order = 0; order <= BUDDY_BLOCK_MAX_ORDER; order++) {
+        size_t block_size = BUDDY_BLOCK_MIN_SIZE << order;
+        if ((size == block_size) || (size / block_size) == 0) {
+            return order;
+        }
+    }
+
+    return -EINVAL;
+}

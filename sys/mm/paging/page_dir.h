@@ -11,14 +11,6 @@ typedef uint32_t page_dir_entry_t;
 #define page_dir_starting_addr(page_dir) ((void *)((uint32_t)page_dir & 0xfffff000))
 
 /**
- * @brief Initialize a page directory
- *
- * @param page_dir  The page directory
- */
-void
-page_dir_init(page_dir_t page_dir);
-
-/**
  * @brief Retrieve a page directory entry from a page directory
  *
  * @param page_dir          The page directory

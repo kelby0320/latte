@@ -6,8 +6,11 @@
 #include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
+#include "mm/kalloc.h"
 #include "mm/vm.h"
 #include "task/process.h"
+
+extern struct vm_area kernel_vm_area;
 
 struct task *tslots[LATTE_TASK_MAX_TASKS];
 
@@ -64,13 +67,14 @@ set_slot(int tid, struct task *task)
 static int
 task_init(struct task *task, int tid, struct process *process)
 {
-    void *stack = kzalloc(LATTE_TASK_STACK_SIZE);
+    int stack_order = kalloc_size_to_order(TASK_STACK_SIZE);
+    void *stack = kalloc_get_phys_pages(stack_order);
     if (!stack) {
         return -ENOMEM;
     }
 
-    int res = vm_area_map_pages_to(process->vm_area, (void *)LATTE_TASK_STACK_VIRT_ADDR_BOTTOM,
-                                   stack, stack + LATTE_TASK_STACK_SIZE,
+    int res = vm_area_map_pages_to(process->vm_area, (void *)TASK_STACK_VIRT_ADDR_BOTTOM,
+                                   stack, stack + TASK_STACK_SIZE,
                                    PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
     if (res < 0) {
         kfree(stack);
@@ -84,9 +88,9 @@ task_init(struct task *task, int tid, struct process *process)
     task->registers.cs = LATTE_USER_CODE_SEGMENT;
     task->registers.ds = LATTE_USER_DATA_SEGMENT;
     task->registers.ss = LATTE_USER_DATA_SEGMENT;
-    task->registers.esp = LATTE_TASK_STACK_VIRT_ADDR_TOP;
-    task->stack = (void *)LATTE_TASK_STACK_VIRT_ADDR_TOP;
-    task->stack_size = LATTE_TASK_STACK_SIZE;
+    task->registers.esp = TASK_STACK_VIRT_ADDR_TOP;
+    task->stack = (void *)TASK_STACK_VIRT_ADDR_TOP;
+    task->stack_size = TASK_STACK_SIZE;
     task->process = process;
 
     return 0;
@@ -141,6 +145,7 @@ task_free(struct task *task)
 void
 task_switch_and_return(struct task *task)
 {
+    paging_copy_kernel_pages_to_user(kernel_vm_area.page_directory, task->process->vm_area->page_directory);
     process_switch_to_vm_area(task->process);
     task_return(&task->registers);
 }

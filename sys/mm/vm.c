@@ -3,9 +3,11 @@
 #include "errno.h"
 #include "kernel.h"
 #include "libk/alloc.h"
+#include "mm/kalloc.h"
 #include "mm/paging/page_dir.h"
 #include "mm/paging/page_tbl.h"
 #include "mm/paging/paging.h"
+#include "libk/memory.h"
 
 #include <stdint.h>
 
@@ -97,22 +99,20 @@ map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys, size_t n
 }
 
 void
-vm_area_from_page_directory(struct vm_area *vm_area, uint32_t *page_dir)
+vm_area_kernel_init(struct vm_area *vm_area, uint32_t *page_dir)
 {
     vm_area->page_directory = page_dir;
 }
 
 int
-vm_area_init(struct vm_area *vm_area)
+vm_area_user_init(struct vm_area *vm_area)
 {
-    uint32_t *page_dir = vzalloc(PAGING_PAGE_SIZE);
+    page_dir_t page_dir = (page_dir_t)kalloc_get_phys_page();
     if (!page_dir) {
         return -ENOMEM;
     }
 
-    // TODO: Need to map kernel memory
-
-    page_dir_init(page_dir);
+    memset(page_dir, 0, PAGING_PAGE_SIZE);
 
     vm_area->page_directory = page_dir;
 
@@ -125,6 +125,12 @@ vm_area_switch_map(struct vm_area *vm_area)
     paging_load_page_directory(vm_area->page_directory);
 }
 
+void *
+vm_area_virt_to_phys(struct vm_area *vm_area, void *virt)
+{
+    return NULL;
+}
+
 int
 vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t flags)
 {
@@ -133,9 +139,11 @@ vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t fla
     }
 
     page_dir_entry_t page_dir_entry = page_dir_get_entry(vm_area->page_directory, virt);
+
     if (page_dir_entry == 0) {
-        //  TODO: Create a new page directory entry (e.g. page table)
-        return -EINVAL;
+        page_tbl_t page_tbl = kalloc_get_phys_page();
+        page_dir_entry = page_dir_add_page_tbl(vm_area->page_directory, virt, page_tbl,
+                                                flags);
     }
 
     page_tbl_t page_tbl = page_tbl_from_page_dir_entry(page_dir_entry);

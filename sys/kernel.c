@@ -54,7 +54,7 @@ switch_to_kernel_vm_area()
 void
 kernel_early_init(unsigned long magic)
 {
-    vm_area_from_page_directory(&kernel_vm_area, &kernel_page_directory);
+    vm_area_kernel_init(&kernel_vm_area, (page_dir_t)&kernel_page_directory);
 
     // 512 MB heap size for now
     // Should be passed to kernel_main by boot code

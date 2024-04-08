@@ -9,8 +9,6 @@
 #define is_page_dir_entry_free(page_dir_entry) (((uint32_t)page_dir_entry & 0xFFFFF000) == 0)
 #define is_page_tbl_entry_free(page_tbl_entry) (((uint32_t)page_tbl_entry & 0xFFFFF000) == 0)
 
-extern uint32_t kernel_page_tables[PAGING_PAGE_DIR_ENTRIES][PAGING_PAGE_TBL_ENTRIES];
-
 static void *
 paging_find_free_large_extent(page_dir_t page_dir, bool is_kernel_addr, size_t num_large_pages)
 {
@@ -82,6 +80,15 @@ find_free_extent_in_page_dir(page_dir_t page_dir, void *starting_addr, size_t nu
     }
 
     return search_vaddr;
+}
+
+void
+paging_copy_kernel_pages_to_user(page_dir_t kernel_page_dir, page_dir_t user_page_dir)
+{
+    for (int i = 0; i < PAGING_KERNEL_DIR_ENTRIES; i++) {
+        page_dir_entry_t kernel_page_dir_entry = kernel_page_dir[i+PAGING_KERNEL_DIR_OFFSET];
+        user_page_dir[i+PAGING_KERNEL_DIR_OFFSET] = kernel_page_dir_entry;
+    }
 }
 
 void *

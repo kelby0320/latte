@@ -10,15 +10,6 @@ typedef uint32_t page_tbl_entry_t;
 #define page_tbl_starting_addr(page_tbl)             ((void *)((uint32_t)page_tbl & 0xfffff000))
 
 /**
- * @brief Initialize a page table
- *
- * @param page_tbl          The page table
- * @param page_tbl_offset   The offset of the page table in the page directory
- */
-void
-page_tbl_init(page_tbl_t page_tbl, uint32_t page_tbl_offset);
-
-/**
  * @brief Retrieve a page table entry from a page table
  *
  * @param page_tbl          The page table

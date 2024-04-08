@@ -19,10 +19,12 @@
 #define PAGING_PAGE_TBL_MASK    0x003FF000
 #define PAGING_PAGE_OFFSET_MASK 0x00000FFF
 
-#define PAGING_PAGE_SIZE        4096
-#define PAGING_PAGE_TBL_ENTRIES 1024
-#define PAGING_PAGE_DIR_ENTRIES 1024
-#define PAGING_LARGE_PAGE_SIZE  (PAGING_PAGE_SIZE * PAGING_PAGE_TBL_ENTRIES)
+#define PAGING_PAGE_SIZE            4096
+#define PAGING_PAGE_TBL_ENTRIES     1024
+#define PAGING_PAGE_DIR_ENTRIES     1024
+#define PAGING_LARGE_PAGE_SIZE      (PAGING_PAGE_SIZE * PAGING_PAGE_TBL_ENTRIES)
+#define PAGING_KERNEL_DIR_ENTRIES   256
+#define PAGING_KERNEL_DIR_OFFSET    768
 
 #define is_aligned(addr) (((uint32_t)addr % PAGING_PAGE_SIZE) == 0)
 
@@ -47,6 +49,9 @@ paging_load_page_directory(page_dir_t page_dir);
  */
 void
 paging_flush_tlb();
+
+void
+paging_copy_kernel_pages_to_user(page_dir_t kernel_page_dir, page_dir_t user_page_dir);
 
 /**
  * @brief   Find a free page in the page directory

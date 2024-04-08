@@ -4,7 +4,6 @@
 #include "kernel.h"
 #include "libk/memory.h"
 #include "libk/slab.h"
-#include "mm/buddy.h"
 #include "mm/kalloc.h"
 #include "mm/vm.h"
 
@@ -110,7 +109,7 @@ vmalloc(size_t size)
         return vmalloc_large_pages(size);
     }
 
-    int order = size_to_order(size);
+    int order = kalloc_size_to_order(size);
     if (order < 0) {
         return NULL;
     }
@@ -120,7 +119,7 @@ vmalloc(size_t size)
         goto err_out;
     }
 
-    size_t mem_size = order_to_size(order);
+    size_t mem_size = kalloc_order_to_size(order);
 
     void *vaddr = vm_area_map_kernel_pages(phys, mem_size);
     if (!vaddr) {
@@ -147,8 +146,8 @@ vzalloc(size_t size)
     }
 
     // We need the actual allocation size, not the requested size
-    int order = size_to_order(size);
-    size_t mem_size = order_to_size(order);
+    int order = kalloc_size_to_order(size);
+    size_t mem_size = kalloc_order_to_size(order);
 
     memset(vaddr, 0, mem_size);
 }

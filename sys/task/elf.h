@@ -30,7 +30,6 @@
 #define EM_860         6
 #define EM_MIPS        7
 #define EM_MIPS_RS4_BE 8
-#define EM_M32         10
 
 #define EV_NONE    0
 #define EV_CURRENT 1

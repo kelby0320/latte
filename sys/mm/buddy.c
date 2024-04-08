@@ -3,6 +3,8 @@
 #include "errno.h"
 #include "libk/memory.h"
 
+#define order_to_size(order)  (BUDDY_BLOCK_MIN_SIZE * (1 << order))
+
 /**
  * @brief Initialize a block list
  *
@@ -247,19 +249,4 @@ buddy_allocator_free(struct buddy_allocator *allocator, void *addr)
     allocator->mem_available += order_to_size(block->order);
 
     deallocate_block(allocator, block);
-}
-
-int
-size_to_order(size_t size)
-{
-    int order;
-
-    for (order = 0; order <= BUDDY_BLOCK_MAX_ORDER; order++) {
-        size_t block_size = BUDDY_BLOCK_MIN_SIZE << order;
-        if ((size == block_size) || (size / block_size) == 0) {
-            return order;
-        }
-    }
-
-    return -EINVAL;
 }

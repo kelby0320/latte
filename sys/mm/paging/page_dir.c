@@ -4,22 +4,8 @@
 #include "mm/kalloc.h"
 #include "mm/paging/page_tbl.h"
 #include "mm/paging/paging.h"
-
-/**
- * @brief Initialize a page directory
- *
- * @param page_dir  Pointer to page directory
- * @return int
- */
-void
-page_dir_init(page_dir_t page_dir)
-{
-    for (int i = 0; i < PAGING_PAGE_DIR_ENTRIES; i++) {
-        page_dir_entry_t page_dir_entry = (i * PAGING_PAGE_SIZE * PAGING_PAGE_TBL_ENTRIES);
-        page_dir_entry &= 0xFFFFF000; // Clear flags
-        page_dir[i] = page_dir_entry;
-    }
-}
+#include "libk/memory.h"
+#include "mm/vm.h"
 
 page_dir_entry_t
 page_dir_get_entry(page_dir_t page_dir, void *vaddr)

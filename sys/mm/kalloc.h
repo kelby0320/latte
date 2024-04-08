@@ -10,6 +10,7 @@
 #define PHYS_PAGE_SIZE         4096
 #define PHYS_PAGE_ORDER        0
 
+#define kalloc_order_to_size(order)  (BUDDY_BLOCK_MIN_SIZE * (1 << order))
 #define kalloc_get_phys_page() (kalloc_get_phys_pages(PHYS_PAGE_ORDER))
 
 /**
@@ -60,5 +61,9 @@ kalloc_unlink_contiguous_allocation(void *paddr1, void *paddr2);
 
 void *
 kalloc_get_next_contiguous_allocation(void *paddr);
+
+int
+kalloc_size_to_order(size_t size);
+
 
 #endif

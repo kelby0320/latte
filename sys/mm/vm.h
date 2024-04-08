@@ -15,7 +15,7 @@
  *
  */
 struct vm_area {
-    uint32_t *page_directory;
+    page_dir_t page_directory;
 };
 
 /**
@@ -25,7 +25,7 @@ struct vm_area {
  * @param page_dir
  */
 void
-vm_area_from_page_directory(struct vm_area *vm_area, uint32_t *page_dir);
+vm_area_kernel_init(struct vm_area *vm_area, page_dir_t page_dir);
 
 /**
  * @brief Initialize a new vm area
@@ -34,7 +34,7 @@ vm_area_from_page_directory(struct vm_area *vm_area, uint32_t *page_dir);
  * @return int      Status code
  */
 int
-vm_area_init(struct vm_area *vm_area);
+vm_area_user_init(struct vm_area *vm_area);
 
 /**
  * @brief Load the page directory from a vm area
@@ -43,6 +43,9 @@ vm_area_init(struct vm_area *vm_area);
  */
 void
 vm_area_switch_map(struct vm_area *vm_area);
+
+void *
+vm_area_virt_to_phys(struct vm_area *vm_area, void *virt);
 
 /**
  * @brief Map a page

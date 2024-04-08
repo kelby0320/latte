@@ -6,6 +6,7 @@
 #include "mm/vm.h"
 #include "task/elf.h"
 #include "vfs/vfs.h"
+#include "mm/kalloc.h"
 
 #include <stdint.h>
 
@@ -18,27 +19,30 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
         return 0; // Skip loading
     }
 
-    size_t segment_offset = phdr->p_offset;
-    size_t segment_size = phdr->p_memsz;
+    size_t elf_segment_size = phdr->p_memsz;
 
     // Ensure segment size aligned with the page size
-    if (segment_size % PAGING_PAGE_SIZE) {
-        segment_size += PAGING_PAGE_SIZE - (segment_size % PAGING_PAGE_SIZE);
+    if (elf_segment_size % PAGING_PAGE_SIZE) {
+        elf_segment_size += PAGING_PAGE_SIZE - (elf_segment_size % PAGING_PAGE_SIZE);
     }
 
     if (elf_img_desc->num_seg_allocs == ELF_IMG_DESC_MAX_PHEADERS) {
         return -ENOMEM;
     }
 
-    void *segment = kzalloc(segment_size);
+    int order = kalloc_size_to_order(elf_segment_size);
+    
+    void *segment = kalloc_get_phys_pages(order);
     if (!segment) {
         return -ENOMEM;
     }
 
+    size_t segment_size = kalloc_order_to_size(order);
+
     elf_img_desc->segment_allocations[elf_img_desc->num_seg_allocs] = segment;
     elf_img_desc->num_seg_allocs++;
 
-    int res = vfs_seek(elf_img_desc->fd, segment_offset, SEEK_SET);
+    int res = vfs_seek(elf_img_desc->fd, phdr->p_offset, SEEK_SET);
     if (res < 0) {
         res = -EIO;
         goto err_out;

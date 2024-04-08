@@ -8,7 +8,6 @@
 #define BUDDY_BLOCK_LIST_LEN  (1 << BUDDY_BLOCK_MAX_ORDER)
 #define BUDDY_BLOCK_MIN_SIZE  4096
 #define BUDDY_BLOCK_MAX_SIZE  (BUDDY_BLOCK_MIN_SIZE * (1 << BUDDY_BLOCK_MAX_ORDER))
-#define order_to_size(order)  (BUDDY_BLOCK_MIN_SIZE * (1 << order))
 
 /**
  * @brief Buddy block structure
@@ -58,8 +57,5 @@ buddy_allocator_malloc(struct buddy_allocator *allocator, unsigned int order);
  */
 void
 buddy_allocator_free(struct buddy_allocator *allocator, void *addr);
-
-int
-size_to_order(size_t size);
 
 #endif

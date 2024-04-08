@@ -98,7 +98,7 @@ process_init(struct process *process, int pid)
     process->id = pid;
     process->vm_area = kzalloc(sizeof(struct vm_area));
 
-    int res = vm_area_init(process->vm_area);
+    int res = vm_area_user_init(process->vm_area);
     if (res < 0) {
         kfree(process->vm_area);
         return res;
