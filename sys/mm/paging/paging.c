@@ -86,8 +86,8 @@ void
 paging_copy_kernel_pages_to_user(page_dir_t kernel_page_dir, page_dir_t user_page_dir)
 {
     for (int i = 0; i < PAGING_KERNEL_DIR_ENTRIES; i++) {
-        page_dir_entry_t kernel_page_dir_entry = kernel_page_dir[i+PAGING_KERNEL_DIR_OFFSET];
-        user_page_dir[i+PAGING_KERNEL_DIR_OFFSET] = kernel_page_dir_entry;
+        page_dir_entry_t kernel_page_dir_entry = kernel_page_dir[i + PAGING_KERNEL_DIR_OFFSET];
+        user_page_dir[i + PAGING_KERNEL_DIR_OFFSET] = kernel_page_dir_entry;
     }
 }
 

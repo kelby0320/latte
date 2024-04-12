@@ -10,6 +10,28 @@
 #define VM_PAGE_WRITABLE PAGING_PAGE_WRITABLE
 #define VM_PAGE_USER     PAGING_PAGE_USER
 
+#define KERNEL_HIGHER_HALF_START 0xC0000000
+#define KERNEL_HEAP_VADDR_START ((void *)0xC4400000) // 3GB + 68MB
+#define USER_HEAP_VADDR_START   ((void *)0x01000000) // 16MB
+
+#define vm_area_map_kernel_page(phys) \
+    vm_area_map_page(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
+
+#define vm_area_map_kernel_pages(phys, size) \
+    vm_area_map_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, size, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
+
+#define vm_area_map_kernel_large_pages(phys, num_large_pages) \
+    vm_area_map_large_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, num_large_pages, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
+
+#define vm_area_map_user_page(vm_area, phys) \
+    vm_area_map_page(vm_area, USER_HEAP_VADDR_START, phys, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
+
+#define vm_area_map_user_pages(vm_area, phys, size) \
+    vm_area_map_pages(vm_area, USER_HEAP_VADDR_START, phys, size, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
+
+#define vm_area_map_user_large_pages(vm_area, phys, num_large_pages) \
+    vm_area_map_large_pages(vm_area, USER_HEAP_VADDR_START, phys, num_large_pages, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
+
 /**
  * @brief VM Area is a wrapper around a page directory
  *
@@ -46,6 +68,25 @@ vm_area_switch_map(struct vm_area *vm_area);
 
 void *
 vm_area_virt_to_phys(struct vm_area *vm_area, void *virt);
+
+void *
+vm_area_map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags);
+
+void *
+vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size, uint8_t flags);
+
+void *
+vm_area_map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys, size_t num_large_pages,
+                uint8_t flags);
+
+void
+vm_area_unmap_page(struct vm_area *vm_area, void *vaddr);
+
+void
+vm_area_unmap_pages(struct vm_area *vm_area, void *vaddr, size_t size);
+
+void
+vm_area_unmap_large_pages(struct vm_area *vm_area, void **vaddrs, size_t num_large_pages);
 
 /**
  * @brief Map a page
@@ -86,72 +127,5 @@ vm_area_map_page_range(struct vm_area *vm_area, void *virt, void *phys, size_t c
 int
 vm_area_map_pages_to(struct vm_area *vm_area, void *virt, void *phys, void *phys_end,
                      uint8_t flags);
-
-/**
- * @brief   Map a single page of kernel memory
- *
- * @param vm_area   Pointer to vm area
- * @param phys      Physical address
- * @return void*    Virtual address of kernel page
- */
-void *
-vm_area_map_kernel_page(void *phys);
-
-/**
- * @brief   Map a set of contiguous pages of kernel memory
- *
- * @param phys      Physical address
- * @param size      Size of the memory to map (must be a multiple of page size)
- * @return void*    Virtual address of the start of contiguously allocated virtual memory
- */
-void *
-vm_area_map_kernel_pages(void *phys, size_t size);
-
-/**
- * @brief   Map a set of large pages of kernel memory
- *
- * Note: A large page is an entire page table, e.g. 4MB
- *
- * @param vm_area           Pointer to vm area
- * @param phys              Array of physical addresses
- * @param num_large_pages   Length of the array
- * @return void*            Virtual address of the start of contiguously allocated virtual memory
- */
-void *
-vm_area_map_kernel_large_pages(void **phys, size_t num_large_pages);
-
-/**
- * @brief           Map a single page of user memory
- *
- * @param vm_area   Pointer to vm area
- * @param phys      Physical address
- * @return void*    Virtual address of user page
- */
-void *
-vm_area_map_user_page(struct vm_area *vm_area, void *phys);
-
-/**
- * @brief        Map a set of contiguous pages of user memory
- *
- * @param vm_area   Pointer to vm area
- * @param phys      Physical address
- * @param size      Size of the memory to map (must be a multiple of page size)
- * @return void*    Virtual address of the start of contiguously allocated virtual memory
- */
-void *
-vm_area_map_user_pages(struct vm_area *vm_area, void *phys, size_t size);
-
-/**
- * @brief                   Map a set of large pages of user memory
- *
- * Note: A large page is an entire page table, e.g. 4MB
- *
- * @param vm_area           Pointer to vm area
- * @param phys              Array of physical addresses
- * @param num_large_pages   Length of the array
- * @return void*            Virtual address of the start of contiguously allocated virtual memory
- */
-void *
-vm_area_map_user_large_pages(struct vm_area *vm_area, void **phys, size_t num_large_pages);
 
 #endif

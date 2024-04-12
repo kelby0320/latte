@@ -83,5 +83,5 @@ section .bss
 
 ; Reserve kernel stack
 kernel_stack_bottom:
-	resb 	16384						; 16 Kib
+	resb 	65536						; 64 Kib
 kernel_stack_top:

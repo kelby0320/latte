@@ -10,7 +10,7 @@
 struct idtr idtr;
 struct idt_entry int_desc_tbl[LATTE_TOTAL_IDT_ENTRIES];
 
-extern void *isr_wrapper_table[31];
+extern void *isr_wrapper_table[256];
 
 extern void
 isr_syscall_wrapper();

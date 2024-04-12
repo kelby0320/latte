@@ -2,11 +2,11 @@
 
 #include "errno.h"
 #include "libk/alloc.h"
+#include "mm/kalloc.h"
 #include "mm/paging/paging.h"
 #include "mm/vm.h"
 #include "task/elf.h"
 #include "vfs/vfs.h"
-#include "mm/kalloc.h"
 
 #include <stdint.h>
 
@@ -31,7 +31,7 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
     }
 
     int order = kalloc_size_to_order(elf_segment_size);
-    
+
     void *segment = kalloc_get_phys_pages(order);
     if (!segment) {
         return -ENOMEM;
@@ -54,10 +54,12 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
         goto err_out;
     }
 
-    uint8_t flags = PAGING_PAGE_PRESENT | PAGING_PAGE_USER;
-    if (phdr->p_flags & PF_W) {
-        flags |= PAGING_PAGE_WRITABLE;
-    }
+    // uint8_t flags = PAGING_PAGE_PRESENT | PAGING_PAGE_USER;
+    // if (phdr->p_flags & PF_W) {
+    //     flags |= PAGING_PAGE_WRITABLE;
+    // }
+
+    uint8_t flags = PAGING_PAGE_PRESENT | PAGING_PAGE_USER | PAGING_PAGE_WRITABLE;
 
     return vm_area_map_pages_to(vm_area, (void *)phdr->p_vaddr, segment, segment + segment_size,
                                 flags);

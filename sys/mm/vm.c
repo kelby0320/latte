@@ -3,11 +3,11 @@
 #include "errno.h"
 #include "kernel.h"
 #include "libk/alloc.h"
+#include "libk/memory.h"
 #include "mm/kalloc.h"
 #include "mm/paging/page_dir.h"
 #include "mm/paging/page_tbl.h"
 #include "mm/paging/paging.h"
-#include "libk/memory.h"
 
 #include <stdint.h>
 
@@ -22,8 +22,8 @@ extern struct vm_area kernel_vm_area;
  * @param flags         Flags to set for the page
  * @return void*        Virtual address of the mapped page
  */
-static void *
-map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
+void *
+vm_area_map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
 {
     void *free_page = paging_find_free_page(vm_area->page_directory, base_vaddr);
     if (!free_page) {
@@ -39,8 +39,8 @@ map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
     return free_page;
 }
 
-static void *
-map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size, uint8_t flags)
+void *
+vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size, uint8_t flags)
 {
     // Size must be a multiple of the page size
     if (size % PAGING_PAGE_SIZE != 0) {
@@ -73,9 +73,9 @@ map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size, ui
  * @param flags             Flags to set for the large pages
  * @return void*            Virtual address of the mapped large pages
  */
-static void *
-map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys, size_t num_large_pages,
-                uint8_t flags)
+void *
+vm_area_map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys,
+                        size_t num_large_pages, uint8_t flags)
 {
     size_t num_pages = num_large_pages * PAGING_PAGE_TBL_ENTRIES;
     void *free_extent = paging_find_free_extent(vm_area->page_directory, base_vaddr, num_pages);
@@ -99,9 +99,51 @@ map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys, size_t n
 }
 
 void
+vm_area_unmap_page(struct vm_area *vm_area, void *vaddr)
+{
+    page_dir_entry_t page_dir_entry = page_dir_get_entry(vm_area->page_directory, vaddr);
+    if (page_dir_entry == 0) {
+        return;
+    }
+
+    page_tbl_t page_tbl = page_tbl_from_page_dir_entry(page_dir_entry);
+    page_tbl_entry_t page_tbl_entry = page_tbl_get_entry(page_tbl, vaddr);
+    if (page_tbl_entry == 0) {
+        return;
+    }
+
+    page_tbl_set_entry(page_tbl, vaddr, 0);
+}
+
+void
+vm_area_unmap_pages(struct vm_area *vm_area, void *vaddr, size_t size)
+{
+    // Size must be a multiple of the page size
+    if (size % PAGING_PAGE_SIZE != 0) {
+        return;
+    }
+
+    size_t num_pages = size / PAGING_PAGE_SIZE;
+
+    for (size_t i = 0; i < num_pages; i++) {
+        void *page_vaddr = vaddr + (i * PAGING_PAGE_SIZE);
+        vm_area_unmap_page(vm_area, page_vaddr);
+    }
+}
+
+void
+uvm_area_nmap_large_pages(struct vm_area *vm_area, void **vaddrs, size_t num_large_pages)
+{
+    for (size_t i = 0; i < num_large_pages; i++) {
+        vm_area_unmap_pages(vm_area, vaddrs[i], PAGING_LARGE_PAGE_SIZE);
+    }
+}
+
+void
 vm_area_kernel_init(struct vm_area *vm_area, uint32_t *page_dir)
 {
-    vm_area->page_directory = page_dir;
+    page_dir_t phys_page_dir = (page_dir_t)((uint32_t)page_dir - KERNEL_HIGHER_HALF_START);
+    vm_area->page_directory = phys_page_dir;
 }
 
 int
@@ -142,8 +184,7 @@ vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t fla
 
     if (page_dir_entry == 0) {
         page_tbl_t page_tbl = kalloc_get_phys_page();
-        page_dir_entry = page_dir_add_page_tbl(vm_area->page_directory, virt, page_tbl,
-                                                flags);
+        page_dir_entry = page_dir_add_page_tbl(vm_area->page_directory, virt, page_tbl, flags);
     }
 
     page_tbl_t page_tbl = page_tbl_from_page_dir_entry(page_dir_entry);
@@ -194,46 +235,4 @@ vm_area_map_pages_to(struct vm_area *vm_area, void *virt, void *phys, void *phys
     uint32_t total_bytes = phys_end - phys;
     size_t total_pages = total_bytes / PAGING_PAGE_SIZE;
     return vm_area_map_page_range(vm_area, virt, phys, total_pages, flags);
-}
-
-void *
-vm_area_map_kernel_page(void *phys)
-{
-    return map_page(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys,
-                    PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE);
-}
-
-void *
-vm_area_map_kernel_pages(void *phys, size_t size)
-{
-    return map_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, size,
-                     PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE);
-}
-
-void *
-vm_area_map_kernel_large_pages(void **phys, size_t num_large_pages)
-{
-    return map_large_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, num_large_pages,
-                           PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE);
-}
-
-void *
-vm_area_map_user_page(struct vm_area *vm_area, void *phys)
-{
-    return map_page(vm_area, USER_HEAP_VADDR_START, phys,
-                    PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
-}
-
-void *
-vm_area_map_user_pages(struct vm_area *vm_area, void *phys, size_t size)
-{
-    return map_pages(vm_area, USER_HEAP_VADDR_START, phys, size,
-                     PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
-}
-
-void *
-vm_area_map_user_large_pages(struct vm_area *vm_area, void **phys, size_t num_large_pages)
-{
-    return map_large_pages(vm_area, USER_HEAP_VADDR_START, phys, num_large_pages,
-                           PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
 }

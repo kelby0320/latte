@@ -70,8 +70,6 @@ kernel_early_init(unsigned long magic)
     irq_init();
 
     tss_init();
-
-    tss_load(LATTE_TSS_SEGMENT);
 }
 
 /**

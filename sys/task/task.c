@@ -7,6 +7,7 @@
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "mm/kalloc.h"
+#include "mm/paging/paging.h"
 #include "mm/vm.h"
 #include "task/process.h"
 
@@ -73,8 +74,10 @@ task_init(struct task *task, int tid, struct process *process)
         return -ENOMEM;
     }
 
+    // Map the stack from the bottom up.
+    // Note: We need to map one extra page to cover the top of stack address
     int res = vm_area_map_pages_to(process->vm_area, (void *)TASK_STACK_VIRT_ADDR_BOTTOM,
-                                   stack, stack + TASK_STACK_SIZE,
+                                   stack, stack + TASK_STACK_SIZE + PAGING_PAGE_SIZE, 
                                    PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
     if (res < 0) {
         kfree(stack);
@@ -185,43 +188,35 @@ task_stack_item(struct task *task, int index)
 int
 task_copy_from_user(struct task *task, void *virt, void *buf, size_t size)
 {
-    // FIX ME
+    int res = 0;
 
-    //     if (size > PAGING_PAGE_SIZE) {
-    //         return -EINVAL;
-    //     }
+    int order = kalloc_size_to_order(size);
+    char *shared_buf = kalloc_get_phys_pages(order);
+    if (!shared_buf) {
+        return -ENOMEM;
+    }
 
-    //     char *tmp = kzalloc(size);
-    //     if (!tmp) {
-    //         return -ENOMEM;
-    //     }
+    size_t shared_buf_size = kalloc_order_to_size(order);
+    memset(shared_buf, 0, shared_buf_size);
 
-    //     uint32_t *task_page_dir = task->process->vm_area->page_directory;
-    //     uint32_t saved_entry = vm_area_get_page_entry(task_page_dir, tmp);
+    void *user_shared_buf = vm_area_map_user_pages(task->process->vm_area, shared_buf, shared_buf_size);
+    if (!user_shared_buf) {
+        res = -ENOMEM;
+        goto err_out;
+    }
 
-    //     // Map the tmp buffer into the task's vm area
-    //     vm_area_map_page(task->process->vm_area, tmp, tmp,
-    //                      PAGING_PAGE_WRITABLE | PAGING_PAGE_PRESENT | PAGING_PAGE_USER);
+    vm_area_switch_map(task->process->vm_area);
 
-    //     vm_area_switch_map(task->process->vm_area);
+    memcpy(user_shared_buf, virt, size);
 
-    //     // Copy data from virt to the shared tmp buffer
-    //     memcpy(tmp, virt, size);
+    switch_to_kernel_vm_area();
 
-    //     switch_to_kernel_vm_area();
+    vm_area_unmap_pages(task->process->vm_area, shared_buf, shared_buf_size);
 
-    //     // Reset the task's page entry
-    //     int res = vm_area_set_page_entry(task_page_dir, tmp, saved_entry);
-    //     if (res < 0) {
-    //         goto out;
-    //     }
+    memcpy(buf, shared_buf, size);
 
-    //     // Copy data from the tmp buffer to the output buffer
-    //     memcpy(buf, tmp, size);
+err_out:
+    kalloc_free_phys_pages(shared_buf);
 
-    // out:
-    //     kfree(tmp);
-    //     return res;
-
-    return -1;
+    return res;
 }
