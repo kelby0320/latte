@@ -41,16 +41,16 @@ struct vm_area {
 };
 
 /**
- * @brief Initialize a new vm_area from an existing page directory
+ * @brief Initialize the kernel's vm_area
  *
- * @param vm_area
- * @param page_dir
+ * @param vm_area   Pointer to vm area
+ * @param page_dir  Page directory
  */
 void
 vm_area_kernel_init(struct vm_area *vm_area, page_dir_t page_dir);
 
 /**
- * @brief Initialize a new vm area
+ * @brief Initialize a new vm area for a user process
  *
  * @param vm_area   Pointer to vm area
  * @return int      Status code
@@ -66,30 +66,86 @@ vm_area_user_init(struct vm_area *vm_area);
 void
 vm_area_switch_map(struct vm_area *vm_area);
 
+/**
+ * @brief   Convert a virtual address to a physical address
+ * 
+ * @param vm_area   Pointer to vm area
+ * @param vaddr     Virtual address
+ * @return void*    Physical address
+ */
 void *
-vm_area_virt_to_phys(struct vm_area *vm_area, void *virt);
+vm_area_virt_to_phys(struct vm_area *vm_area, void *vaddr);
 
+/**
+ * @brief   Map a physical page to a virtual address
+ * 
+ * @param vm_area       Pointer to vm area
+ * @param base_vaddr    Base virtual address to search for a free virtual address
+ * @param phys          Physical address of the page
+ * @param flags         Flags to set for the page
+ * @return void*        Virtual address of the mapped page
+ */
 void *
 vm_area_map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags);
 
+/**
+ * @brief   Map a range of physical pages to a virtual address
+ * 
+ * @param vm_area       Pointer to vm area
+ * @param base_vaddr    Base virtual address to search for free virtual addresses
+ * @param phys          Physical address of the first page
+ * @param size          Size of the range to map
+ * @param flags         Flags to set for the pages
+ * @return void*        Virtual address of the mapped pages
+ */
 void *
 vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size, uint8_t flags);
 
+/**
+ * @brief   Map a range of large pages (4MB) to a virtual address
+ * 
+ * @param vm_area           Pointer to vm area
+ * @param base_vaddr        Base virtual address to search for free virtual addresses
+ * @param phys              Array of physical addresses of the large pages
+ * @param num_large_pages   Number of large pages to map
+ * @param flags             Flags to set for the pages
+ * @return void*            Virtual address of the mapped large pages
+ */
 void *
 vm_area_map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys, size_t num_large_pages,
                 uint8_t flags);
 
+/**
+ * @brief   Unmap a page
+ * 
+ * @param vm_area   Pointer to vm area
+ * @param vaddr     Virtual address
+ */
 void
 vm_area_unmap_page(struct vm_area *vm_area, void *vaddr);
 
+/**
+ * @brief   Unmap a range of pages
+ * 
+ * @param vm_area   Pointer to vm area
+ * @param vaddr     Virtual address
+ * @param size      Size of the range to unmap
+ */
 void
 vm_area_unmap_pages(struct vm_area *vm_area, void *vaddr, size_t size);
 
+/**
+ * @brief   Unmap a range of large pages
+ * 
+ * @param vm_area           Pointer to vm area
+ * @param vaddrs            Array of virtual addresses
+ * @param num_large_pages   Number of large pages to unmap
+ */
 void
 vm_area_unmap_large_pages(struct vm_area *vm_area, void **vaddrs, size_t num_large_pages);
 
 /**
- * @brief Map a page
+ * @brief   Map a physical page to a virtual address
  *
  * @param vm_area   Pointer to vm area
  * @param virt      Virtual address
@@ -101,7 +157,7 @@ int
 vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t flags);
 
 /**
- * @brief Map a set of pages
+ * @brief   Map a range of pages to a virtual address
  *
  * @param vm_area   Pointer to vm area
  * @param virt      Virtual address
@@ -115,7 +171,7 @@ vm_area_map_page_range(struct vm_area *vm_area, void *virt, void *phys, size_t c
                        uint8_t flags);
 
 /**
- * @brief Map a memory range
+ * @brief   Map a set of physical pages to a virtual address
  *
  * @param vm_area   Pointer to vm area
  * @param virt      Virtual address

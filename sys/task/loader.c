@@ -13,6 +13,11 @@
 static int
 loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_area, int idx)
 {
+    // Note: Allocated segment size may be larger than requested size
+    // As a result, subsequently allocated segments may overlap
+    //
+    // FIXME
+
     struct elf32_phdr *phdr = &elf_img_desc->elf_pheaders[idx];
 
     if (phdr->p_type != PT_LOAD) {
@@ -54,15 +59,18 @@ loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_
         goto err_out;
     }
 
-    // uint8_t flags = PAGING_PAGE_PRESENT | PAGING_PAGE_USER;
-    // if (phdr->p_flags & PF_W) {
-    //     flags |= PAGING_PAGE_WRITABLE;
-    // }
+    uint8_t flags = PAGING_PAGE_PRESENT | PAGING_PAGE_USER;
+    if (phdr->p_flags & PF_W) {
+        flags |= PAGING_PAGE_WRITABLE;
+    }
 
-    uint8_t flags = PAGING_PAGE_PRESENT | PAGING_PAGE_USER | PAGING_PAGE_WRITABLE;
+    res = vm_area_map_pages_to(vm_area, (void *)phdr->p_vaddr, segment, segment + segment_size,
+                               flags);
+    if (res < 0) {
+        goto err_out;
+    }
 
-    return vm_area_map_pages_to(vm_area, (void *)phdr->p_vaddr, segment, segment + segment_size,
-                                flags);
+    return res;
 
 err_out:
     kfree(segment);

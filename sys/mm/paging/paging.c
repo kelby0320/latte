@@ -26,6 +26,7 @@ find_free_extent_in_page_tbl(page_tbl_t page_tbl, void *starting_addr, size_t nu
         if (is_page_tbl_entry_free(page_tbl_entry)) {
             extent_pages++;
         } else {
+            // Reset search
             search_vaddr += PAGING_PAGE_SIZE * (extent_pages + 1);
             extent_pages = 0;
         }
@@ -51,6 +52,7 @@ find_free_extent_in_page_dir(page_dir_t page_dir, void *starting_addr, size_t nu
         page_dir_entry_t page_dir_entry = page_dir_get_entry(page_dir, search_vaddr);
 
         if (is_page_dir_entry_free(page_dir_entry)) {
+            // Add a new page table to the directory
             page_tbl_t page_tbl = kalloc_get_phys_page();
             page_dir_entry = page_dir_add_page_tbl(page_dir, search_vaddr, page_tbl,
                                                    PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE);
@@ -62,10 +64,12 @@ find_free_extent_in_page_dir(page_dir_t page_dir, void *starting_addr, size_t nu
 
         void *extent_addr = find_free_extent_in_page_tbl(page_tbl, search_vaddr, num_pages_to_find);
         if (!extent_addr) {
+            // Reset search
             search_vaddr += PAGING_PAGE_TBL_ENTRIES * PAGING_PAGE_SIZE * (extent_dirs + 1);
             extent_dirs = 0;
             total_num_pages = num_pages;
         } else {
+            // Continue search
             if (extent_addr != search_vaddr) {
                 search_vaddr = extent_addr;
             }

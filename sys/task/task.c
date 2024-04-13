@@ -76,8 +76,8 @@ task_init(struct task *task, int tid, struct process *process)
 
     // Map the stack from the bottom up.
     // Note: We need to map one extra page to cover the top of stack address
-    int res = vm_area_map_pages_to(process->vm_area, (void *)TASK_STACK_VIRT_ADDR_BOTTOM,
-                                   stack, stack + TASK_STACK_SIZE + PAGING_PAGE_SIZE, 
+    int res = vm_area_map_pages_to(process->vm_area, (void *)TASK_STACK_VIRT_ADDR_BOTTOM, stack,
+                                   stack + TASK_STACK_SIZE + PAGING_PAGE_SIZE,
                                    PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
     if (res < 0) {
         kfree(stack);
@@ -148,7 +148,8 @@ task_free(struct task *task)
 void
 task_switch_and_return(struct task *task)
 {
-    paging_copy_kernel_pages_to_user(kernel_vm_area.page_directory, task->process->vm_area->page_directory);
+    paging_copy_kernel_pages_to_user(kernel_vm_area.page_directory,
+                                     task->process->vm_area->page_directory);
     process_switch_to_vm_area(task->process);
     task_return(&task->registers);
 }
@@ -190,6 +191,7 @@ task_copy_from_user(struct task *task, void *virt, void *buf, size_t size)
 {
     int res = 0;
 
+    // Create a shared buffer between kernel and user space
     int order = kalloc_size_to_order(size);
     char *shared_buf = kalloc_get_phys_pages(order);
     if (!shared_buf) {
@@ -199,7 +201,9 @@ task_copy_from_user(struct task *task, void *virt, void *buf, size_t size)
     size_t shared_buf_size = kalloc_order_to_size(order);
     memset(shared_buf, 0, shared_buf_size);
 
-    void *user_shared_buf = vm_area_map_user_pages(task->process->vm_area, shared_buf, shared_buf_size);
+    // Map the shared buffer into user space
+    void *user_shared_buf =
+        vm_area_map_user_pages(task->process->vm_area, shared_buf, shared_buf_size);
     if (!user_shared_buf) {
         res = -ENOMEM;
         goto err_out;
@@ -207,12 +211,15 @@ task_copy_from_user(struct task *task, void *virt, void *buf, size_t size)
 
     vm_area_switch_map(task->process->vm_area);
 
+    // Copy data to the shared buffer
     memcpy(user_shared_buf, virt, size);
 
     switch_to_kernel_vm_area();
 
+    // Unmap the shared buffer from user space
     vm_area_unmap_pages(task->process->vm_area, shared_buf, shared_buf_size);
 
+    // Copy data from the shared buffer to buf
     memcpy(buf, shared_buf, size);
 
 err_out:

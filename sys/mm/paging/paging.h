@@ -50,6 +50,14 @@ paging_load_page_directory(page_dir_t page_dir);
 void
 paging_flush_tlb();
 
+/**
+ * @brief   Copy kernel page directory entries to user page directory
+ *
+ * Copied entries are marked as supervisor and so are still inaccessable by user mode code
+ * 
+ * @param kernel_page_dir   Kernel page directory
+ * @param user_page_dir     User page directory
+ */
 void
 paging_copy_kernel_pages_to_user(page_dir_t kernel_page_dir, page_dir_t user_page_dir);
 

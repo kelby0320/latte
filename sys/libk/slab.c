@@ -8,11 +8,11 @@
 #define SLAB_ITEM_USED 1
 
 /**
- * @brief
+ * @brief Initialize a slab
  *
- * @param slab
- * @param obj_size
- * @return int
+ * @param slab      Pointer to the slab
+ * @param obj_size  Size of the objects in the slab
+ * @return int      Status code
  */
 static int
 slab_init(struct slab *slab, size_t obj_size)
@@ -29,9 +29,9 @@ slab_init(struct slab *slab, size_t obj_size)
 }
 
 /**
- * @brief
+ * @brief   Free a slab
  *
- * @param slab
+ * @param slab  Pointer to the slab
  */
 static void
 slab_free(struct slab *slab)
@@ -40,10 +40,10 @@ slab_free(struct slab *slab)
 }
 
 /**
- * @brief
+ * @brief   Append a slab to the end of the slab list
  *
- * @param slab_head
- * @param new_slab
+ * @param slab_head Pointer to the head of the slab list
+ * @param new_slab  Pointer to the new slab
  */
 static void
 slab_append_slab(struct slab *slab_head, struct slab *new_slab)
@@ -57,10 +57,10 @@ slab_append_slab(struct slab *slab_head, struct slab *new_slab)
 }
 
 /**
- * @brief
+ * @brief   Allocate an object from a slab
  *
- * @param slab
- * @return void*
+ * @param slab      Pointer to the slab
+ * @return void*    Pointer to the object
  */
 static void *
 slab_alloc(struct slab *slab)
@@ -82,11 +82,11 @@ slab_alloc(struct slab *slab)
 }
 
 /**
- * @brief
+ * @brief   Deallocate an object from a slab
  *
- * @param slab
- * @param ptr
- * @return int
+ * @param slab  Pointer to the slab
+ * @param ptr   Pointer to the object
+ * @return int  Status code
  */
 static int
 slab_dealloc(struct slab *slab, void *ptr)

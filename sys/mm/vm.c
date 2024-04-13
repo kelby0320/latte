@@ -13,15 +13,51 @@
 
 extern struct vm_area kernel_vm_area;
 
-/**
- * @brief   Maps a page to a virtual address in the given VM area
- *
- * @param vm_area       Pointer to the vm area
- * @param base_vaddr    Base virtual address to map the page to
- * @param phys          Physical address of the page
- * @param flags         Flags to set for the page
- * @return void*        Virtual address of the mapped page
- */
+void
+vm_area_kernel_init(struct vm_area *vm_area, uint32_t *page_dir)
+{
+    page_dir_t phys_page_dir = (page_dir_t)((uint32_t)page_dir - KERNEL_HIGHER_HALF_START);
+    vm_area->page_directory = phys_page_dir;
+}
+
+int
+vm_area_user_init(struct vm_area *vm_area)
+{
+    page_dir_t page_dir = (page_dir_t)kalloc_get_phys_page();
+    if (!page_dir) {
+        return -ENOMEM;
+    }
+
+    memset(page_dir, 0, PAGING_PAGE_SIZE);
+
+    vm_area->page_directory = page_dir;
+
+    return 0;
+}
+
+void
+vm_area_switch_map(struct vm_area *vm_area)
+{
+    paging_load_page_directory(vm_area->page_directory);
+}
+
+void *
+vm_area_virt_to_phys(struct vm_area *vm_area, void *vaddr)
+{
+    page_dir_entry_t page_dir_entry = page_dir_get_entry(vm_area->page_directory, vaddr);
+    if (page_dir_entry == 0) {
+        return NULL;
+    }
+
+    page_tbl_t page_tbl = page_tbl_from_page_dir_entry(page_dir_entry);
+    page_tbl_entry_t page_tbl_entry = page_tbl_get_entry(page_tbl, vaddr);
+    if (page_tbl_entry == 0) {
+        return NULL;
+    }
+
+    return (void *)(page_tbl_entry & PAGING_PAGE_OFFSET_MASK);
+}
+
 void *
 vm_area_map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
 {
@@ -63,16 +99,6 @@ vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t 
     return free_extent;
 }
 
-/**
- * @brief   Maps large pages to a virtual address in the given VM area
- *
- * @param vm_area           Pointer to the vm area
- * @param base_vaddr        Base virtual address to map the large pages to
- * @param phys              Array of physical addresses of the large pages
- * @param num_large_pages   Number of large pages to map
- * @param flags             Flags to set for the large pages
- * @return void*            Virtual address of the mapped large pages
- */
 void *
 vm_area_map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys,
                         size_t num_large_pages, uint8_t flags)
@@ -132,45 +158,11 @@ vm_area_unmap_pages(struct vm_area *vm_area, void *vaddr, size_t size)
 }
 
 void
-uvm_area_nmap_large_pages(struct vm_area *vm_area, void **vaddrs, size_t num_large_pages)
+vm_area_unmap_large_pages(struct vm_area *vm_area, void **vaddrs, size_t num_large_pages)
 {
     for (size_t i = 0; i < num_large_pages; i++) {
         vm_area_unmap_pages(vm_area, vaddrs[i], PAGING_LARGE_PAGE_SIZE);
     }
-}
-
-void
-vm_area_kernel_init(struct vm_area *vm_area, uint32_t *page_dir)
-{
-    page_dir_t phys_page_dir = (page_dir_t)((uint32_t)page_dir - KERNEL_HIGHER_HALF_START);
-    vm_area->page_directory = phys_page_dir;
-}
-
-int
-vm_area_user_init(struct vm_area *vm_area)
-{
-    page_dir_t page_dir = (page_dir_t)kalloc_get_phys_page();
-    if (!page_dir) {
-        return -ENOMEM;
-    }
-
-    memset(page_dir, 0, PAGING_PAGE_SIZE);
-
-    vm_area->page_directory = page_dir;
-
-    return 0;
-}
-
-void
-vm_area_switch_map(struct vm_area *vm_area)
-{
-    paging_load_page_directory(vm_area->page_directory);
-}
-
-void *
-vm_area_virt_to_phys(struct vm_area *vm_area, void *virt)
-{
-    return NULL;
 }
 
 int

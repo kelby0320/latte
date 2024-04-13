@@ -40,28 +40,40 @@ void
 kalloc_free_phys_pages(void *paddr);
 
 /**
- * @brief
+ * @brief Link two contiguous physical memory allocations
  *
- * @param paddr1
- * @param paddr2
+ * @param paddr1    Physical address of the first allocation
+ * @param paddr2    Physical address of the second allocation
  * @return int
  */
 int
 kalloc_link_contiguous_allocation(void *paddr1, void *paddr2);
 
 /**
- * @brief
+ * @brief   Unlink two contiguous physical memory allocations
  *
- * @param paddr1
- * @param paddr2
+ * @param paddr1    Physical address of the first allocation
+ * @param paddr2    Physical address of the second allocation
  * @return int
  */
 int
 kalloc_unlink_contiguous_allocation(void *paddr1, void *paddr2);
 
+/**
+ * @brief   Get the next contiguous allocation
+ * 
+ * @param paddr     Physical address of the current allocation
+ * @return void*    Physical address of the next allocation
+ */
 void *
 kalloc_get_next_contiguous_allocation(void *paddr);
 
+/**
+ * @brief   Get the order of a given size
+ * 
+ * @param size  Size of the allocation
+ * @return int  Order of the allocation
+ */
 int
 kalloc_size_to_order(size_t size);
 
