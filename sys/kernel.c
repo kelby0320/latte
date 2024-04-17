@@ -13,8 +13,8 @@
 #include "mm/kalloc.h"
 #include "mm/vm.h"
 #include "msgbuf.h"
-#include "task/process.h"
-#include "task/sched.h"
+#include "proc/process.h"
+#include "sched/sched.h"
 #include "vfs/vfs.h"
 
 extern uint32_t kernel_page_directory;
@@ -116,8 +116,8 @@ kernel_main(unsigned long magic)
     vfs_read(fd, buf, 32);
     printk(buf);
 
-    process_spawn("/bin/hello");
-    schedule_first_task();
+    process_create_first("/bin/hello");
+    schedule_first_thread();
 
     while (1) {}
 }

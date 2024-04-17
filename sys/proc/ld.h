@@ -1,7 +1,7 @@
-#ifndef LOADER_H
-#define LOADER_H
+#ifndef LD_H
+#define LD_H
 
-#include "task/elf.h"
+#include "proc/elf.h"
 
 #include <stddef.h>
 
@@ -42,7 +42,7 @@ struct vm_area;
  * @return int      Status code
  */
 int
-loader_init_image(struct elf_img_desc *img_desc, const char *filename);
+ld_init_image(struct elf_img_desc *img_desc, const char *filename);
 
 /**
  * @brief Free resources associated with an ELF image
@@ -50,7 +50,7 @@ loader_init_image(struct elf_img_desc *img_desc, const char *filename);
  * @param img_desc     Pointer to the ELF image descriptor
  */
 void
-loader_free_image(struct elf_img_desc *img_desc);
+ld_free_image(struct elf_img_desc *img_desc);
 
 /**
  * @brief Map memory regions of an ELF image
@@ -60,6 +60,6 @@ loader_free_image(struct elf_img_desc *img_desc);
  * @return int      Status code
  */
 int
-loader_map_image(struct elf_img_desc *img_desc, struct vm_area *vm_area);
+ld_map_image(struct elf_img_desc *img_desc, struct vm_area *vm_area);
 
 #endif

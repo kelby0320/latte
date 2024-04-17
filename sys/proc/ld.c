@@ -1,17 +1,25 @@
-#include "task/loader.h"
+#include "proc/ld.h"
 
 #include "errno.h"
 #include "libk/alloc.h"
 #include "mm/kalloc.h"
 #include "mm/paging/paging.h"
 #include "mm/vm.h"
-#include "task/elf.h"
+#include "proc/elf.h"
 #include "vfs/vfs.h"
 
 #include <stdint.h>
 
+/**
+ * @brief   Load a program header into memory
+ *
+ * @param elf_img_desc  ELF image descriptor
+ * @param vm_area       VM area
+ * @param idx           Index of the program header
+ * @return int          Status code
+ */
 static int
-loader_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_area, int idx)
+ld_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_area, int idx)
 {
     // Note: Allocated segment size may be larger than requested size
     // As a result, subsequently allocated segments may overlap
@@ -77,8 +85,14 @@ err_out:
     return res;
 }
 
+/**
+ * @brief   Read the ELF program headers
+ *
+ * @param img_desc  ELF image descriptor
+ * @return int      Status code
+ */
 static int
-loader_read_program_headers(struct elf_img_desc *img_desc)
+ld_read_program_headers(struct elf_img_desc *img_desc)
 {
     int pheader_start = img_desc->elf_header.e_ehsize;
     int res = vfs_seek(img_desc->fd, pheader_start, SEEK_SET);
@@ -102,8 +116,14 @@ loader_read_program_headers(struct elf_img_desc *img_desc)
     return 0;
 }
 
+/**
+ * @brief   Read the ELF header
+ *
+ * @param img_desc  ELF image descriptor
+ * @return int      Status code
+ */
 static int
-loader_read_elf_header(struct elf_img_desc *img_desc)
+ld_read_elf_header(struct elf_img_desc *img_desc)
 {
     int res = vfs_read(img_desc->fd, (char *)&img_desc->elf_header, sizeof(struct elf32_ehdr));
     if (res < 0) {
@@ -119,7 +139,7 @@ loader_read_elf_header(struct elf_img_desc *img_desc)
 }
 
 int
-loader_init_image(struct elf_img_desc *img_desc, const char *filename)
+ld_init_image(struct elf_img_desc *img_desc, const char *filename)
 {
     int fd = vfs_open(filename, "r");
     if (fd < 0) {
@@ -128,12 +148,12 @@ loader_init_image(struct elf_img_desc *img_desc, const char *filename)
 
     img_desc->fd = fd;
 
-    int res = loader_read_elf_header(img_desc);
+    int res = ld_read_elf_header(img_desc);
     if (res < 0) {
         goto err_out;
     }
 
-    res = loader_read_program_headers(img_desc);
+    res = ld_read_program_headers(img_desc);
     if (res < 0) {
         goto err_out;
     }
@@ -150,17 +170,17 @@ err_out:
 }
 
 void
-loader_free_image(struct elf_img_desc *img_desc)
+ld_free_image(struct elf_img_desc *img_desc)
 {
     vfs_close(img_desc->fd);
     img_desc->fd = -1;
 }
 
 int
-loader_map_image(struct elf_img_desc *img_desc, struct vm_area *vm_area)
+ld_map_image(struct elf_img_desc *img_desc, struct vm_area *vm_area)
 {
     for (int i = 0; i < img_desc->num_pheaders; i++) {
-        int res = loader_map_program_header(img_desc, vm_area, i);
+        int res = ld_map_program_header(img_desc, vm_area, i);
         if (res < 0) {
             return res;
         }

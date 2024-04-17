@@ -47,14 +47,17 @@ C_OBJECTS = ./sys/boot/boot.o \
 	./sys/mm/buddy.o \
 	./sys/mm/kalloc.o \
 	./sys/mm/vm.o \
+	./sys/proc/elf.o \
+	./sys/proc/ld.o \
+	./sys/proc/mgmt.o \
+	./sys/proc/mmap.o \
+	./sys/proc/process.o \
+	./sys/sched/sched.o \
 	./sys/syscall/io.o \
 	./sys/syscall/mmap.o \
 	./sys/syscall/syscall.o \
-	./sys/task/elf.o \
-	./sys/task/loader.o \
-	./sys/task/process.o \
-	./sys/task/sched.o \
-	./sys/task/task.o \
+	./sys/thread/thread.o \
+	./sys/thread/userio.o \
 	./sys/vfs/file_descriptor.o \
 	./sys/vfs/mountpoint.o \
 	./sys/vfs/vfs.o \
@@ -69,7 +72,7 @@ AS_OBJECTS = ./sys/boot/boot.asm.o \
 	./sys/irq/irq.asm.o \
 	./sys/mm/paging/paging.asm.o \
 	./sys/port/io.asm.o \
-	./sys/task/task.asm.o
+	./sys/thread/thread.asm.o
 
 TEST_OBJECTS = ./test/test.o \
 	./test/sys/fs/path.o \

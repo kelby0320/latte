@@ -1,10 +1,10 @@
 section .text
 
-global task_return
+global thread_return
 
 ; void
-; task_return(struct registers *registers)
-task_return:
+; thread_return(struct registers *registers)
+thread_return:
     mov     ebp, esp
 
     mov     ebx, [ebp+4]                ; Access registers through ebx

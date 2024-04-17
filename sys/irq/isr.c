@@ -4,22 +4,22 @@
 #include "kernel.h"
 #include "mm/vm.h"
 #include "port/io.h"
+#include "proc/process.h"
+#include "sched/sched.h"
 #include "syscall/syscall.h"
-#include "task/process.h"
-#include "task/sched.h"
-#include "task/task.h"
+#include "thread/thread.h"
 
 void
 isr_handler_wrapper(int interrupt_no, struct isr_frame *isr_frame)
 {
     switch_to_kernel_vm_area();
 
-    struct task *current_task = sched_get_current();
-    task_save_state(current_task, isr_frame);
+    struct thread *current_thread = sched_get_current();
+    thread_save_state(current_thread, isr_frame);
 
     do_irq(interrupt_no);
 
-    vm_area_switch_map(current_task->process->vm_area);
+    vm_area_switch_map(current_thread->process->vm_area);
 
     outb(0x20, 0x20);
 }
@@ -29,12 +29,12 @@ isr_syscall_handler_wrapper(int syscall_no, struct isr_frame *isr_frame)
 {
     switch_to_kernel_vm_area();
 
-    struct task *current_task = sched_get_current();
-    task_save_state(current_task, isr_frame);
+    struct thread *current_thread = sched_get_current();
+    thread_save_state(current_thread, isr_frame);
 
     void *res = do_syscall(syscall_no);
 
-    vm_area_switch_map(current_task->process->vm_area);
+    vm_area_switch_map(current_thread->process->vm_area);
 
     return res;
 }

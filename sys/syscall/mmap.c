@@ -2,25 +2,27 @@
 
 #include "errno.h"
 #include "irq/isr.h"
-#include "task/process.h"
-#include "task/sched.h"
-#include "task/task.h"
+#include "proc/mmap.h"
+#include "proc/process.h"
+#include "sched/sched.h"
+#include "thread/thread.h"
+#include "thread/userio.h"
 
 #include <stddef.h>
 
 void *
 do_mmap()
 {
-    struct task *current_task = sched_get_current();
-    size_t size = (size_t)task_stack_item(current_task, 0);
-    return process_mmap(current_task->process, size);
+    struct thread *current_thread = sched_get_current();
+    size_t size = (size_t)thread_get_stack_item(current_thread, 0);
+    return process_mmap(current_thread->process, NULL, size, 0, 0, -1, 0);
 }
 
 void *
 do_munmap()
 {
-    struct task *current_task = sched_get_current();
-    void *ptr = task_stack_item(current_task, 0);
-    process_munmap(current_task->process, ptr);
+    struct thread *current_thread = sched_get_current();
+    void *ptr = thread_get_stack_item(current_thread, 0);
+    process_munmap(current_thread->process, ptr, 0);
     return NULL;
 }
