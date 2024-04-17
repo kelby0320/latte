@@ -9,6 +9,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define PROCESS_ALLOCATION_MEMORY_SEGMENT  0
+#define PROCESS_ALLOCATION_PROGRAM_SEGMENT 1
+
 #define PROCESS_STATE_CREATED  0
 #define PROCESS_STATE_RUNNING  1
 #define PROCESS_STATE_SLEEPING 2
@@ -23,8 +26,11 @@
  *
  */
 struct process_allocation {
+    // Allocation type
+    uint8_t type;
+
     // Memory address
-    void *ptr;
+    void *addr;
 
     // Size of allocation
     size_t size;

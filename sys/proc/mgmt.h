@@ -1,7 +1,10 @@
 #ifndef PROC_MGMT_H
 #define PROC_MGMT_H
 
-#include "proc/process.h"
+#include <stdint.h>
+
+struct process;
+struct process_allocation;
 
 int
 process_fork(struct process *process);

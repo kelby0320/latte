@@ -2,10 +2,12 @@
 
 #include "errno.h"
 #include "libk/alloc.h"
+#include "libk/list.h"
 #include "mm/kalloc.h"
 #include "mm/paging/paging.h"
 #include "mm/vm.h"
 #include "proc/elf.h"
+#include "proc/process.h"
 #include "vfs/vfs.h"
 
 #include <stdint.h>
@@ -19,14 +21,14 @@
  * @return int          Status code
  */
 static int
-ld_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_area, int idx)
+ld_map_program_header(struct process *process, int idx)
 {
     // Note: Allocated segment size may be larger than requested size
     // As a result, subsequently allocated segments may overlap
     //
     // FIXME
 
-    struct elf32_phdr *phdr = &elf_img_desc->elf_pheaders[idx];
+    struct elf32_phdr *phdr = &process->elf_img_desc.elf_pheaders[idx];
 
     if (phdr->p_type != PT_LOAD) {
         return 0; // Skip loading
@@ -39,10 +41,6 @@ ld_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_area
         elf_segment_size += PAGING_PAGE_SIZE - (elf_segment_size % PAGING_PAGE_SIZE);
     }
 
-    if (elf_img_desc->num_seg_allocs == ELF_IMG_DESC_MAX_PHEADERS) {
-        return -ENOMEM;
-    }
-
     int order = kalloc_size_to_order(elf_segment_size);
 
     void *segment = kalloc_get_phys_pages(order);
@@ -52,16 +50,13 @@ ld_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_area
 
     size_t segment_size = kalloc_order_to_size(order);
 
-    elf_img_desc->segment_allocations[elf_img_desc->num_seg_allocs] = segment;
-    elf_img_desc->num_seg_allocs++;
-
-    int res = vfs_seek(elf_img_desc->fd, phdr->p_offset, SEEK_SET);
+    int res = vfs_seek(process->elf_img_desc.fd, phdr->p_offset, SEEK_SET);
     if (res < 0) {
         res = -EIO;
         goto err_out;
     }
 
-    res = vfs_read(elf_img_desc->fd, segment, phdr->p_filesz);
+    res = vfs_read(process->elf_img_desc.fd, segment, phdr->p_filesz);
     if (res < 0) {
         res = -EIO;
         goto err_out;
@@ -72,11 +67,16 @@ ld_map_program_header(struct elf_img_desc *elf_img_desc, struct vm_area *vm_area
         flags |= PAGING_PAGE_WRITABLE;
     }
 
-    res = vm_area_map_pages_to(vm_area, (void *)phdr->p_vaddr, segment, segment + segment_size,
-                               flags);
+    res = vm_area_map_pages_to(process->vm_area, (void *)phdr->p_vaddr, segment,
+                               segment + segment_size, flags);
     if (res < 0) {
         goto err_out;
     }
+
+    struct process_allocation segment_allocation = {
+        .type = PROCESS_ALLOCATION_PROGRAM_SEGMENT, .addr = segment, .size = segment_size};
+
+    list_item_append(process_allocation_t, &process->allocations, segment_allocation);
 
     return res;
 
@@ -158,8 +158,6 @@ ld_init_image(struct elf_img_desc *img_desc, const char *filename)
         goto err_out;
     }
 
-    img_desc->num_seg_allocs = 0;
-
     return 0;
 
 err_out:
@@ -177,10 +175,10 @@ ld_free_image(struct elf_img_desc *img_desc)
 }
 
 int
-ld_map_image(struct elf_img_desc *img_desc, struct vm_area *vm_area)
+ld_map_image_to_process(struct process *process)
 {
-    for (int i = 0; i < img_desc->num_pheaders; i++) {
-        int res = ld_map_program_header(img_desc, vm_area, i);
+    for (int i = 0; i < process->elf_img_desc.num_pheaders; i++) {
+        int res = ld_map_program_header(process, i);
         if (res < 0) {
             return res;
         }

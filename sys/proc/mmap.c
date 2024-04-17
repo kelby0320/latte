@@ -6,6 +6,7 @@
 
 #include "libk/alloc.h"
 #include "mm/paging/paging.h"
+#include "proc/process.h"
 
 void *
 process_mmap(struct process *process, void *addr, size_t size, int prot, int flags, int fd,
@@ -28,8 +29,9 @@ process_mmap(struct process *process, void *addr, size_t size, int prot, int fla
         goto err_out;
     }
 
-    struct process_allocation palloc = {.ptr = virt, .size = segment_size};
-    list_item_append(process_allocation_t, process->allocations, palloc);
+    struct process_allocation palloc = {
+        .type = PROCESS_ALLOCATION_MEMORY_SEGMENT, .addr = virt, .size = segment_size};
+    list_item_append(process_allocation_t, &process->allocations, palloc);
 
     return virt;
 

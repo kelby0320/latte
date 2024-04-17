@@ -47,7 +47,7 @@ process_load_exec(struct process *process, const char *filename)
         goto err_out;
     }
 
-    res = ld_map_image(&process->elf_img_desc, process->vm_area);
+    res = ld_map_image_to_process(process);
     if (res < 0) {
         // If this fails, what is the state of vm_area?
         goto err_out;

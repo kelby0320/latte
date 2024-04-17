@@ -7,6 +7,8 @@
 
 #define ELF_IMG_DESC_MAX_PHEADERS 8
 
+struct process;
+
 /**
  * @brief ELF file image descriptor
  *
@@ -20,12 +22,6 @@ struct elf_img_desc {
 
     // Number of ELF program headers
     int num_pheaders;
-
-    // Memory segment allocations
-    void *segment_allocations[ELF_IMG_DESC_MAX_PHEADERS];
-
-    // Number of segment allocations
-    int num_seg_allocs;
 
     // ELF file descriptor
     int fd;
@@ -53,13 +49,12 @@ void
 ld_free_image(struct elf_img_desc *img_desc);
 
 /**
- * @brief Map memory regions of an ELF image
+ * @brief Map memory regions of an ELF image to a process
  *
- * @param img_desc  Pointer to an ELF image descriptor
- * @param vm_area   Pointer to a VM area
+ * @param img_desc  Pointer to a process
  * @return int      Status code
  */
 int
-ld_map_image(struct elf_img_desc *img_desc, struct vm_area *vm_area);
+ld_map_image_to_process(struct process *process);
 
 #endif
