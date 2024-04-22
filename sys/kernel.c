@@ -111,11 +111,6 @@ kernel_main(unsigned long magic)
     int out_fd = vfs_open("/dev/term0", "w");
     msgbuf_add_output_fd(out_fd);
 
-    char buf[1024];
-    int fd = vfs_open("/latte.txt", "r");
-    vfs_read(fd, buf, 32);
-    printk(buf);
-
     process_create_first("/bin/hello");
     schedule_first_thread();
 

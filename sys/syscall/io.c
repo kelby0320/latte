@@ -57,12 +57,12 @@ do_read()
 
     int res = vfs_read(fd, buf, count);
     if (res < 0) {
-        goto out;
+        goto out_free_buf;
     }
 
-    // thread_copy_to_user(current_thread, (void *)user_buf, buf, sizeof(buf) - 1);
+    res = thread_copy_to_user(current_thread, (void *)user_buf, buf, count);
 
-out:
+out_free_buf:
     kfree(buf);
     return (void *)res;
 }
@@ -82,9 +82,14 @@ do_write()
         return (void *)-ENOMEM;
     }
 
-    thread_copy_from_user(current_thread, (void *)user_buf, buf, count);
+    int res = thread_copy_from_user(current_thread, (void *)user_buf, buf, count);
+    if (res < 0) {
+        goto out_free_buf;
+    }
 
-    int res = vfs_write(fd, buf, count);
+    res = vfs_write(fd, buf, count);
+
+out_free_buf:
     kfree(buf);
 
     return (void *)res;
