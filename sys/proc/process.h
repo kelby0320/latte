@@ -36,16 +36,6 @@ struct process_allocation {
     size_t size;
 };
 
-typedef struct process_allocation process_allocation_t;
-typedef struct thread thread_t;
-
-struct process;
-typedef struct process *process_ptr_t;
-
-LIST_ITEM_TYPE_PROTO(process_allocation_t);
-LIST_ITEM_TYPE_PROTO(thread_t);
-LIST_ITEM_TYPE_PROTO(process_ptr_t);
-
 /**
  * @brief Object that represents a process on the system
  *
@@ -79,13 +69,16 @@ struct process {
     struct process *parent;
 
     // List of child processes
-    LIST(process_ptr_t) children;
+    struct list_item *children;
+    // LIST(process_ptr_t) children;
 
     // List of threads associated with the process
-    LIST(thread_t) threads;
+    struct list_item *threads;
+    // LIST(thread_t) threads;
 
     // List of memory allocations for the process
-    LIST(process_allocation_t) allocations;
+    struct list_item *allocations;
+    // LIST(process_allocation_t) allocations;
 };
 
 /**

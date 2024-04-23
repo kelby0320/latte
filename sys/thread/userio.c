@@ -1,5 +1,6 @@
 #include "thread/userio.h"
 
+#include "errno.h"
 #include "kernel.h"
 #include "libk/memory.h"
 #include "mm/kalloc.h"

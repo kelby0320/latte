@@ -174,9 +174,16 @@ vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t fla
 
     page_dir_entry_t page_dir_entry = page_dir_get_entry(vm_area->page_directory, virt);
 
+    // Create new page directory entry if on doesn't exists
     if (page_dir_entry == 0) {
         page_tbl_t page_tbl = kalloc_get_phys_page();
         page_dir_entry = page_dir_add_page_tbl(vm_area->page_directory, virt, page_tbl, flags);
+    }
+
+    // Update flags if they are different
+    if ((page_dir_entry & 0x0000000F) != flags) {
+        page_dir_entry |= flags;
+        page_dir_set_entry(vm_area->page_directory, virt, page_dir_entry);
     }
 
     page_tbl_t page_tbl = page_tbl_from_page_dir_entry(page_dir_entry);

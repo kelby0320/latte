@@ -76,6 +76,10 @@ vsprintf(char *buf, const char *fmt, va_list vlist)
     int ival;
     char *sval;
 
+    fmt_ptr = fmt;
+    buf_ptr = buf;
+    char tmp = *fmt_ptr;
+
     for (fmt_ptr = fmt, buf_ptr = buf; *fmt_ptr; fmt_ptr++) {
         if (*fmt_ptr != '%') {
             *buf_ptr = *fmt_ptr;

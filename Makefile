@@ -37,6 +37,7 @@ C_OBJECTS = ./sys/boot/boot.o \
 	./sys/irq/irq.o \
 	./sys/irq/isr.o \
 	./sys/libk/alloc.o \
+	./sys/libk/list.o \
 	./sys/libk/memory.o \
 	./sys/libk/print.o \
 	./sys/libk/slab.o \

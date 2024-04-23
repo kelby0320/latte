@@ -73,10 +73,12 @@ ld_map_program_header(struct process *process, int idx)
         goto err_out;
     }
 
-    struct process_allocation segment_allocation = {
-        .type = PROCESS_ALLOCATION_PROGRAM_SEGMENT, .addr = segment, .size = segment_size};
+    struct process_allocation *segment_allocation = kzalloc(sizeof(struct process_allocation));
+    segment_allocation->type = PROCESS_ALLOCATION_PROGRAM_SEGMENT;
+    segment_allocation->addr = segment;
+    segment_allocation->size = segment_size;
 
-    list_item_append(process_allocation_t, &process->allocations, segment_allocation);
+    list_append(&process->allocations, segment_allocation);
 
     return res;
 

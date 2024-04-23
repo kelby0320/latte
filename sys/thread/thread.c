@@ -14,11 +14,7 @@
 
 extern struct vm_area kernel_vm_area;
 
-typedef struct thread *thread_ptr_t;
-
-LIST_ITEM_TYPE_DEF(thread_ptr_t);
-
-static LIST(thread_ptr_t) thread_list = NULL;
+struct list_item *thread_list = NULL;
 static uint32_t next_tid = 1;
 
 /**
@@ -76,7 +72,7 @@ thread_create(struct process *process)
     thread->stack_size = THREAD_STACK_SIZE;
     thread->process = process;
 
-    list_item_append(thread_ptr_t, &thread_list, thread);
+    list_append(&thread_list, thread);
 
     return thread->tid;
 
@@ -88,10 +84,10 @@ err_out:
 struct thread *
 thread_get(uint32_t tid)
 {
-    for_each_in_list(thread_ptr_t, thread_list, thread)
+    for_each_in_list(struct thread *, thread_list, list, thread)
     {
-        if (thread->data->tid == tid) {
-            return thread->data;
+        if (thread->tid == tid) {
+            return thread;
         }
     }
 

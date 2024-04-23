@@ -15,7 +15,8 @@ do_mmap()
 {
     struct thread *current_thread = sched_get_current();
     size_t size = (size_t)thread_get_stack_item(current_thread, 0);
-    return process_mmap(current_thread->process, NULL, size, 0, 0, -1, 0);
+    void *vaddr = process_mmap(current_thread->process, NULL, size, 0, 0, -1, 0);
+    return vaddr;
 }
 
 void *

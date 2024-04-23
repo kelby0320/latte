@@ -1,61 +1,44 @@
 #ifndef LIBK_LIST_H
 #define LIBK_LIST_H
 
-#include "errno.h"
-#include "libk/alloc.h"
+// list_for_each_entry(palloc, &process->allocations, struct process_allocation, list)
+
+#define for_each_in_list(T, head, list, item)                                                      \
+    struct list_item *list;                                                                        \
+    T item;                                                                                        \
+    for (list = head, item = list->data; list != NULL; list = list->next)
+
+struct list_item {
+    void *data;
+    struct list_item *next;
+};
 
 /**
- * @brief   List prototypes for use in header files
+ * @brief   Append an item to the list
  *
+ * @param head  The head of the list
+ * @param data  The data to append
+ * @return int
  */
-#define LIST_ITEM_TYPE_PROTO(T)                                                                    \
-    struct list_item_##T;                                                                          \
-    int list_item_append_##T(struct list_item_##T **head, T data);                                 \
-    void list_item_destroy_##T(struct list_item_##T *head);
+int
+list_append(struct list_item **head, void *data);
 
 /**
- * @brief   List definitions for use in source files
+ * @brief   Remove an item from the list
  *
- * Do not use this macro in header files. You will get a load
- * of linker errors complaining about multiple definitions.
- *
+ * @param head  The head of the list
+ * @param data  The data to remove
+ * @return int
  */
-#define LIST_ITEM_TYPE_DEF(T)                                                                      \
-    struct list_item_##T {                                                                         \
-        T data;                                                                                    \
-        struct list_item_##T *next;                                                                \
-    };                                                                                             \
-                                                                                                   \
-    int list_item_append_##T(struct list_item_##T **head, T data)                                  \
-    {                                                                                              \
-        struct list_item_##T *new_item = kzalloc(sizeof(struct list_item_##T));                    \
-        if (!new_item) {                                                                           \
-            return -ENOMEM;                                                                        \
-        }                                                                                          \
-                                                                                                   \
-        new_item->data = data;                                                                     \
-        new_item->next = *head;                                                                    \
-        *head = new_item;                                                                          \
-                                                                                                   \
-        return 0;                                                                                  \
-    }                                                                                              \
-                                                                                                   \
-    void list_item_destroy_##T(struct list_item_##T *head)                                         \
-    {                                                                                              \
-        for (struct list_item_##T *item = head; item != NULL; item = item->next) {                 \
-            kfree(item);                                                                           \
-        }                                                                                          \
-    }
+int
+list_remove(struct list_item **head, void *data);
 
-#define LIST(T) struct list_item_##T *
-
-#define for_each_in_list(T, head, item)                                                            \
-    for (struct list_item_##T *item = head; item != NULL; item = item->next)
-
-#define list_item_append(T, head, data) list_item_append_##T(head, data)
-
-#define list_item_remove(T, head, data) list_item_remove_##T(head, data)
-
-#define list_item_destroy(T, head) list_item_destroy_##T(head)
+/**
+ * @brief   Destroy the list
+ *
+ * @param head  The head of the list
+ */
+void
+list_destroy(struct list_item *head);
 
 #endif

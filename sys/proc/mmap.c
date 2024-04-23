@@ -1,5 +1,7 @@
 #include "proc/mmap.h"
 
+#include "errno.h"
+#include "libk/list.h"
 #include "mm/kalloc.h"
 #include "mm/vm.h"
 #include "proc/mgmt.h"
@@ -12,10 +14,6 @@ void *
 process_mmap(struct process *process, void *addr, size_t size, int prot, int flags, int fd,
              size_t offset)
 {
-    if (size % PAGING_PAGE_SIZE) {
-        size = (size + PAGING_PAGE_SIZE) - (size % PAGING_PAGE_SIZE);
-    }
-
     int order = kalloc_size_to_order(size);
     void *segment = kalloc_get_phys_pages(order);
     if (!segment) {
@@ -29,9 +27,12 @@ process_mmap(struct process *process, void *addr, size_t size, int prot, int fla
         goto err_out;
     }
 
-    struct process_allocation palloc = {
-        .type = PROCESS_ALLOCATION_MEMORY_SEGMENT, .addr = virt, .size = segment_size};
-    list_item_append(process_allocation_t, &process->allocations, palloc);
+    struct process_allocation *palloc = kzalloc(sizeof(struct process_allocation));
+    palloc->type = PROCESS_ALLOCATION_MEMORY_SEGMENT;
+    palloc->addr = virt;
+    palloc->size = segment_size;
+
+    list_append(&process->allocations, palloc);
 
     return virt;
 
@@ -42,7 +43,32 @@ err_out:
 int
 process_munmap(struct process *process, void *addr, size_t length)
 {
-    // TODO
+    // Find the corresponding allocation
+    struct process_allocation *palloc = NULL;
+    for_each_in_list(struct process_allocation *, process->allocations, list, allocation)
+    {
+        if (allocation->addr == addr) {
+            palloc = allocation;
+            break;
+        }
+    }
 
-    return -1;
+    if (!palloc) {
+        return -ENOENT;
+    }
+
+    // Remove the allocation from the allcation list
+    list_remove(&process->allocations, palloc);
+
+    // Unmap the allocation
+    vm_area_unmap_pages(process->vm_area, palloc->addr, palloc->size);
+
+    // Free physcal memory
+    void *paddr = vm_area_virt_to_phys(process->vm_area, palloc->addr);
+    kalloc_free_phys_pages(paddr);
+
+    // Free the allocation object
+    kfree(palloc);
+
+    return 0;
 }

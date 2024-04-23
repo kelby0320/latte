@@ -1,6 +1,7 @@
 #include "proc/process.h"
 
 #include "config.h"
+#include "errno.h"
 #include "gdt/gdt.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
@@ -12,11 +13,7 @@
 
 #include <stddef.h>
 
-LIST_ITEM_TYPE_DEF(process_allocation_t);
-LIST_ITEM_TYPE_DEF(thread_t);
-LIST_ITEM_TYPE_DEF(process_ptr_t);
-
-static LIST(process_ptr_t) process_list = NULL;
+static struct list_item *process_list = NULL;
 static uint32_t next_pid = 1;
 
 /**
@@ -108,7 +105,7 @@ process_create_first(const char *filename)
         goto err_out4;
     }
 
-    list_item_append(process_ptr_t, &process_list, (process_ptr_t)process);
+    list_append(&process_list, process);
 
     return process->pid;
 
@@ -144,7 +141,7 @@ process_switch_to_vm_area(struct process *process)
 int
 process_add_thread(struct process *process, struct thread *thread)
 {
-    list_item_append(thread_t, &process->threads, (thread_t)*thread);
+    list_append(&process->threads, thread);
 
     sched_add_thread(thread);
 

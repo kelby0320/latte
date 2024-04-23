@@ -21,6 +21,16 @@ page_dir_entry_t
 page_dir_get_entry(page_dir_t page_dir, void *vaddr);
 
 /**
+ * @brief   Set a page directory entry in a page directory
+ *
+ * @param page_dir          The page directory
+ * @param vaddr             The virtual address of the entry
+ * @param page_dir_entry    The page directory entry
+ */
+void
+page_dir_set_entry(page_dir_t page_dir, void *vaddr, page_dir_entry_t page_dir_entry);
+
+/**
  * @brief Create a new page directory entry for the given virtual address
  *
  * @param page_dir          The page directory

@@ -1,4 +1,5 @@
 #include "latte/io.h"
+#include "latte/mmap.h"
 #include "stdio.h"
 
 #define BUF_SIZE 128
@@ -6,7 +7,7 @@
 int
 main(int argc, char **argv)
 {
-    char buf[BUF_SIZE];
+    char *buf = mmap(BUF_SIZE);
 
     int fd = open("/latte.txt", "r");
     if (fd < 0) {
