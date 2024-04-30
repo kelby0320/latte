@@ -1,5 +1,5 @@
-#ifndef LATTE_MMAP_H
-#define LATTE_MMAP_H
+#ifndef LIBC_SYS_MMAP_H
+#define LIBC_SYS_MMAP_H
 
 #include <stddef.h>
 

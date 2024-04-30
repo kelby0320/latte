@@ -1,6 +1,5 @@
-#include "latte/io.h"
-#include "latte/mmap.h"
 #include "stdio.h"
+#include "unistd.h"
 
 #define BUF_SIZE 128
 

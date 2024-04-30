@@ -151,14 +151,12 @@ test: $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 
 libs:
 	cd ./lib/libc && $(MAKE) all
-	cd ./lib/liblatte && $(MAKE) all
 
 bin: libs
 	cd ./bin/hello && $(MAKE) all
 
 clean_libs:
 	cd ./lib/libc && $(MAKE) clean
-	cd ./lib/liblatte && $(MAKE) clean
 
 clean_bin:
 	cd ./bin/hello && $(MAKE) clean

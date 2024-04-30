@@ -7,13 +7,16 @@ AR = i686-elf-ar
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
 ASFLAGS = -f elf -g
 
-C_OBJECTS = ./src/ctype.o \
+C_OBJECTS = ./src/sys/mmap.o \
+	./src/ctype.o \
 	./src/init.o \
 	./src/stdio.o \
 	./src/stdlib.o \
-	./src/string.o 
+	./src/string.o \
+	./src/unistd.o
 
-AS_OBJECTS = ./src/crt0.asm.o 
+AS_OBJECTS = ./src/crt0.asm.o \
+	./src/syscall.asm.o
 
 INCLUDES=-I../../include
 

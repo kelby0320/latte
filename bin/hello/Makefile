@@ -1,7 +1,6 @@
 HELLO = ./hello
 
 LIBC = ../../lib/libc/libc.a
-LIBLATTE = ../../lib/liblatte/liblatte.a
 
 CC = i686-elf-gcc
 
@@ -14,7 +13,7 @@ INCLUDES=-I../../include
 all: $(HELLO)
 
 $(HELLO): $(C_OBJECTS)
-	$(CC) -g -T ./linker.ld -o $(HELLO) -ffreestanding -O0 -nostdlib -fpic $(C_OBJECTS) $(LIBC) $(LIBLATTE)
+	$(CC) -g -T ./linker.ld -o $(HELLO) -ffreestanding -O0 -nostdlib -fpic $(C_OBJECTS) $(LIBC)
 
 $(filter %.o,$(C_OBJECTS)): %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
