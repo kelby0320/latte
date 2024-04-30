@@ -1,14 +1,7 @@
 #include "stdio.h"
 
-#include "latte/io.h"
 #include "string.h"
-
-#include <stdbool.h>
-#include <stddef.h>
-
-int stdin;
-int stdout;
-int stderr;
+#include "unistd.h"
 
 static int
 int_to_str(int i, char *buf, size_t buf_size)
