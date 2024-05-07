@@ -118,6 +118,12 @@ thread_destroy(struct thread *thread)
 }
 
 void
+thread_set_return_value(struct thread *thread, uint32_t value)
+{
+    thread->registers.eax = value;
+}
+
+void
 thread_switch_and_return(struct thread *thread)
 {
     paging_copy_kernel_pages_to_user(kernel_vm_area.page_directory,

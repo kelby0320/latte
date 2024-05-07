@@ -1,36 +1,34 @@
 #ifndef SYSCALL_IO_H
 #define SYSCALL_IO_H
 
+struct thread;
+
 /**
  * @brief Execute the open system call
  *
- * @return void* Status code
  */
-void *
-do_open();
+void
+do_open(struct thread *current_thread);
 
 /**
  * @brief Execute the close system call
  *
- * @return void* Status code
  */
-void *
-do_close();
+void
+do_close(struct thread *current_thread);
 
 /**
  * @brief Execute the read system call
  *
- * @return void* Number of bytes read or negative error code
  */
-void *
-do_read();
+void
+do_read(struct thread *current_thread);
 
 /**
  * @brief Execute the write system call
  *
- * @return void* Number of bytes written or negative error code
  */
-void *
-do_write();
+void
+do_write(struct thread *current_thread);
 
 #endif

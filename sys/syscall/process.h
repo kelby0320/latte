@@ -1,36 +1,34 @@
 #ifndef SYSCALL_PROCESS_H
 #define SYSCALL_PROCESS_H
 
+struct thread;
+
 /**
  * @brief   Execute the fork system call
  *
- * @return void*
  */
-void *
-do_fork();
+void
+do_fork(struct thread *current_thread);
 
 /**
  * @brief   Execute the execve system call
  *
- * @return void*
  */
-void *
-do_execve();
+void
+do_execve(struct thread *current_thread);
 
 /**
  * @brief   Execute the wait system call
  *
- * @return void*
  */
-void *
-do_wait();
+void
+do_wait(struct thread *current_thread);
 
 /**
  * @brief   Execute the exit system call
  *
- * @return void*
  */
-void *
-do_exit();
+void
+do_exit(struct thread *current_thread);
 
 #endif

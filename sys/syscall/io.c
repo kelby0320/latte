@@ -13,10 +13,9 @@
 
 #include <stddef.h>
 
-void *
-do_open()
+void
+do_open(struct thread *current_thread)
 {
-    struct thread *current_thread = sched_get_current();
     const char *user_mode_str = (const char *)thread_get_stack_item(current_thread, 0);
     const char *user_filename = (const char *)thread_get_stack_item(current_thread, 1);
 
@@ -31,45 +30,46 @@ do_open()
 
     int gfd = vfs_open(filename, mode_str);
     if (gfd < 0) {
-        return (void *)gfd;
+        thread_set_return_value(current_thread, gfd);
+        return;
     }
 
     int pfd = process_add_gfd(current_thread->process, gfd);
-    return (void *)pfd;
+    thread_set_return_value(current_thread, pfd);
 }
 
-void *
-do_close()
+void
+do_close(struct thread *current_thread)
 {
-    struct thread *current_thread = sched_get_current();
     int pfd = (int)thread_get_stack_item(current_thread, 0);
 
     int gfd = process_get_gfd(current_thread->process, pfd);
     if (gfd < 0) {
-        return (void *)(-ENOENT);
+        thread_set_return_value(current_thread, -ENOENT);
+        return;
     }
 
     int res = vfs_close(gfd);
-    return (void *)res;
+    thread_set_return_value(current_thread, res);
 }
 
-void *
-do_read()
+void
+do_read(struct thread *current_thread)
 {
-    struct thread *current_thread = sched_get_current();
-
     size_t count = (size_t)thread_get_stack_item(current_thread, 0);
     char *user_buf = (char *)thread_get_stack_item(current_thread, 1);
     int pfd = (int)thread_get_stack_item(current_thread, 2);
 
     int gfd = process_get_gfd(current_thread->process, pfd);
     if (gfd < 0) {
-        return (void *)(-ENOENT);
+        thread_set_return_value(current_thread, -ENOENT);
+        return;
     }
 
     char *buf = kzalloc(count);
     if (!buf) {
-        return (void *)-ENOMEM;
+        thread_set_return_value(current_thread, -ENOMEM);
+        return;
     }
 
     int res = vfs_read(gfd, buf, count);
@@ -81,27 +81,27 @@ do_read()
 
 out_free_buf:
     kfree(buf);
-    return (void *)res;
+    thread_set_return_value(current_thread, res);
 }
 
-void *
-do_write()
+void
+do_write(struct thread *current_thread)
 {
-    struct thread *current_thread = sched_get_current();
-
     size_t count = (size_t)thread_get_stack_item(current_thread, 0);
     const char *user_buf = (const char *)thread_get_stack_item(current_thread, 1);
     int pfd = (int)thread_get_stack_item(current_thread, 2);
 
     int gfd = process_get_gfd(current_thread->process, pfd);
     if (gfd < 0) {
-        return (void *)(-ENOENT);
+        thread_set_return_value(current_thread, -ENOENT);
+        return;
     }
 
     size_t buf_size = count + 1;
     char *buf = kzalloc(buf_size);
     if (!buf) {
-        return (void *)-ENOMEM;
+        thread_set_return_value(current_thread, -ENOMEM);
+        return;
     }
 
     int res = thread_copy_from_user(current_thread, (void *)user_buf, buf, count);
@@ -113,6 +113,5 @@ do_write()
 
 out_free_buf:
     kfree(buf);
-
-    return (void *)res;
+    thread_set_return_value(current_thread, res);
 }

@@ -24,7 +24,7 @@ isr_handler_wrapper(int interrupt_no, struct isr_frame *isr_frame)
     outb(0x20, 0x20);
 }
 
-void *
+void
 isr_syscall_handler_wrapper(int syscall_no, struct isr_frame *isr_frame)
 {
     switch_to_kernel_vm_area();
@@ -32,9 +32,7 @@ isr_syscall_handler_wrapper(int syscall_no, struct isr_frame *isr_frame)
     struct thread *current_thread = sched_get_current();
     thread_save_state(current_thread, isr_frame);
 
-    void *res = do_syscall(syscall_no);
+    do_syscall(syscall_no);
 
-    vm_area_switch_map(current_thread->process->vm_area);
-
-    return res;
+    schedule(); // No return
 }

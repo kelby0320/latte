@@ -111,16 +111,6 @@ int
 process_create_first(const char *filename);
 
 /**
- * @brief   Remove a process from the system
- *
- * @param process       Pointer to the process
- * @param status_code   Exit status code
- * @return int          Status code
- */
-int
-process_terminate(struct process *process, uint8_t status_code);
-
-/**
  * @brief Switch to a process's vm_area
  *
  * @param process   Pointer to the process

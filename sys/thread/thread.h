@@ -90,6 +90,14 @@ void
 thread_destroy(struct thread *thread);
 
 /**
+ * @brief   Set the return value for a thread
+ *
+ * @param thread    Pointer to the thread
+ */
+void
+thread_set_return_value(struct thread *thread, uint32_t value);
+
+/**
  * @brief Switch to this thread and begin executing in user space
  *
  * @param thread      Pointer to the thread

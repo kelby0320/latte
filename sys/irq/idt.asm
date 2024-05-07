@@ -42,11 +42,11 @@ isr_syscall_wrapper:
     pushad                              ; Push general purpose registers (struct interrupt_frame)
     push    esp
     push    eax                         ; Push syscall number
-    call    isr_syscall_handler_wrapper
-    mov     dword[syscall_result], eax
-    add     esp, 8
-    popad
-    mov     eax, [syscall_result]
+    call    isr_syscall_handler_wrapper ; No return
+    ; mov     dword[syscall_result], eax
+    ; add     esp, 8
+    ; popad
+    ; mov     eax, [syscall_result]
     iretd
 
 section .data
@@ -64,5 +64,5 @@ isr_wrapper_table_entry i
 %assign i i+1
 %endrep
 
-syscall_result:
-    dd 0
+; syscall_result:
+;     dd 0

@@ -15,7 +15,14 @@ process_wait(struct process *process);
 int
 process_execve(struct process *process, const char *const *argv, const char *const *envp);
 
-uint8_t
+/**
+ * @brief   Terminate a running process
+ *
+ * @param process       Pointer to the process
+ * @param status_code   Exit status code
+ * @return int          Status code
+ */
+int
 process_exit(struct process *process, uint8_t status_code);
 
 #endif
