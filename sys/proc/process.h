@@ -21,6 +21,9 @@
 #define PROCESS_STATUS_CODE_SUCCESS 0
 #define PROCESS_STATUS_CODE_FAILURE 1
 
+#define PROCESS_ARGV_SIZE 4096
+#define PROCESS_ENVP_SIZE 4096
+
 #define ROOT_UID 0
 #define ROOT_GID 0
 
@@ -69,6 +72,12 @@ struct process {
 
     // Filename of executable
     char filename[LATTE_MAX_PATH_LEN];
+
+    // Command line arguments
+    char **argv;
+
+    // Environment variables
+    char **envp;
 
     // Elf image descriptor
     struct elf_img_desc elf_img_desc;

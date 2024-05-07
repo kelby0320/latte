@@ -9,12 +9,14 @@ ASFLAGS = -f elf -g
 
 C_OBJECTS = ./src/stdio/printf.o \
 	./src/stdio/stdio.o \
+	./src/stdlib/env.o \
 	./src/stdlib/free.o \
 	./src/stdlib/malloc.o \
 	./src/sys/mmap/mmap.o \
 	./src/sys/mmap/munmap.o \
 	./src/sys/wait.o \
 	./src/ctype.o \
+	./src/entry.o \
 	./src/init.o \
 	./src/string/string.o \
 	./src/unistd/close.o \

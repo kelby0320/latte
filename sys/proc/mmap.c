@@ -1,13 +1,13 @@
 #include "proc/mmap.h"
 
 #include "errno.h"
+#include "libk/alloc.h"
 #include "libk/list.h"
+#include "libk/memory.h"
 #include "mm/kalloc.h"
+#include "mm/paging/paging.h"
 #include "mm/vm.h"
 #include "proc/mgmt.h"
-
-#include "libk/alloc.h"
-#include "mm/paging/paging.h"
 #include "proc/process.h"
 
 void *
@@ -21,15 +21,17 @@ process_mmap(struct process *process, void *addr, size_t size, int prot, int fla
     }
     size_t segment_size = kalloc_order_to_size(order);
 
+    memset(segment, 0, segment_size);
+
     void *virt = vm_area_map_user_pages(process->vm_area, segment, segment_size);
     if (!virt) {
-        kfree(segment);
+        kalloc_free_phys_pages(segment);
         goto err_out;
     }
 
     struct process_allocation *palloc = kzalloc(sizeof(struct process_allocation));
     palloc->type = PROCESS_ALLOCATION_MEMORY_SEGMENT;
-    palloc->addr = virt;
+    palloc->addr = segment;
     palloc->size = segment_size;
 
     list_push_front(&process->allocations, palloc);
