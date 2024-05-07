@@ -4,14 +4,6 @@
 struct thread;
 
 /**
- * @brief Initialize the scheduler
- *
- * @return int  Status code
- */
-int
-sched_init();
-
-/**
  * @brief Add a thread to the scheduler
  *
  * @param thread  Pointer to the thread
@@ -19,6 +11,15 @@ sched_init();
  */
 int
 sched_add_thread(struct thread *thread);
+
+/**
+ * @brief   Remove a thread from the scheduler
+ *
+ * @param thread    Pointer to the thread
+ * @return int      Status code
+ */
+int
+sched_remove_thread(struct thread *thread);
 
 /**
  * @brief Get the currently executing thread

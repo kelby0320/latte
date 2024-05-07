@@ -4,11 +4,14 @@
 #include "errno.h"
 #include "irq/isr.h"
 #include "libk/alloc.h"
+#include "libk/list.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "mm/kalloc.h"
 #include "mm/paging/paging.h"
 #include "mm/vm.h"
 #include "proc/process.h"
+#include "sched/sched.h"
 
 #include <stddef.h>
 
@@ -72,7 +75,9 @@ thread_create(struct process *process)
     thread->stack_size = THREAD_STACK_SIZE;
     thread->process = process;
 
-    list_append(&thread_list, thread);
+    list_push_front(&thread_list, thread);
+
+    sched_add_thread(thread);
 
     return thread->tid;
 
@@ -97,7 +102,19 @@ thread_get(uint32_t tid)
 void
 thread_destroy(struct thread *thread)
 {
-    // TODO
+    int res = sched_remove_thread(thread);
+    if (res < 0) {
+        printk("Error unscheduling thread %d", thread->tid);
+    }
+
+    res = list_remove(&thread_list, thread);
+    if (res < 0) {
+        printk("Error removing thread %d", thread->tid);
+    }
+
+    kalloc_free_phys_pages(thread->stack);
+
+    kfree(thread);
 }
 
 void

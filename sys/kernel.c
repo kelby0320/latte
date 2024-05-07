@@ -29,7 +29,7 @@ struct vm_area kernel_vm_area;
 void
 panic(const char *str)
 {
-    printk(str);
+    printk("Kernel Panic! %s", str);
     while (1) {}
 }
 

@@ -7,9 +7,11 @@
 #include "libk/list.h"
 #include "libk/memory.h"
 #include "libk/string.h"
+#include "mm/kalloc.h"
 #include "mm/vm.h"
+#include "proc/fd.h"
 #include "proc/ld.h"
-#include "sched/sched.h"
+#include "vfs/vfs.h"
 
 #include <stddef.h>
 
@@ -80,53 +82,84 @@ process_create_first(const char *filename)
 
     process->vm_area = kzalloc(sizeof(struct vm_area));
     if (!process->vm_area) {
-        goto err_out1;
+        goto err_alloc;
     }
 
     res = vm_area_user_init(process->vm_area);
     if (res < 0) {
-        goto err_out2;
+        goto err_vmarea;
     }
 
     res = process_load_exec(process, filename);
     if (res < 0) {
-        goto err_out3;
+        goto err_proc;
     }
 
     int tid = thread_create(process);
     if (tid < 0) {
-        goto err_out3;
+        goto err_proc;
     }
 
     struct thread *thread = thread_get(tid);
 
-    res = process_add_thread(process, thread);
+    res = list_push_front(&process->threads, thread);
     if (res < 0) {
-        goto err_out4;
+        goto err_thread;
     }
 
-    list_append(&process_list, process);
+    list_push_front(&process_list, process);
 
     return process->pid;
 
-err_out4:
+err_thread:
     thread_destroy(thread);
 
-err_out3:
-    process_destroy(process);
+err_proc:
+    process_terminate(process, PROCESS_STATUS_CODE_FAILURE);
 
-err_out2:
+err_vmarea:
     kfree(process->vm_area);
 
-err_out1:
+err_alloc:
     kfree(process);
     return res;
 }
 
 int
-process_destroy(struct process *process)
+process_terminate(struct process *process, uint8_t status_code)
 {
-    // TODO
+    // kill/unschedule all threads
+    for_each_in_list(struct thread *, process->threads, tlist, thread) { thread_destroy(thread); }
+
+    list_destroy(process->threads);
+
+    // close all open file descriptors
+    for_each_in_list(struct process_fd *, process->open_fds, fdlist, proc_fd)
+    {
+        int gfd = process_get_gfd(process, proc_fd->pfd);
+        if (gfd < 0) {
+            kfree(proc_fd);
+            continue;
+        }
+
+        vfs_close(gfd);
+        kfree(proc_fd);
+    }
+
+    list_destroy(process->open_fds);
+
+    // free all memory allocations
+    for_each_in_list(struct process_allocation *, process->allocations, alloc_list, alloc)
+    {
+        kalloc_free_phys_pages(alloc->addr);
+        kfree(alloc);
+    }
+
+    list_destroy(process->allocations);
+
+    // set state and status_code entry
+    process->state = PROCESS_STATE_ZOMBIE;
+    process->status_code = status_code;
 
     return 0;
 }
@@ -136,14 +169,4 @@ process_switch_to_vm_area(struct process *process)
 {
     gdt_set_user_data_segment();
     vm_area_switch_map(process->vm_area);
-}
-
-int
-process_add_thread(struct process *process, struct thread *thread)
-{
-    list_append(&process->threads, thread);
-
-    sched_add_thread(thread);
-
-    return 0;
 }

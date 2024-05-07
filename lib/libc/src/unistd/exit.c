@@ -1,7 +1,9 @@
 #include "unistd.h"
 
+#include "syscall.h"
+
 void
 _exit(int status)
 {
-    return;
+    do_syscall1(EXIT_SYSCALL_NO, (uint32_t)status);
 }

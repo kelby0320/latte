@@ -4,7 +4,7 @@
 #include "libk/alloc.h"
 
 int
-list_append(struct list_item **head, void *data)
+list_push_front(struct list_item **head, void *data)
 {
     struct list_item *new_item = kzalloc(sizeof(struct list_item));
     if (!new_item) {
@@ -16,6 +16,32 @@ list_append(struct list_item **head, void *data)
     *head = new_item;
 
     return 0;
+}
+
+void *
+list_pop_front(struct list_item **head)
+{
+    if (!*head) {
+        return NULL;
+    }
+
+    struct list_item *item = *head;
+    void *data = item->data;
+    *head = item->next;
+
+    kfree(item);
+
+    return data;
+}
+
+void *
+list_front(struct list_item *head)
+{
+    if (!head) {
+        return NULL;
+    }
+
+    return head->data;
 }
 
 int

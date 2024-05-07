@@ -13,6 +13,7 @@ C_OBJECTS = ./src/stdio/printf.o \
 	./src/stdlib/malloc.o \
 	./src/sys/mmap/mmap.o \
 	./src/sys/mmap/munmap.o \
+	./src/sys/wait.o \
 	./src/ctype.o \
 	./src/init.o \
 	./src/string/string.o \

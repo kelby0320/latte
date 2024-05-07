@@ -29,7 +29,7 @@ vfs_mount(const char *path, struct block_device *block_device);
  *
  * @param filename  Name of the file
  * @param mode_str  File open mode
- * @return int      Status code
+ * @return int      File descriptor
  */
 int
 vfs_open(const char *filename, const char *mode_str);
@@ -49,7 +49,7 @@ vfs_close(int fd);
  * @param fd    Global file descriptor number
  * @param ptr   Buffer to read into
  * @param count Number of bytes to read
- * @return int  Status code
+ * @return int  Number of bytes read
  */
 int
 vfs_read(int fd, char *ptr, size_t count);
@@ -60,7 +60,7 @@ vfs_read(int fd, char *ptr, size_t count);
  * @param fd    Global file descriptor number
  * @param ptr   Buffer to write to the file
  * @param count Number of bytes to write
- * @return int  Status code
+ * @return int  Number of bytes written
  */
 int
 vfs_write(int fd, const char *ptr, size_t count);

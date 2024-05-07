@@ -78,7 +78,7 @@ ld_map_program_header(struct process *process, int idx)
     segment_allocation->addr = segment;
     segment_allocation->size = segment_size;
 
-    list_append(&process->allocations, segment_allocation);
+    list_push_front(&process->allocations, segment_allocation);
 
     return res;
 

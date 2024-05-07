@@ -18,6 +18,9 @@
 #define PROCESS_STATE_STOPPED  3
 #define PROCESS_STATE_ZOMBIE   4
 
+#define PROCESS_STATUS_CODE_SUCCESS 0
+#define PROCESS_STATUS_CODE_FAILURE 1
+
 #define ROOT_UID 0
 #define ROOT_GID 0
 
@@ -34,6 +37,14 @@ struct process_allocation {
 
     // Size of allocation
     size_t size;
+};
+
+struct process_fd {
+    // Process file descriptor
+    int pfd;
+
+    // Global file descriptor
+    int gfd;
 };
 
 /**
@@ -70,15 +81,15 @@ struct process {
 
     // List of child processes
     struct list_item *children;
-    // LIST(process_ptr_t) children;
 
     // List of threads associated with the process
     struct list_item *threads;
-    // LIST(thread_t) threads;
 
     // List of memory allocations for the process
     struct list_item *allocations;
-    // LIST(process_allocation_t) allocations;
+
+    // List of open file descriptors
+    struct list_item *open_fds;
 };
 
 /**
@@ -93,11 +104,12 @@ process_create_first(const char *filename);
 /**
  * @brief   Remove a process from the system
  *
- * @param process   Pointer to the process
- * @return int      Status code
+ * @param process       Pointer to the process
+ * @param status_code   Exit status code
+ * @return int          Status code
  */
 int
-process_destroy(struct process *process);
+process_terminate(struct process *process, uint8_t status_code);
 
 /**
  * @brief Switch to a process's vm_area
@@ -106,15 +118,5 @@ process_destroy(struct process *process);
  */
 void
 process_switch_to_vm_area(struct process *process);
-
-/**
- * @brief   Add a thread to the process
- *
- * @param process   Pointer to the process
- * @param thread    Pointer to the thread
- * @return int      Status code
- */
-int
-process_add_thread(struct process *process, struct thread *thread);
 
 #endif

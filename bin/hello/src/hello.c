@@ -22,6 +22,8 @@ main(int argc, char **argv)
 
     printf(buf);
 
+    _exit(0);
+
     while (1) {}
 
     return 0;

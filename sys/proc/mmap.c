@@ -32,7 +32,7 @@ process_mmap(struct process *process, void *addr, size_t size, int prot, int fla
     palloc->addr = virt;
     palloc->size = segment_size;
 
-    list_append(&process->allocations, palloc);
+    list_push_front(&process->allocations, palloc);
 
     return virt;
 

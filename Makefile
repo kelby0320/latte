@@ -40,6 +40,7 @@ C_OBJECTS = ./sys/boot/boot.o \
 	./sys/libk/list.o \
 	./sys/libk/memory.o \
 	./sys/libk/print.o \
+	./sys/libk/queue.o \
 	./sys/libk/slab.o \
 	./sys/libk/string.o \
 	./sys/mm/paging/page_dir.o \
@@ -49,6 +50,7 @@ C_OBJECTS = ./sys/boot/boot.o \
 	./sys/mm/kalloc.o \
 	./sys/mm/vm.o \
 	./sys/proc/elf.o \
+	./sys/proc/fd.o \
 	./sys/proc/ld.o \
 	./sys/proc/mgmt.o \
 	./sys/proc/mmap.o \
@@ -56,6 +58,7 @@ C_OBJECTS = ./sys/boot/boot.o \
 	./sys/sched/sched.o \
 	./sys/syscall/io.o \
 	./sys/syscall/mmap.o \
+	./sys/syscall/process.o \
 	./sys/syscall/syscall.o \
 	./sys/thread/thread.o \
 	./sys/thread/userio.o \

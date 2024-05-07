@@ -5,6 +5,7 @@
 #include "irq/isr.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
+#include "proc/fd.h"
 #include "sched/sched.h"
 #include "thread/thread.h"
 #include "thread/userio.h"
@@ -28,16 +29,27 @@ do_open()
     thread_copy_from_user(current_thread, (void *)user_mode_str, mode_str, sizeof(mode_str) - 1);
     thread_copy_from_user(current_thread, (void *)user_filename, filename, sizeof(filename) - 1);
 
-    int res = vfs_open(filename, mode_str);
-    return (void *)res;
+    int gfd = vfs_open(filename, mode_str);
+    if (gfd < 0) {
+        return (void *)gfd;
+    }
+
+    int pfd = process_add_gfd(current_thread->process, gfd);
+    return (void *)pfd;
 }
 
 void *
 do_close()
 {
     struct thread *current_thread = sched_get_current();
-    int fd = (int)thread_get_stack_item(current_thread, 0);
-    int res = vfs_close(fd);
+    int pfd = (int)thread_get_stack_item(current_thread, 0);
+
+    int gfd = process_get_gfd(current_thread->process, pfd);
+    if (gfd < 0) {
+        return (void *)(-ENOENT);
+    }
+
+    int res = vfs_close(gfd);
     return (void *)res;
 }
 
@@ -48,14 +60,19 @@ do_read()
 
     size_t count = (size_t)thread_get_stack_item(current_thread, 0);
     char *user_buf = (char *)thread_get_stack_item(current_thread, 1);
-    int fd = (int)thread_get_stack_item(current_thread, 2);
+    int pfd = (int)thread_get_stack_item(current_thread, 2);
+
+    int gfd = process_get_gfd(current_thread->process, pfd);
+    if (gfd < 0) {
+        return (void *)(-ENOENT);
+    }
 
     char *buf = kzalloc(count);
     if (!buf) {
         return (void *)-ENOMEM;
     }
 
-    int res = vfs_read(fd, buf, count);
+    int res = vfs_read(gfd, buf, count);
     if (res < 0) {
         goto out_free_buf;
     }
@@ -74,7 +91,12 @@ do_write()
 
     size_t count = (size_t)thread_get_stack_item(current_thread, 0);
     const char *user_buf = (const char *)thread_get_stack_item(current_thread, 1);
-    int fd = (int)thread_get_stack_item(current_thread, 2);
+    int pfd = (int)thread_get_stack_item(current_thread, 2);
+
+    int gfd = process_get_gfd(current_thread->process, pfd);
+    if (gfd < 0) {
+        return (void *)(-ENOENT);
+    }
 
     size_t buf_size = count + 1;
     char *buf = kzalloc(buf_size);
@@ -87,7 +109,7 @@ do_write()
         goto out_free_buf;
     }
 
-    res = vfs_write(fd, buf, count);
+    res = vfs_write(gfd, buf, count);
 
 out_free_buf:
     kfree(buf);

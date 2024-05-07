@@ -7,6 +7,10 @@
 #define WRITE_SYSCALL_NO  3
 #define MMAP_SYSCALL_NO   4
 #define MUNMAP_SYSCALL_NO 5
+#define FORK_SYSCALL_NO   6
+#define EXECVE_SYSCALL_NO 7
+#define WAIT_SYSCALL_NO   8
+#define EXIT_SYSCALL_NO   9
 
 int
 do_syscall1(int syscall_no, int arg1);
