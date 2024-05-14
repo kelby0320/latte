@@ -1,19 +1,9 @@
-#ifndef PROC_MGMT_H
-#define PROC_MGMT_H
+#ifndef PROC_MGMT_EXIT_H
+#define PROC_MGMT_EXIT_H
 
 #include <stdint.h>
 
 struct process;
-struct process_allocation;
-
-int
-process_fork(struct process *process);
-
-int
-process_wait(struct process *process);
-
-int
-process_execve(struct process *process, const char *const *argv, const char *const *envp);
 
 /**
  * @brief   Terminate a running process

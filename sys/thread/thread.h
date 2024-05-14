@@ -82,6 +82,16 @@ struct thread *
 thread_get(uint32_t tid);
 
 /**
+ * @brief   Copy a thread
+ *
+ * @param thread            Pointer to the thread
+ * @param child_process     Pointer to the child process the thread will belong to
+ * @return struct thread*   Pointer to the new thread
+ */
+struct thread *
+thread_copy_to(const struct thread *thread, const struct process *child_process);
+
+/**
  * @brief Destroy a thread
  *
  * @param thread  Pointer to the thread

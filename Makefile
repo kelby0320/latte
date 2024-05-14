@@ -49,10 +49,13 @@ C_OBJECTS = ./sys/boot/boot.o \
 	./sys/mm/buddy.o \
 	./sys/mm/kalloc.o \
 	./sys/mm/vm.o \
+	./sys/proc/mgmt/exec.o \
+	./sys/proc/mgmt/exit.o \
+	./sys/proc/mgmt/fork.o \
+	./sys/proc/mgmt/wait.o \
 	./sys/proc/elf.o \
 	./sys/proc/fd.o \
 	./sys/proc/ld.o \
-	./sys/proc/mgmt.o \
 	./sys/proc/mmap.o \
 	./sys/proc/process.o \
 	./sys/sched/sched.o \

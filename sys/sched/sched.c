@@ -14,10 +14,6 @@ static struct thread *current_thread = NULL;
 int
 sched_add_thread(struct thread *thread)
 {
-    if (thread->state != THREAD_STATE_NEW) {
-        return -EINVAL;
-    }
-
     thread->state = THREAD_STATE_READY;
     return queue_enqueue(&ready_queue, thread);
 }

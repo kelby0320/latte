@@ -11,7 +11,7 @@
 #include "mm/vm.h"
 #include "proc/fd.h"
 #include "proc/ld.h"
-#include "proc/mgmt.h"
+#include "proc/mgmt/exit.h"
 #include "vfs/vfs.h"
 
 #include <stddef.h>
@@ -19,13 +19,8 @@
 static struct list_item *process_list = NULL;
 static uint32_t next_pid = 1;
 
-/**
- * @brief Get the next pid
- *
- * @return uint32_t
- */
-static inline uint32_t
-get_next_pid()
+uint32_t
+process_next_pid()
 {
     return next_pid++;
 }
@@ -55,7 +50,8 @@ allocate_empty_args(struct process *process, struct thread *thread)
     }
 
     palloc->type = PROCESS_ALLOCATION_MEMORY_SEGMENT;
-    palloc->addr = argv_segment;
+    palloc->paddr = argv_segment;
+    palloc->vaddr = virt;
     palloc->size = PROCESS_ARGV_SIZE;
 
     list_push_front(&process->allocations, palloc);
@@ -96,7 +92,8 @@ allocate_empty_environ(struct process *process, struct thread *thread)
     }
 
     palloc->type = PROCESS_ALLOCATION_MEMORY_SEGMENT;
-    palloc->addr = envp_segment;
+    palloc->paddr = envp_segment;
+    palloc->vaddr = virt;
     palloc->size = PROCESS_ENVP_SIZE;
 
     list_push_front(&process->allocations, palloc);
@@ -153,7 +150,7 @@ process_create_first(const char *filename)
         return -ENOMEM;
     }
 
-    process->pid = get_next_pid();
+    process->pid = process_next_pid();
     process->uid = ROOT_UID;
     process->gid = ROOT_GID;
     process->state = PROCESS_STATE_CREATED;

@@ -1,10 +1,23 @@
 section .text
 
+global do_syscall0
 global do_syscall1
 global do_syscall2
 global do_syscall3
 
 %define SYSCALL_INTERRUPT_NO    0x80
+
+; int
+; do_syscall0(int syscall_no);
+do_syscall0:
+    push    ebp
+    mov     ebp, esp
+
+    mov     eax, [ebp+8]               ; System call number
+    int     SYSCALL_INTERRUPT_NO
+    
+    pop     ebp
+    ret
 
 ; int
 ; do_syscall1(int syscall_no, int arg1);

@@ -27,6 +27,8 @@
 #define ROOT_UID 0
 #define ROOT_GID 0
 
+typedef uint32_t pid_t;
+
 /**
  * @brief Object that tracks memory allocations for a process
  *
@@ -35,8 +37,11 @@ struct process_allocation {
     // Allocation type
     uint8_t type;
 
-    // Memory address
-    void *addr;
+    // Pysical memory address
+    void *paddr;
+
+    // Virtual memory address
+    void *vaddr;
 
     // Size of allocation
     size_t size;
@@ -56,7 +61,7 @@ struct process_fd {
  */
 struct process {
     // Process Id
-    uint32_t pid;
+    pid_t pid;
 
     // User Id
     uint16_t uid;
@@ -100,6 +105,14 @@ struct process {
     // List of open file descriptors
     struct list_item *open_fds;
 };
+
+/**
+ * @brief Get the next pid
+ *
+ * @return uint32_t
+ */
+uint32_t
+process_next_pid();
 
 /**
  * @brief   Create the first user process on the system

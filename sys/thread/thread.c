@@ -47,20 +47,21 @@ thread_create(struct process *process)
         return -ENOMEM;
     }
 
+    int res = 0;
     int stack_order = kalloc_size_to_order(THREAD_STACK_SIZE);
     void *stack = kalloc_get_phys_pages(stack_order);
     if (!stack) {
-        return -ENOMEM;
+        res = -ENOMEM;
+        goto err_alloc;
     }
 
     // Map the stack from the bottom up.
     // Note: We need to map one extra page to cover the top of stack address
-    int res = vm_area_map_pages_to(process->vm_area, (void *)THREAD_STACK_VIRT_ADDR_BOTTOM, stack,
-                                   stack + THREAD_STACK_SIZE + PAGING_PAGE_SIZE,
-                                   PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
+    res = vm_area_map_pages_to(process->vm_area, (void *)THREAD_STACK_VIRT_ADDR_BOTTOM, stack,
+                               stack + THREAD_STACK_SIZE + PAGING_PAGE_SIZE,
+                               PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
     if (res < 0) {
-        kalloc_free_phys_pages(stack);
-        goto err_out;
+        goto err_map;
     }
 
     thread->state = THREAD_STATE_NEW;
@@ -71,17 +72,26 @@ thread_create(struct process *process)
     thread->registers.ds = LATTE_USER_DATA_SEGMENT;
     thread->registers.ss = LATTE_USER_DATA_SEGMENT;
     thread->registers.esp = THREAD_STACK_VIRT_ADDR_TOP;
-    thread->stack = (void *)THREAD_STACK_VIRT_ADDR_TOP;
+    thread->stack = stack;
     thread->stack_size = THREAD_STACK_SIZE;
     thread->process = process;
 
-    list_push_front(&thread_list, thread);
+    res = list_push_front(&thread_list, thread);
+    if (res < 0) {
+        goto err_map;
+    }
 
-    sched_add_thread(thread);
+    res = sched_add_thread(thread);
+    if (res < 0) {
+        goto err_map;
+    }
 
     return thread->tid;
 
-err_out:
+err_map:
+    kalloc_free_phys_pages(stack);
+
+err_alloc:
     kfree(thread);
     return res;
 }
@@ -96,6 +106,57 @@ thread_get(uint32_t tid)
         }
     }
 
+    return NULL;
+}
+
+struct thread *
+thread_copy_to(const struct thread *thread, const struct process *child_process)
+{
+    struct thread *thread_copy = kzalloc(sizeof(struct thread));
+    if (!thread) {
+        return NULL;
+    }
+
+    memcpy(thread_copy, thread, sizeof(struct thread));
+
+    int res = 0;
+    int stack_order = kalloc_size_to_order(THREAD_STACK_SIZE);
+    void *stack = kalloc_get_phys_pages(stack_order);
+    if (!stack) {
+        res = -ENOMEM;
+        goto err_alloc;
+    }
+
+    memcpy(stack, thread->stack, THREAD_STACK_SIZE);
+
+    res = vm_area_map_pages_to(child_process->vm_area, (void *)THREAD_STACK_VIRT_ADDR_BOTTOM, stack,
+                               stack + THREAD_STACK_SIZE + PAGING_PAGE_SIZE,
+                               PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
+    if (res < 0) {
+        goto err_map;
+    }
+
+    thread_copy->tid = get_next_tid(); // This is a problem!!!
+    thread_copy->stack = stack;
+    thread_copy->process = (struct process *)child_process;
+
+    res = list_push_front(&thread_list, thread_copy);
+    if (res < 0) {
+        goto err_map;
+    }
+
+    res = sched_add_thread(thread_copy);
+    if (res < 0) {
+        goto err_map;
+    }
+
+    return thread_copy;
+
+err_map:
+    kalloc_free_phys_pages(stack);
+
+err_alloc:
+    kfree(thread_copy);
     return NULL;
 }
 

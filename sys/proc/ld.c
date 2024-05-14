@@ -75,7 +75,8 @@ ld_map_program_header(struct process *process, int idx)
 
     struct process_allocation *segment_allocation = kzalloc(sizeof(struct process_allocation));
     segment_allocation->type = PROCESS_ALLOCATION_PROGRAM_SEGMENT;
-    segment_allocation->addr = segment;
+    segment_allocation->paddr = segment;
+    segment_allocation->vaddr = (void *)phdr->p_vaddr;
     segment_allocation->size = segment_size;
 
     list_push_front(&process->allocations, segment_allocation);

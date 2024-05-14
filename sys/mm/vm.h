@@ -11,26 +11,32 @@
 #define VM_PAGE_USER     PAGING_PAGE_USER
 
 #define KERNEL_HIGHER_HALF_START 0xC0000000
-#define KERNEL_HEAP_VADDR_START ((void *)0xC4400000) // 3GB + 68MB
-#define USER_HEAP_VADDR_START   ((void *)0x01000000) // 16MB
+#define KERNEL_HEAP_VADDR_START  ((void *)0xC4400000) // 3GB + 68MB
+#define USER_HEAP_VADDR_START    ((void *)0x01000000) // 16MB
 
-#define vm_area_map_kernel_page(phys) \
-    vm_area_map_page(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
+#define vm_area_map_kernel_page(phys)                                                              \
+    vm_area_map_page(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys,                               \
+                     PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
 
-#define vm_area_map_kernel_pages(phys, size) \
-    vm_area_map_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, size, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
+#define vm_area_map_kernel_pages(phys, size)                                                       \
+    vm_area_map_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, size,                        \
+                      PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
 
-#define vm_area_map_kernel_large_pages(phys, num_large_pages) \
-    vm_area_map_large_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, num_large_pages, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
+#define vm_area_map_kernel_large_pages(phys, num_large_pages)                                      \
+    vm_area_map_large_pages(&kernel_vm_area, KERNEL_HEAP_VADDR_START, phys, num_large_pages,       \
+                            PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE)
 
-#define vm_area_map_user_page(vm_area, phys) \
-    vm_area_map_page(vm_area, USER_HEAP_VADDR_START, phys, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
+#define vm_area_map_user_page(vm_area, phys)                                                       \
+    vm_area_map_page(vm_area, USER_HEAP_VADDR_START, phys,                                         \
+                     PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
 
-#define vm_area_map_user_pages(vm_area, phys, size) \
-    vm_area_map_pages(vm_area, USER_HEAP_VADDR_START, phys, size, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
+#define vm_area_map_user_pages(vm_area, phys, size)                                                \
+    vm_area_map_pages(vm_area, USER_HEAP_VADDR_START, phys, size,                                  \
+                      PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
 
-#define vm_area_map_user_large_pages(vm_area, phys, num_large_pages) \
-    vm_area_map_large_pages(vm_area, USER_HEAP_VADDR_START, phys, num_large_pages, PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
+#define vm_area_map_user_large_pages(vm_area, phys, num_large_pages)                               \
+    vm_area_map_large_pages(vm_area, USER_HEAP_VADDR_START, phys, num_large_pages,                 \
+                            PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER)
 
 /**
  * @brief VM Area is a wrapper around a page directory
@@ -68,7 +74,7 @@ vm_area_switch_map(struct vm_area *vm_area);
 
 /**
  * @brief   Convert a virtual address to a physical address
- * 
+ *
  * @param vm_area   Pointer to vm area
  * @param vaddr     Virtual address
  * @return void*    Physical address
@@ -78,7 +84,7 @@ vm_area_virt_to_phys(struct vm_area *vm_area, void *vaddr);
 
 /**
  * @brief   Map a physical page to a virtual address
- * 
+ *
  * @param vm_area       Pointer to vm area
  * @param base_vaddr    Base virtual address to search for a free virtual address
  * @param phys          Physical address of the page
@@ -90,7 +96,7 @@ vm_area_map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t 
 
 /**
  * @brief   Map a range of physical pages to a virtual address
- * 
+ *
  * @param vm_area       Pointer to vm area
  * @param base_vaddr    Base virtual address to search for free virtual addresses
  * @param phys          Physical address of the first page
@@ -99,11 +105,12 @@ vm_area_map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t 
  * @return void*        Virtual address of the mapped pages
  */
 void *
-vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size, uint8_t flags);
+vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size,
+                  uint8_t flags);
 
 /**
  * @brief   Map a range of large pages (4MB) to a virtual address
- * 
+ *
  * @param vm_area           Pointer to vm area
  * @param base_vaddr        Base virtual address to search for free virtual addresses
  * @param phys              Array of physical addresses of the large pages
@@ -112,12 +119,12 @@ vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t 
  * @return void*            Virtual address of the mapped large pages
  */
 void *
-vm_area_map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys, size_t num_large_pages,
-                uint8_t flags);
+vm_area_map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys,
+                        size_t num_large_pages, uint8_t flags);
 
 /**
  * @brief   Unmap a page
- * 
+ *
  * @param vm_area   Pointer to vm area
  * @param vaddr     Virtual address
  */
@@ -126,7 +133,7 @@ vm_area_unmap_page(struct vm_area *vm_area, void *vaddr);
 
 /**
  * @brief   Unmap a range of pages
- * 
+ *
  * @param vm_area   Pointer to vm area
  * @param vaddr     Virtual address
  * @param size      Size of the range to unmap
@@ -136,7 +143,7 @@ vm_area_unmap_pages(struct vm_area *vm_area, void *vaddr, size_t size);
 
 /**
  * @brief   Unmap a range of large pages
- * 
+ *
  * @param vm_area           Pointer to vm area
  * @param vaddrs            Array of virtual addresses
  * @param num_large_pages   Number of large pages to unmap

@@ -1,16 +1,23 @@
 #include "syscall/process.h"
 
-#include "proc/mgmt.h"
+#include "proc/mgmt/exit.h"
+#include "proc/mgmt/fork.h"
 #include "proc/process.h"
 #include "sched/sched.h"
+#include "thread/thread.h"
 #include "thread/userio.h"
 
 void
 do_fork(struct thread *current_thread)
 {
-    process_fork(current_thread->process);
+    struct process *child;
+    int res = process_fork(current_thread->process, &child);
+    if (res < 0) {
+        thread_set_return_value(current_thread, -1);
+        return;
+    }
 
-    schedule();
+    thread_set_return_value(current_thread, child->pid);
 }
 
 void
@@ -27,8 +34,5 @@ void
 do_exit(struct thread *current_thread)
 {
     int status_code = (int)thread_get_stack_item(current_thread, 0);
-
     process_exit(current_thread->process, (uint8_t)status_code);
-
-    schedule();
 }

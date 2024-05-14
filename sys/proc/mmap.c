@@ -7,7 +7,6 @@
 #include "mm/kalloc.h"
 #include "mm/paging/paging.h"
 #include "mm/vm.h"
-#include "proc/mgmt.h"
 #include "proc/process.h"
 
 void *
@@ -31,7 +30,8 @@ process_mmap(struct process *process, void *addr, size_t size, int prot, int fla
 
     struct process_allocation *palloc = kzalloc(sizeof(struct process_allocation));
     palloc->type = PROCESS_ALLOCATION_MEMORY_SEGMENT;
-    palloc->addr = segment;
+    palloc->paddr = segment;
+    palloc->vaddr = virt;
     palloc->size = segment_size;
 
     list_push_front(&process->allocations, palloc);
@@ -49,7 +49,7 @@ process_munmap(struct process *process, void *addr, size_t length)
     struct process_allocation *palloc = NULL;
     for_each_in_list(struct process_allocation *, process->allocations, list, allocation)
     {
-        if (allocation->addr == addr) {
+        if (allocation->vaddr == addr) {
             palloc = allocation;
             break;
         }
@@ -63,10 +63,10 @@ process_munmap(struct process *process, void *addr, size_t length)
     list_remove(&process->allocations, palloc);
 
     // Unmap the allocation
-    vm_area_unmap_pages(process->vm_area, palloc->addr, palloc->size);
+    vm_area_unmap_pages(process->vm_area, palloc->vaddr, palloc->size);
 
     // Free physcal memory
-    void *paddr = vm_area_virt_to_phys(process->vm_area, palloc->addr);
+    void *paddr = vm_area_virt_to_phys(process->vm_area, palloc->vaddr);
     kalloc_free_phys_pages(paddr);
 
     // Free the allocation object

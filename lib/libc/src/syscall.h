@@ -13,6 +13,9 @@
 #define EXIT_SYSCALL_NO   9
 
 int
+do_syscall0(int syscall_no);
+
+int
 do_syscall1(int syscall_no, int arg1);
 
 int

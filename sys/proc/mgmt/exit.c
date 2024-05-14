@@ -1,31 +1,12 @@
-#include "proc/mgmt.h"
+#include "proc/mgmt/exit.h"
 
 #include "libk/alloc.h"
+#include "libk/list.h"
 #include "mm/kalloc.h"
 #include "proc/fd.h"
 #include "proc/process.h"
+#include "thread/thread.h"
 #include "vfs/vfs.h"
-
-int
-process_fork(struct process *process)
-{
-    // TODO
-    return -1;
-}
-
-int
-process_wait(struct process *process)
-{
-    // TODO
-    return -1;
-}
-
-int
-process_execve(struct process *process, const char *const *argv, const char *const *envp)
-{
-    // TODO
-    return -1;
-}
 
 int
 process_exit(struct process *process, uint8_t status_code)
@@ -53,7 +34,7 @@ process_exit(struct process *process, uint8_t status_code)
     // free all memory allocations
     for_each_in_list(struct process_allocation *, process->allocations, alloc_list, alloc)
     {
-        kalloc_free_phys_pages(alloc->addr);
+        kalloc_free_phys_pages(alloc->paddr);
         kfree(alloc);
     }
 

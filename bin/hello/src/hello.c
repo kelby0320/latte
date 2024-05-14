@@ -22,5 +22,16 @@ main(int argc, char **argv)
 
     printf(buf);
 
+    pid_t pid = fork();
+    if (pid < 0) {
+        printf("Failed to fork\n");
+    } else if (pid == 0) {
+        // Child
+        printf("Child process\n");
+    } else {
+        // Parent
+        printf("Parent process\n");
+    }
+
     return 0;
 }
