@@ -115,6 +115,61 @@ uint32_t
 process_next_pid();
 
 /**
+ * @brief   Free all threads of a process
+ *
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
+int
+process_free_threads(struct process *process);
+
+/**
+ * @brief   Free all memory allocations of a process
+ *
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
+int
+process_free_allocations(struct process *process);
+
+/**
+ * @brief   Free all file descriptors of a process
+ *
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
+int
+process_free_fds(struct process *process);
+
+/**
+ * @brief   Create a new vm_area for a process
+ *
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
+int
+process_new_vm_area(struct process *process);
+
+/**
+ * @brief Load the process's executable
+ *
+ * @param process   Pointer to the process
+ * @param filename  Filename
+ * @return int      Status code
+ */
+int
+process_load_exec(struct process *process, const char *filename);
+
+/**
+ * @brief   Add a thread to a process
+ *
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
+int
+process_add_thread(struct process *process);
+
+/**
  * @brief   Create the first user process on the system
  *
  * @param filename  Filename of the executable

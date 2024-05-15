@@ -11,8 +11,8 @@
 
 typedef void (*syscall_t)();
 
-static syscall_t syscalls[] = {do_open,   do_close, do_read,   do_write, do_mmap,
-                               do_munmap, do_fork,  do_execve, do_wait,  do_exit};
+static syscall_t syscalls[] = {do_open,   do_close, do_read,  do_write, do_mmap,
+                               do_munmap, do_fork,  do_execv, do_wait,  do_exit};
 
 void
 do_syscall(int syscall_no)

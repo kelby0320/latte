@@ -11,11 +11,11 @@ void
 do_fork(struct thread *current_thread);
 
 /**
- * @brief   Execute the execve system call
+ * @brief   Execute the execv system call
  *
  */
 void
-do_execve(struct thread *current_thread);
+do_execv(struct thread *current_thread);
 
 /**
  * @brief   Execute the wait system call

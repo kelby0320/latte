@@ -111,7 +111,7 @@ kernel_main(unsigned long magic)
     int out_fd = vfs_open("/dev/term0", "w");
     msgbuf_add_output_fd(out_fd);
 
-    process_create_first("/bin/hello");
+    process_create_first("/bin/init");
     schedule_first_thread();
 
     while (1) {}

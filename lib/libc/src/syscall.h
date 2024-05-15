@@ -8,7 +8,7 @@
 #define MMAP_SYSCALL_NO   4
 #define MUNMAP_SYSCALL_NO 5
 #define FORK_SYSCALL_NO   6
-#define EXECVE_SYSCALL_NO 7
+#define EXECV_SYSCALL_NO  7
 #define WAIT_SYSCALL_NO   8
 #define EXIT_SYSCALL_NO   9
 

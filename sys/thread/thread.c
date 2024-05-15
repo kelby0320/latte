@@ -165,12 +165,12 @@ thread_destroy(struct thread *thread)
 {
     int res = sched_remove_thread(thread);
     if (res < 0) {
-        printk("Error unscheduling thread %d", thread->tid);
+        printk("Error unscheduling thread %d\n", thread->tid);
     }
 
     res = list_remove(&thread_list, thread);
     if (res < 0) {
-        printk("Error removing thread %d", thread->tid);
+        printk("Error removing thread %d\n", thread->tid);
     }
 
     kalloc_free_phys_pages(thread->stack);

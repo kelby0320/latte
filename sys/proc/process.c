@@ -108,14 +108,72 @@ err_segment_alloc:
     return -ENOMEM;
 }
 
-/**
- * @brief Load the process's executable
- *
- * @param pid       Process Id
- * @param filename  Filename
- * @return int      Status code
- */
-static int
+int
+process_free_threads(struct process *process)
+{
+    for_each_in_list(struct thread *, process->threads, tlist, thread) { thread_destroy(thread); }
+
+    list_destroy(process->threads);
+
+    process->threads = NULL;
+
+    return 0;
+}
+
+int
+process_free_allocations(struct process *process)
+{
+    for_each_in_list(struct process_allocation *, process->allocations, alloc_list, alloc)
+    {
+        kalloc_free_phys_pages(alloc->paddr);
+        kfree(alloc);
+    }
+
+    list_destroy(process->allocations);
+
+    process->allocations = NULL;
+
+    return 0;
+}
+
+int
+process_free_fds(struct process *process)
+{
+    for_each_in_list(struct process_fd *, process->open_fds, fdlist, proc_fd)
+    {
+        int gfd = process_get_gfd(process, proc_fd->pfd);
+        if (gfd < 0) {
+            kfree(proc_fd);
+            continue;
+        }
+
+        vfs_close(gfd);
+        kfree(proc_fd);
+    }
+
+    list_destroy(process->open_fds);
+
+    process->open_fds = NULL;
+
+    return 0;
+}
+
+int
+process_new_vm_area(struct process *process)
+{
+    if (process->vm_area) {
+        kfree(process->vm_area);
+    }
+
+    process->vm_area = kzalloc(sizeof(struct vm_area));
+    if (!process->vm_area) {
+        return -ENOMEM;
+    }
+
+    return vm_area_user_init(process->vm_area);
+}
+
+int
 process_load_exec(struct process *process, const char *filename)
 {
     strncpy(process->filename, filename, LATTE_MAX_PATH_LEN);
@@ -141,6 +199,27 @@ err_out:
 }
 
 int
+process_add_thread(struct process *process)
+{
+    int res = 0;
+
+    int tid = thread_create(process);
+    if (tid < 0) {
+        res = tid;
+        return res;
+    }
+
+    struct thread *thread = thread_get(tid);
+
+    res = list_push_front(&process->threads, thread);
+    if (res < 0) {
+        return res;
+    }
+
+    return 0;
+}
+
+int
 process_create_first(const char *filename)
 {
     int res = 0;
@@ -159,14 +238,9 @@ process_create_first(const char *filename)
     process->children = NULL;
     process->allocations = NULL;
 
-    process->vm_area = kzalloc(sizeof(struct vm_area));
-    if (!process->vm_area) {
-        goto err_alloc;
-    }
-
-    res = vm_area_user_init(process->vm_area);
+    res = process_new_vm_area(process);
     if (res < 0) {
-        goto err_vmarea;
+        goto err_vm_area;
     }
 
     res = process_load_exec(process, filename);
@@ -174,24 +248,19 @@ process_create_first(const char *filename)
         goto err_proc;
     }
 
-    int tid = thread_create(process);
-    if (tid < 0) {
-        goto err_proc;
-    }
-
-    struct thread *thread = thread_get(tid);
-
-    res = list_push_front(&process->threads, thread);
+    res = process_add_thread(process);
     if (res < 0) {
         goto err_thread;
     }
 
-    res = allocate_empty_args(process, thread);
+    struct thread *main_thread = list_front(process->threads);
+
+    res = allocate_empty_args(process, main_thread);
     if (res < 0) {
         goto err_thread;
     }
 
-    res = allocate_empty_environ(process, thread);
+    res = allocate_empty_environ(process, main_thread);
     if (res < 0) {
         goto err_thread;
     }
@@ -201,15 +270,16 @@ process_create_first(const char *filename)
     return process->pid;
 
 err_thread:
-    thread_destroy(thread);
+    process_free_threads(process);
 
 err_proc:
     process_exit(process, PROCESS_STATUS_CODE_FAILURE);
 
-err_vmarea:
-    kfree(process->vm_area);
+err_vm_area:
+    if (process->vm_area) {
+        kfree(process->vm_area);
+    }
 
-err_alloc:
     kfree(process);
     return res;
 }

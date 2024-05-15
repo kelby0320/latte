@@ -148,13 +148,10 @@ process_fork(struct process *parent, struct process **child_out)
 
     process_shallow_copy(parent, child);
 
-    child->vm_area = kzalloc(sizeof(struct vm_area));
-    if (!child->vm_area) {
-        res = -ENOMEM;
-        goto err_child;
+    res = process_new_vm_area(child);
+    if (res < 0) {
+        goto err_vm_area;
     }
-
-    vm_area_user_init(child->vm_area);
 
     res = process_copy_threads(parent, child);
     if (res < 0) {
@@ -179,20 +176,20 @@ process_fork(struct process *parent, struct process **child_out)
     return 0;
 
 err_fds:
-    for_each_in_list(struct process_fd *, child->open_fds, open_fds_list, fd) { kfree(fd); }
-    list_destroy(child->open_fds);
+    process_free_fds(child);
 
 err_alloc:
-    list_destroy(child->allocations);
+    process_free_allocations(child);
 
 err_thread:
-    for_each_in_list(struct thread *, parent->threads, tlist, t) { thread_destroy(t); }
-    list_destroy(child->threads);
+    process_free_threads(child);
 
 err_vm_area:
-    kfree(child->vm_area);
+    if (child->vm_area) {
+        kfree(child->vm_area);
+    }
 
-err_child:
     kfree(child);
+
     return res;
 }

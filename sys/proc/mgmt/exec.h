@@ -6,12 +6,12 @@ struct process;
 /**
  * @brief   Execute a new program.
  *
- * @param process   The process to execute the program in.
- * @param argv      The arguments to the program.
- * @param envp      The environment variables.
+ * @param process   The process to execute the program in
+ * @param argv      The arguments to the program
+ * @param path      The path to the program
  * @return int      Status code
  */
 int
-process_execve(struct process *process, const char *const *argv, const char *const *envp);
+process_execv(struct process *process, const char *path, const char *const *argv);
 
 #endif

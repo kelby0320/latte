@@ -1,5 +1,8 @@
 #include "syscall/process.h"
 
+#include "libk/alloc.h"
+#include "libk/memory.h"
+#include "proc/mgmt/exec.h"
 #include "proc/mgmt/exit.h"
 #include "proc/mgmt/fork.h"
 #include "proc/process.h"
@@ -21,8 +24,17 @@ do_fork(struct thread *current_thread)
 }
 
 void
-do_execve(struct thread *current_thread)
+do_execv(struct thread *current_thread)
 {
+    const char *const *user_argv = (const char *)thread_get_stack_item(current_thread, 0);
+    const char *user_path = (const char *)thread_get_stack_item(current_thread, 1);
+
+    char path[LATTE_MAX_PATH_LEN];
+    memset(path, 0, sizeof(path));
+
+    thread_copy_from_user(current_thread, (void *)user_path, path, sizeof(path) - 1);
+
+    process_execv(current_thread->process, path, NULL);
 }
 
 void

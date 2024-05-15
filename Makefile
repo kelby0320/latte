@@ -160,12 +160,14 @@ libs:
 
 bin: libs
 	cd ./bin/hello && $(MAKE) all
+	cd ./bin/init && $(MAKE) all
 
 clean_libs:
 	cd ./lib/libc && $(MAKE) clean
 
 clean_bin:
 	cd ./bin/hello && $(MAKE) clean
+	cd ./bin/init && $(MAKE) clean
 
 clean: clean_libs clean_bin
 	-rm -r $(C_OBJECTS) $(AS_OBJECTS)
