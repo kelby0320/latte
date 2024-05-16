@@ -9,5 +9,6 @@
 #define EEXIST 6
 #define ENFILE 7
 #define EAGAIN 8
+#define ECHILD 9
 
 #endif

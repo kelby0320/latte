@@ -22,6 +22,24 @@ int
 sched_remove_thread(struct thread *thread);
 
 /**
+ * @brief   Move a thread to the blocked queue
+ *
+ * @param thread    Pointer to the thread
+ * @return int      Status code
+ */
+int
+sched_block_thread(struct thread *thread);
+
+/**
+ * @brief   Move a thread to the ready queue
+ *
+ * @param thread    Pointer to the thread
+ * @return int      Status code
+ */
+int
+sched_unblock_thread(struct thread *thread);
+
+/**
  * @brief Get the currently executing thread
  *
  * @return struct thread*

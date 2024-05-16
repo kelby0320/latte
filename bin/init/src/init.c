@@ -32,9 +32,9 @@ main()
         execv("/bin/hello", NULL);
     } else {
         // Parent
-        // int status_code;
-        // pid_t child_pid = wait(&status_code);
-        // printf("Child process (%d) exited with status code %d\n", child_pid, status_code);
+        int status_code;
+        pid_t child_pid = wait(&status_code);
+        printf("Child process (%d) exited with status code %d\n", child_pid, status_code);
     }
 
     return 0;

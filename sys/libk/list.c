@@ -67,6 +67,12 @@ list_remove(struct list_item **head, void *data)
     return -ENOENT;
 }
 
+bool
+list_empty(struct list_item *head)
+{
+    return head == NULL;
+}
+
 void
 list_destroy(struct list_item *head)
 {

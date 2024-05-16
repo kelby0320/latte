@@ -1,15 +1,16 @@
 #ifndef PROC_MGMT_WAIT_H
 #define PROC_MGMT_WAIT_H
 
-struct process;
+#include "proc/process.h"
 
 /**
  * @brief   Wait for a process to exit.
  *
  * @param process   The process to wait for.
- * @return int      The exit status of the process.
+ * @param status    The status of the exited process.
+ * @return pid_t    The PID of the exited process.
  */
-int
-process_wait(struct process *process);
+pid_t
+process_wait(struct process *process, int *status);
 
 #endif

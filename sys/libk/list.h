@@ -1,6 +1,8 @@
 #ifndef LIBK_LIST_H
 #define LIBK_LIST_H
 
+#include <stdbool.h>
+
 #define for_each_in_list(T, head, list, item)                                                      \
     struct list_item *list;                                                                        \
     T item;                                                                                        \
@@ -48,6 +50,16 @@ list_front(struct list_item *head);
  */
 int
 list_remove(struct list_item **head, void *data);
+
+/**
+ * @brief   Check if the list is empty
+ *
+ * @param head      The head of the list
+ * @return true     If the list is empty
+ * @return false    If the list is not empty
+ */
+bool
+list_empty(struct list_item *head);
 
 /**
  * @brief   Destroy the list

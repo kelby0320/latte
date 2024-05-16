@@ -35,6 +35,13 @@ vm_area_user_init(struct vm_area *vm_area)
     return 0;
 }
 
+int
+vm_area_free(struct vm_area *vm_area)
+{
+    // TODO
+    return 0;
+}
+
 void
 vm_area_switch_map(struct vm_area *vm_area)
 {

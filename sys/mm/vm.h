@@ -65,6 +65,15 @@ int
 vm_area_user_init(struct vm_area *vm_area);
 
 /**
+ * @brief
+ *
+ * @param vm_area
+ * @return int
+ */
+int
+vm_area_free(struct vm_area *vm_area);
+
+/**
  * @brief Load the page directory from a vm area
  *
  * @param vm_area   Pointer to vm area

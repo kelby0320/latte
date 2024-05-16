@@ -31,6 +31,25 @@ sched_remove_thread(struct thread *thread)
     return 0;
 }
 
+int
+sched_block_thread(struct thread *thread)
+{
+    queue_remove(&ready_queue, thread);
+
+    if (current_thread == thread) {
+        current_thread = NULL;
+    }
+
+    return queue_enqueue(&blocked_queue, thread);
+}
+
+int
+sched_unblock_thread(struct thread *thread)
+{
+    queue_remove(&blocked_queue, thread);
+    return queue_enqueue(&ready_queue, thread);
+}
+
 struct thread *
 sched_get_current()
 {

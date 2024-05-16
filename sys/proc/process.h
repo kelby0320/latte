@@ -142,6 +142,15 @@ int
 process_free_fds(struct process *process);
 
 /**
+ * @brief   Free the vm_area of a process
+ *
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
+int
+process_free_vm_area(struct process *process);
+
+/**
  * @brief   Create a new vm_area for a process
  *
  * @param process   Pointer to the process
@@ -177,6 +186,15 @@ process_add_thread(struct process *process);
  */
 int
 process_create_first(const char *filename);
+
+/**
+ * @brief   Remove a process from the system
+ *
+ * @param process   Pointer to the process
+ * @return int      Status code
+ */
+int
+process_remove(struct process *process);
 
 /**
  * @brief Switch to a process's vm_area

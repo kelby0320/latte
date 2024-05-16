@@ -159,6 +159,18 @@ process_free_fds(struct process *process)
 }
 
 int
+process_free_vm_area(struct process *process)
+{
+    vm_area_free(process->vm_area);
+
+    kfree(process->vm_area);
+
+    process->vm_area = NULL;
+
+    return 0;
+}
+
+int
 process_new_vm_area(struct process *process)
 {
     if (process->vm_area) {
@@ -282,6 +294,30 @@ err_vm_area:
 
     kfree(process);
     return res;
+}
+
+int
+process_remove(struct process *process)
+{
+    if (process->state != PROCESS_STATE_ZOMBIE) {
+        return -EINVAL;
+    }
+
+    if (!list_empty(process->children)) {
+        struct process *parent = process->parent;
+        for_each_in_list(struct process *, process->children, list, child)
+        {
+            list_push_front(&parent->children, child);
+        }
+    }
+
+    list_destroy(process->children);
+
+    list_remove(&process_list, process);
+
+    kfree(process);
+
+    return 0;
 }
 
 void
