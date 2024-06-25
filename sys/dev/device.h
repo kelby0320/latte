@@ -1,141 +1,21 @@
-#ifndef DEVICE_H
-#define DEVICE_H
+#ifndef DEV_DEVICE_H
+#define DEV_DEVICE_H
 
-#include "config.h"
-#include "fs/fs.h"
+#include <stdint.h>
 
-#include <stddef.h>
-
-#define DEVICE_TYPE_RAW   0
-#define DEVICE_TYPE_BLOCK 1
-#define DEVICE_TYPE_VGA   2
-#define DEVICE_TYPE_TERM  3
+#define as_device(dev) ((struct device *)(dev))
 
 struct bus;
-struct device;
+struct device_driver;
 
-typedef unsigned int device_type_t;
-
-/**
- * @brief File operations structure for devices
- *
- */
-struct file_operations {
-    int (*read)(struct device *device, size_t offset, char *buf, size_t count);
-    int (*write)(struct device *device, size_t offset, const char *buf, size_t count);
-    int (*seek)(struct device *device, size_t offset, file_seek_mode_t seek_mode);
-};
-
-/**
- * @brief Device structure
- *
- */
 struct device {
-    // Name of the device
-    char name[LATTE_DEVICE_NAME_MAX_SIZE];
-
-    // Type identifier
-    device_type_t type;
-
-    // Pointer to the bus the device is on
+    char *name;
+    unsigned int id;
     struct bus *bus;
-
-    // Pointer to file_operations structure for the device
-    struct file_operations file_operations;
+    struct device_driver *driver;
 };
 
-#define as_device(ptr) ((struct device *)ptr)
-
-/**
- * @brief Device iterator structure
- *
- */
-struct device_iterator {
-    // Pointer to the device list
-    struct device **device_list;
-
-    // Pointer to the device list length
-    int *device_list_len;
-
-    // Current index of the device iterator
-    int current_idx;
-};
-
-/**
- * @brief Add a device to the system
- *
- * @param device    Pointer to the device
- * @return int      Status code
- */
 int
-device_add_device(struct device *device);
-
-/**
- * @brief Find a device by name
- *
- * @param name              Name of the device
- * @return struct device*   Pointer to the device if found or NULL
- */
-struct device *
-device_find(const char *name);
-
-/**
- * @brief Initialize a device iterator
- *
- * @param iter  Pointer to the device iterator
- * @return int  Status code
- */
-int
-device_iterator_init(struct device_iterator **iter);
-
-/**
- * @brief Free a device iterator
- *
- * @param iter  Pointer to the iterator
- */
-void
-device_iterator_free(struct device_iterator *iter);
-
-/**
- * @brief Get the current device associated with a device iterator
- *
- * @param iter              Pointer to the device iterator
- * @return struct device*   Pointer to the associated device
- */
-struct device *
-device_iterator_val(struct device_iterator *iter);
-
-/**
- * @brief Increment the device iterator
- *
- * @param iter  Pointer to the device iterator
- * @return int  Status code
- */
-int
-device_iterator_next(struct device_iterator *iter);
-
-/**
- * @brief A macro to all easy iteratation of devices
- *
- */
-#define for_each_device(dev)                                                                       \
-    struct device_iterator *iter;                                                                  \
-    device_iterator_init(&iter);                                                                   \
-                                                                                                   \
-    while (true) {                                                                                 \
-        struct device *dev = device_iterator_val(iter);                                            \
-        if (!dev) {                                                                                \
-            break;                                                                                 \
-        }
-
-/**
- * @brief A macro that pairs with the for_each_device macro to end device iteration
- *
- */
-#define for_each_device_end()                                                                      \
-    device_iterator_next(iter);                                                                    \
-    }                                                                                              \
-                                                                                                   \
-    device_iterator_free(iter)
+make_device(struct device *dev, const char *name);
 
 #endif

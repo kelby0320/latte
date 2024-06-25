@@ -18,6 +18,32 @@ list_push_front(struct list_item **head, void *data)
     return 0;
 }
 
+int
+list_push_back(struct list_item **head, void *data)
+{
+    struct list_item *new_item = kzalloc(sizeof(struct list_item));
+    if (!new_item) {
+        return -ENOMEM;
+    }
+
+    new_item->data = data;
+    new_item->next = NULL;
+
+    if (!*head) {
+        *head = new_item;
+        return 0;
+    }
+
+    struct list_item *item = *head;
+    while (item->next) {
+        item = item->next;
+    }
+
+    item->next = new_item;
+
+    return 0;
+}
+
 void *
 list_pop_front(struct list_item **head)
 {

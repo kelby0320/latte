@@ -8,6 +8,8 @@
     T item;                                                                                        \
     for (list = head, item = list->data; list != NULL; list = list->next, item = list->data)
 
+#define list_container_of(item) ((struct list_item *)&item)
+
 struct list_item {
     void *data;
     struct list_item *next;
@@ -18,10 +20,20 @@ struct list_item {
  *
  * @param head  The head of the list
  * @param data  The data to append
- * @return int
+ * @return int  Status code
  */
 int
 list_push_front(struct list_item **head, void *data);
+
+/**
+ * @brief   Add an item to the back of list
+ *
+ * @param head  The head of the list
+ * @param data  The data to append
+ * @return int  Status code
+ */
+int
+list_push_back(struct list_item **head, void *data);
 
 /**
  * @brief   Remove an item from the front of list
@@ -46,7 +58,7 @@ list_front(struct list_item *head);
  *
  * @param head  The head of the list
  * @param data  The data to remove
- * @return int
+ * @return int  Status code
  */
 int
 list_remove(struct list_item **head, void *data);

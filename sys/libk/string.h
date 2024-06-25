@@ -25,6 +25,9 @@ strncmp(const char *str1, const char *str2, size_t n);
 char *
 strncpy(char *dest, const char *src, size_t n);
 
+char *
+strtok(char *str, const char *delim);
+
 bool
 isalpha(char c);
 

@@ -10,7 +10,6 @@ AllowShortBlocksOnASingleLine: Empty
 PointerAlignment: Right
 BinPackArguments: true
 BinPackParameters: true
-AlignAfterOpenBracket: Align
-ColumnLimit: 100
+AlignAfterOpenBracket: AlwaysBreak
 IncludeBlocks: Preserve
 AlignConsecutiveMacros: true
