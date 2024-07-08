@@ -11,19 +11,20 @@ ASFLAGS = -f elf -g
 INCLUDES = -I./sys
 TEST_INCLUDES = -I./sys -I./test
 
-C_OBJECTS = ./sys/boot/boot.o \
+C_OBJECTS = ./sys/block/block.o \
+	./sys/block/buffered_reader.o \
+	./sys/block/disk.o \
+	./sys/block/partition.o \
+	./sys/boot/boot.o \
 	./sys/boot/multiboot2.o \
-	./sys/bus/ata/ata.o \
-	./sys/bus/virtual/dev/dev.o \
-	./sys/bus/virtual/devfs/devfs.o \
-	./sys/bus/virtual/virtual.o \
-	./sys/bus/bus.o \
-	./sys/bus/mass_storage.o \
-	./sys/dev/block/block.o \
-	./sys/dev/term/term.o \
-	./sys/dev/vga/vga.o \
-	./sys/dev/device.o \
-	./sys/fs/bufferedreader.o \
+	./sys/dev/bus.o \
+	./sys/dev/device.o\
+	./sys/dev/platform/platform_device.o \
+	./sys/drivers/driver.o \
+	./sys/drivers/platform/platform_driver.o \
+	./sys/drivers/platform/ata/ata.o \
+	./sys/drivers/platform/ata/ata_io.o \
+	./sys/drivers/platform/devfs/devfs.o \
 	./sys/fs/fs.o \
 	./sys/fs/path.o \
 	./sys/fs/devfs/devfs.o \
@@ -73,6 +74,7 @@ C_OBJECTS = ./sys/boot/boot.o \
 
 AS_OBJECTS = ./sys/boot/boot.asm.o \
 	./sys/boot/header.asm.o \
+	./sys/cpu/port.asm.o \
 	./sys/gdt/gdt.asm.o \
 	./sys/gdt/tss.asm.o \
 	./sys/irq/idt.asm.o \
@@ -115,7 +117,7 @@ test: $(TEST_OBJECTS) $(TEST_EXECUTABLES)
 
 ./test/test.o: ./test/test.c
 	gcc -g $(TEST_INCLUDES) -c ./test/test.c -o ./test/test.o
-	
+
 ./test/sys/fs/path.o: ./sys/fs/path.c
 	gcc -g $(TEST_INCLUDES) -c ./sys/fs/path.c -o ./test/sys/fs/path.o
 

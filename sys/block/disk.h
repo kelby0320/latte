@@ -10,7 +10,7 @@
 struct device;
 
 struct disk {
-    unsigned int id;
+    const char *name;
     struct device *device;
     struct partition_table_entry partition_table[4];
     int (*read_sectors)(struct device *dev, unsigned int lba, char *buf, size_t count);

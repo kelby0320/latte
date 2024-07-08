@@ -1,8 +1,8 @@
 #include "fs/ext2/inode.h"
 
+#include "block/buffered_reader.h"
 #include "config.h"
 #include "errno.h"
-#include "fs/bufferedreader.h"
 #include "fs/ext2/common.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
@@ -185,8 +185,8 @@ ext2_read_block(struct block_iterator *iter, struct ext2_private *fs_private, ch
     int block_no = block_iterator_block_no(iter);
     int data_offset = EXT2_FS_START + (block_no * fs_private->block_size);
 
-    bufferedreader_seek(fs_private->reader, data_offset);
-    return bufferedreader_read(fs_private->reader, out, fs_private->block_size);
+    block_buffered_reader_seek(fs_private->reader, data_offset);
+    return block_buffered_reader_read(fs_private->reader, out, fs_private->block_size);
 }
 
 /**
@@ -228,9 +228,9 @@ ext2_read_block_group_desc(struct ext2_block_group_descriptor **desc_out,
         return -ENOMEM;
     }
 
-    bufferedreader_seek(fs_private->reader, bg_desc_start);
+    block_buffered_reader_seek(fs_private->reader, bg_desc_start);
     int res =
-        bufferedreader_read(fs_private->reader, desc, sizeof(struct ext2_block_group_descriptor));
+        block_buffered_reader_read(fs_private->reader, (char *)desc, sizeof(struct ext2_block_group_descriptor));
     if (res < 0) {
         kfree(desc);
         return res;
@@ -261,8 +261,8 @@ ext2_read_inode_from_tbl(struct ext2_inode **inode_out, struct ext2_private *fs_
         return -ENOMEM;
     }
 
-    bufferedreader_seek(fs_private->reader, inode_start);
-    int res = bufferedreader_read(fs_private->reader, inode, sizeof(struct ext2_inode));
+    block_buffered_reader_seek(fs_private->reader, inode_start);
+    int res = block_buffered_reader_read(fs_private->reader, (char *)inode, sizeof(struct ext2_inode));
     if (res < 0) {
         kfree(inode);
         return res;

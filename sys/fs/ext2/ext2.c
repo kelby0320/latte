@@ -1,8 +1,8 @@
 #include "fs/ext2/ext2.h"
 
+#include "block/buffered_reader.h"
 #include "config.h"
 #include "errno.h"
-#include "fs/bufferedreader.h"
 #include "fs/ext2/common.h"
 #include "fs/ext2/dir.h"
 #include "fs/ext2/inode.h"
@@ -26,9 +26,10 @@
 static int
 ext2_read_superblock(struct ext2_private *fs_private)
 {
-    bufferedreader_seek(fs_private->reader, EXT2_FS_START + EXT2_SUPERBLOCK_OFFSET);
+    struct block_buffered_reader *reader = fs_private->reader;
+    block_buffered_reader_seek(reader, EXT2_FS_START + EXT2_SUPERBLOCK_OFFSET);
     int res =
-        bufferedreader_read(fs_private->reader, &fs_private->superblock, EXT2_SUPERBLOCK_SIZE);
+        block_buffered_reader_read(reader, (char *)&fs_private->superblock, EXT2_SUPERBLOCK_SIZE);
     return res;
 }
 
@@ -231,42 +232,42 @@ ext2_seek(struct file_descriptor *file_descriptor, uint32_t offset, file_seek_mo
 /**
  * @brief Attempt to bind an Ext2 filesystem to the disk
  *
- * @param block_device Pointer to the block device
+ * @param block        Pointer to the block device
  * @return void *      Pointer to private Ext2 data structure
  */
 static void *
-ext2_resolve(struct block_device *block_device)
+ext2_resolve(struct block *block)
 {
     struct ext2_private *fs_private = kzalloc(sizeof(struct ext2_private));
     if (!fs_private) {
         return NULL;
     }
 
-    struct bufferedreader *reader;
-    int res = bufferedreader_new(&reader, block_device);
-    if (res < 0) {
-        goto err_out1;
+    struct block_buffered_reader *reader = kzalloc(sizeof(struct block_buffered_reader));
+    if (!reader) {
+	goto err_reader_alloc;
     }
-
+    
+    block_buffered_reader_init(reader, block);
     fs_private->reader = reader;
 
-    res = ext2_read_superblock(fs_private);
+    int res = ext2_read_superblock(fs_private);
     if (res < 0) {
-        goto err_out2;
+        goto err_superblock;
     }
 
     if (fs_private->superblock.s_magic != EXT2_MAGIC_NUMBER) {
-        goto err_out2;
+        goto err_superblock;
     }
 
     fs_private->block_size = 1024 << fs_private->superblock.s_log_block_size;
 
     return fs_private;
 
-err_out2:
+err_superblock:
     kfree(reader);
 
-err_out1:
+err_reader_alloc:
     kfree(fs_private);
     return NULL;
 }

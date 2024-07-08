@@ -1,8 +1,8 @@
 #include "vfs/vfs.h"
 
-#include "bus/bus.h"
+#include "dev/bus.h"
 #include "config.h"
-#include "dev/block/block.h"
+#include "block/block.h"
 #include "dev/device.h"
 #include "errno.h"
 #include "fs/fs.h"
@@ -17,23 +17,16 @@
 #include <stdbool.h>
 
 /**
- * @brief Predicate to determine whether a device is a boot device
+ * @brief Predicate to determine whether a block is a bootable
  *
- * @param device    Pointer to the device
+ * @param block    Pointer to the block
  * @return true
  * @return false
  */
-static bool
-is_boot_device(struct device *device)
+static inline bool
+is_boot_block(struct block *block)
 {
-    if (device->type == DEVICE_TYPE_BLOCK) {
-        struct block_device *block_device = (struct block_device *)device;
-        if (block_device->type == BLOCK_DEVICE_TYPE_PART) {
-            return true;
-        }
-    }
-
-    return false;
+    return block->bootable;
 }
 
 /**
@@ -44,38 +37,13 @@ is_boot_device(struct device *device)
  * @return false
  */
 static bool
-is_virtual_block_device(struct device *device)
+is_devfs_block(struct block *block)
 {
-    if (device->type == DEVICE_TYPE_BLOCK) {
-        struct block_device *block_device = (struct block_device *)device;
-        if (block_device->type == BLOCK_DEVICE_TYPE_VIRT) {
-            return true;
-        }
+    if (strncmp(block->name, "devfs", 5) == 0) {
+	return true;
     }
 
     return false;
-}
-
-/**
- * @brief Find a specific block device using the give predicate function
- *
- * @param predicate         Pointer to predicate function
- * @param block_device_out  Output pointer to block device
- * @return int              Status code
- */
-static int
-vfs_find_block_device(bool (*predicate)(struct device *), struct block_device **block_device_out)
-{
-    for_each_device(device)
-    {
-        if (predicate(device)) {
-            *block_device_out = (struct block_device *)device;
-            return 0;
-        }
-    }
-    for_each_device_end();
-
-    return -EEXIST;
 }
 
 /**
@@ -86,15 +54,14 @@ vfs_find_block_device(bool (*predicate)(struct device *), struct block_device **
  * @return int          Status code
  */
 static int
-vfs_find_and_mount(const char *mount_path, bool (*predicate)(struct device *))
+vfs_find_and_mount(const char *mount_path, bool (*predicate)(struct block *))
 {
-    struct block_device *block_device;
-    int res = vfs_find_block_device(predicate, &block_device);
-    if (res < 0) {
-        return res;
+    struct block *block = block_find(predicate);
+    if (!block) {
+	return -ENOENT;
     }
 
-    res = vfs_mount(mount_path, block_device);
+    int res = vfs_mount(mount_path, block);
     if (res < 0) {
         return res;
     }
@@ -105,12 +72,12 @@ vfs_find_and_mount(const char *mount_path, bool (*predicate)(struct device *))
 int
 vfs_init()
 {
-    int res = vfs_find_and_mount("/", is_boot_device);
+    int res = vfs_find_and_mount("/", is_boot_block);
     if (res < 0) {
         panic("Unable to mount root filesystem\n");
     }
 
-    res = vfs_find_and_mount("/dev", is_virtual_block_device);
+    res = vfs_find_and_mount("/dev", is_devfs_block);
     if (res < 0) {
         panic("Unable to mount devfs filesystem\n");
     }
@@ -119,7 +86,7 @@ vfs_init()
 }
 
 int
-vfs_mount(const char *path, struct block_device *block_device)
+vfs_mount(const char *path, struct block *block)
 {
     struct mountpoint *mountpoint = kzalloc(sizeof(struct mountpoint));
     if (!mountpoint) {
@@ -127,7 +94,7 @@ vfs_mount(const char *path, struct block_device *block_device)
     }
 
     strncpy(mountpoint->path, path, LATTE_MAX_PATH_LEN);
-    mountpoint->block_device = block_device;
+    mountpoint->block = block;
 
     int res = fs_resolve(mountpoint);
     if (res < 0) {
@@ -135,7 +102,7 @@ vfs_mount(const char *path, struct block_device *block_device)
     }
 
     printk("Found %s filesystem on %s\n", mountpoint->filesystem->name,
-           mountpoint->block_device->device.name);
+           mountpoint->block->name);
 
     res = mountpoint_add(mountpoint);
     if (res < 0) {

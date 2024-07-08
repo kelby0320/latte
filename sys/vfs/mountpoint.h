@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-struct block_device;
+struct block;
 struct filesystem;
 
 /**
@@ -12,7 +12,7 @@ struct filesystem;
  */
 struct mountpoint {
     // Pointer to the block device
-    struct block_device *block_device;
+    struct block *block;
 
     // Pointer to the filesystem
     struct filesystem *filesystem;

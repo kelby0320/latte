@@ -1,7 +1,7 @@
 #include "fs/fs.h"
 
+#include "block/block.h"
 #include "config.h"
-#include "dev/block/block.h"
 #include "errno.h"
 #include "fs/devfs/devfs.h"
 #include "fs/ext2/ext2.h"
@@ -68,9 +68,9 @@ fs_resolve(struct mountpoint *mountpoint)
 {
     for (int i = 0; i < filesystems_len; i++) {
         struct filesystem *filesystem = filesystems[i];
-        struct block_device *block_device = mountpoint->block_device;
+        struct block *block = mountpoint->block;
 
-        void *fs_private = filesystem->resolve(block_device);
+        void *fs_private = filesystem->resolve(block);
         if (fs_private) {
             mountpoint->filesystem = filesystem;
             mountpoint->fs_private = fs_private;

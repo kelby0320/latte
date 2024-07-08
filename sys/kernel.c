@@ -1,8 +1,8 @@
 #include "kernel.h"
 
 #include "boot/multiboot2.h"
-#include "bus/bus.h"
 #include "config.h"
+#include "dev/bus.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "gdt/tss.h"
@@ -107,6 +107,8 @@ kernel_main(unsigned long magic)
     kernel_early_init(magic);
 
     kernel_late_init();
+
+    panic("Early Halt!");
 
     int out_fd = vfs_open("/dev/term0", "w");
     msgbuf_add_output_fd(out_fd);

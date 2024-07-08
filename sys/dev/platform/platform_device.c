@@ -43,7 +43,7 @@ platform_match(struct device *dev, struct device_driver *drv)
     const char *compat = pdrv->driver.compat;
     const char *pdev_name = pdev->name;
 
-    /* strtok will modify strings so make a copy of compat */
+    /* strsep will modify strings so make a copy of compat */
     int compat_size = strlen(compat) + 1;
     char *copy_compat = kzalloc(compat_size);
     if (!copy_compat) {
@@ -53,13 +53,17 @@ platform_match(struct device *dev, struct device_driver *drv)
     strcpy(copy_compat, compat);
 
     int match = -1;
-    char *tok = strtok(copy_compat, ",");
-    while (tok != NULL) {
-        match = strcmp(tok, pdev_name);
-        if (match == 0) {
-            break;
-        }
-    }
+    do {
+	char *token = strsep(&copy_compat, ",");
+	if (token == NULL) {
+	    break;
+	}
+
+	match = strcmp(token, pdev_name);
+	if (match == 0) {
+	    break;
+	}
+    } while (true);
 
     kfree(copy_compat);
     return match;

@@ -136,6 +136,8 @@ struct ext2_inode {
     uint32_t i_osd2[3];     /* OS dependent 2 */
 } __attribute((packed));
 
+struct block_buffered_reader;
+
 /**
  * @brief Ext2 private filesystem data structure
  *
@@ -148,7 +150,7 @@ struct ext2_private {
     uint32_t block_size;
 
     // Pointer to a buffered reader for the filesystem
-    struct bufferedreader *reader;
+    struct block_buffered_reader *reader;
 };
 
 /**

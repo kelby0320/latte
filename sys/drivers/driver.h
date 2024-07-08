@@ -1,6 +1,10 @@
 #ifndef DRIVER_H
 #define DRIVER_H
 
+#include "fs/fs.h"
+
+#include <stddef.h>
+
 #define as_device_driver(drv) ((struct device_driver *)(drv))
 
 struct bus;
@@ -12,6 +16,12 @@ struct device_driver {
     void *private;
     struct bus *bus;
     int (*probe)(struct device *dev);
+};
+
+struct file_operations {
+    int (*read)(struct device *dev, size_t offset, char *buf, size_t count);
+    int (*write)(struct device *dev, size_t offset, const char *buf, size_t count);
+    int (*seek)(struct device *dev, size_t offset, file_seek_mode_t seek_mode);
 };
 
 int

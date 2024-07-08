@@ -29,7 +29,7 @@ struct file_stat {
 struct path;
 struct file_descriptor;
 struct mountpoint;
-struct block_device;
+struct block;
 
 /**
  * @brief Filesystem interface structure
@@ -37,7 +37,7 @@ struct block_device;
  */
 struct filesystem {
     // Pointer to function to resolve the filesystem
-    void *(*resolve)(struct block_device *block_device);
+    void *(*resolve)(struct block *block);
 
     // Pointer to function to open a file
     int (*open)(void *fs_private, struct path *path, file_mode_t mode, void **out);

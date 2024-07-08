@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+struct block;
+
 /**
  * @brief Initialize Virtual File System
  *
@@ -18,11 +20,11 @@ vfs_init();
  * @brief Mount a partition
  *
  * @param path          Path to mount in the VFS
- * @param block_device  Pointer to the block device
+ * @param block_device  Pointer to the block
  * @return int          Status code
  */
 int
-vfs_mount(const char *path, struct block_device *block_device);
+vfs_mount(const char *path, struct block *block);
 
 /**
  * @brief Open a file

@@ -146,10 +146,37 @@ strncpy(char *dest, const char *src, size_t n)
     return dest;
 }
 
-char *
-strtok(char *str, const char *delim)
+static bool
+is_delim(char c, const char *delim)
 {
-    // TODO
+    for (const char *p = delim; p != NULL; p++) {
+	if (c == *p) {
+	    return true;
+	}
+    }
+
+    return false;
+}
+
+char *
+strsep(char **stringp, const char *delim)
+{
+    if (*stringp == NULL) {
+	return NULL;
+    }
+
+    char *token, *p = *stringp;
+    while (true) {
+	if (is_delim(*p)) {
+	    *p = \0;
+	    break;
+	}
+
+	p++;
+    }
+
+    *stringp = ++p;
+    return token;
 }
 
 bool

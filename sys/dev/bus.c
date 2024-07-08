@@ -11,6 +11,8 @@
 
 #include <stddef.h>
 
+#define STATIC_PLATFORM_DEVICE_COUNT 4
+
 static struct list_item *bus_list = NULL;
 
 static struct platform_device *
@@ -54,20 +56,20 @@ err_name:
 static int
 add_platform_devices()
 {
-    struct platform_device *pdevices[3];
+    struct platform_device *pdevices[STATIC_PLATFORM_DEVICE_COUNT];
     pdevices[0] = make_platform_device("ata0", 0x1F0, 8);
     pdevices[1] = make_platform_device("ata1", 0x170, 8);
     pdevices[2] = make_platform_device("vga0", 0xB8000, 4000);
+    pdevices[3] = make_platform_device("devfs", 0, 0);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < STATIC_PLATFORM_DEVICE_COUNT; i++) {
         if (!pdevices[i]) {
             return -ENOMEM;
         }
 
         int res = platform_device_register(pdevices[i]);
         if (res < 0) {
-            printk(
-                "Failed to register platform device: %s\n", pdevices[i]->name);
+            printk("Failed to register platform device: %s\n", pdevices[i]->name);
         }
     }
 

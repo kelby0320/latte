@@ -1,13 +1,15 @@
 #include "fs/devfs/devfs.h"
 
+#include "block/buffered_reader.h"
 #include "config.h"
-#include "dev/block/block.h"
 #include "dev/device.h"
+#include "drivers/driver.h"
 #include "errno.h"
 #include "fs/fs.h"
 #include "fs/path.h"
 #include "kernel.h"
 #include "libk/alloc.h"
+#include "libk/list.h"
 #include "libk/print.h"
 #include "libk/string.h"
 #include "vfs/file_descriptor.h"
@@ -16,18 +18,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define DEVFS_DEVICE_LIST_LENGTH 32
-
 /**
  * @brief Private devfs filesystem data
  *
  */
 struct devfs_private {
-    // List of devices
-    struct device *devices[DEVFS_DEVICE_LIST_LENGTH];
+    // Pointer to buffered reader for the filesystem
+    struct block_buffered_reader *reader;
+};
 
-    // Length of block device list
-    size_t devices_len;
+struct devfs_node {
+    struct device *device;
+    struct file_operations *fops;
 };
 
 /**
@@ -36,7 +38,7 @@ struct devfs_private {
  */
 struct devfs_descriptor_private {
     // Pointer to device
-    struct device *device;
+    struct devfs_node *devfs_node;
 
     // Read/Write offset
     size_t offset;
@@ -45,12 +47,24 @@ struct devfs_descriptor_private {
 #define as_devfs_private(ptr)            ((struct devfs_private *)ptr)
 #define as_devfs_descriptor_private(ptr) ((struct devfs_descriptor_private *)ptr)
 
+static struct list_item *node_list = NULL;
+static size_t num_nodes = 0;
+
+/**
+ * @brief Check if block is a devfs block device
+ *
+ * @param block    Pointer to block
+ * @return bool
+ */
 static bool
-is_devfs_block_device(struct block_device *block_device)
+is_devfs_block_device(struct block *block)
 {
     char buf[LATTE_SECTOR_SIZE];
 
-    int num_read = block_device_read_sectors(block_device, 0, buf, 1);
+    struct block_buffered_reader reader;
+    block_buffered_reader_init(&reader, block);
+
+    int num_read = block_buffered_reader_read(&reader, buf, LATTE_SECTOR_SIZE);
     if (num_read < 0) {
         return false;
     }
@@ -63,67 +77,33 @@ is_devfs_block_device(struct block_device *block_device)
 }
 
 /**
- * @brief Add a device to devfs
+ * @brief Match a path to a devfs_node
  *
- * @param devfs_private     Pointer to private devfs data
- * @param device            Pointer to the device
- * @return int              Status code
+ * @param devfs_private           Pointer to devfs private data
+ * @param path                    Device path
+ * @return struct devfs_node*     Matched devfs_node or NULL
  */
-static int
-devfs_private_add_device(struct devfs_private *devfs_private, struct device *device)
-{
-
-    devfs_private->devices[devfs_private->devices_len] = device;
-    devfs_private->devices_len++;
-
-    return 0;
-}
-
-/**
- * @brief Initialize devfs private data
- *
- * @param devfs_private Pointer to devfs private data
- * @return int          Status code
- */
-static int
-devfs_private_init(struct devfs_private *devfs_private)
-{
-    for_each_device(device)
-    {
-        int res = devfs_private_add_device(devfs_private, device);
-        if (res < 0) {
-            printk("Unknown device with type %d\n", device->type);
-        }
-    }
-    for_each_device_end();
-
-    return 0;
-}
-
-/**
- * @brief Match a device path to a device
- *
- * @param devfs_private     Pointer to devfs private data
- * @param path              Device path
- * @return struct device*   Matched device or NULL
- */
-static struct device *
+static struct devfs_node *
 match_device(struct devfs_private *devfs_private, struct path *path)
 {
-    struct device **device_list = devfs_private->devices;
-    size_t device_list_len = devfs_private->devices_len;
     char *match_name = path->root->next->element; // Second elemnt in the path, e.g. /dev/device0
 
-    for (size_t i = 0; i < device_list_len; i++) {
-        struct device *device = device_list[i];
-        if (strcmp(device->name, match_name) == 0) {
-            return device;
-        }
+    for_each_in_list(struct devfs_node *, node_list, list, node) {
+	struct device *device = node->device;
+	if (strcmp(device->name, match_name) == 0) {
+	    return node;
+	}
     }
 
     return NULL;
 }
 
+/**
+ * @brief Check if path is a valid devfs path
+ *
+ * @param path    Pointer to path object
+ * @return bool
+ */
 static bool
 is_valid_path(struct path *path)
 {
@@ -163,18 +143,17 @@ devfs_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
         return -EINVAL;
     }
 
-    struct device *device = match_device(devfs_private, path);
-    if (!device) {
+    struct devfs_node *devfs_node = match_device(devfs_private, path);
+    if (!devfs_node) {
         return -EEXIST;
     }
 
-    struct devfs_descriptor_private *descriptor_private =
-        kzalloc(sizeof(struct devfs_descriptor_private));
+    struct devfs_descriptor_private *descriptor_private = kzalloc(sizeof(struct devfs_descriptor_private));
     if (!descriptor_private) {
         return -ENOMEM;
     }
 
-    descriptor_private->device = device;
+    descriptor_private->devfs_node = devfs_node;
     descriptor_private->offset = 0;
 
     *out = descriptor_private;
@@ -192,7 +171,7 @@ static int
 devfs_close(void *fs_private)
 {
     // TODO
-    return 0;
+    return -EIO;
 }
 
 /**
@@ -207,11 +186,11 @@ static int
 devfs_read(struct file_descriptor *file_descriptor, char *buf, size_t count)
 {
     struct devfs_descriptor_private *descriptor_private = file_descriptor->private;
-    struct device *device = descriptor_private->device;
+    struct devfs_node *devfs_node = descriptor_private->devfs_node;
     size_t offset = descriptor_private->offset;
 
-    if (device->file_operations.read != NULL) {
-        return device->file_operations.read(device, offset, buf, count);
+    if (devfs_node->fops->read != NULL) {
+        return devfs_node->fops->read(devfs_node->device, offset, buf, count);
     }
 
     return -EIO;
@@ -229,46 +208,48 @@ static int
 devfs_write(struct file_descriptor *file_descriptor, const char *buf, size_t count)
 {
     struct devfs_descriptor_private *descriptor_private = file_descriptor->private;
-    struct device *device = descriptor_private->device;
+    struct devfs_node *devfs_node = descriptor_private->devfs_node;
     size_t offset = descriptor_private->offset;
 
-    if (device->file_operations.write != NULL) {
-        return device->file_operations.write(device, offset, buf, count);
+    if (devfs_node->fops->write != NULL) {
+        return devfs_node->fops->write(devfs_node->device, offset, buf, count);
     }
 
     return -EIO;
 }
 
 /**
- * @brief
+ * @brief Read stat info from a devfs open file
  *
- * @param file_descriptor
- * @param stat
- * @return int
+ * @param file_descriptor  Pointer to the file descriptor
+ * @param stat             Pointer to the stat structure
+ * @return int             Status code
  */
 static int
 devfs_stat(struct file_descriptor *file_descriptor, struct file_stat *stat)
 {
+    // TODO
+    return -EIO;
 }
 
 /**
- * @brief
+ * @brief Seek on a devfs open file
  *
- * @param file_descriptor
- * @param offset
- * @param seek_mode
- * @return int
+ * @param file_descriptor  Pointer to the file descriptor
+ * @param offset           Seek offset
+ * @param seek_mode        Seek mode
+ * @return int             New offset location
  */
 static int
 devfs_seek(struct file_descriptor *file_descriptor, size_t offset, file_seek_mode_t seek_mode)
 {
     struct devfs_descriptor_private *descriptor_private = file_descriptor->private;
-    struct device *device = descriptor_private->device;
+    struct devfs_node *devfs_node = descriptor_private->devfs_node;
 
     descriptor_private->offset = offset;
 
-    if (device->file_operations.seek != NULL) {
-        return device->file_operations.seek(device, offset, seek_mode);
+    if (devfs_node->fops->seek != NULL) {
+        return devfs_node->fops->seek(devfs_node->device, offset, seek_mode);
     }
 
     return -EIO;
@@ -277,13 +258,13 @@ devfs_seek(struct file_descriptor *file_descriptor, size_t offset, file_seek_mod
 /**
  * @brief Resolve a devfs filesystem
  *
- * @param block_device  Pointer to a block device
+ * @param block  Pointer to a block device
  * @return void*        Pointer to private filesystem data
  */
 static void *
-devfs_resolve(struct block_device *block_device)
+devfs_resolve(struct block *block)
 {
-    if (!is_devfs_block_device(block_device)) {
+    if (!is_devfs_block_device(block)) {
         return NULL;
     }
 
@@ -292,13 +273,18 @@ devfs_resolve(struct block_device *block_device)
         return NULL;
     }
 
-    int res = devfs_private_init(fs_private);
-    if (res < 0) {
-        kfree(fs_private);
-        return NULL;
+    struct block_buffered_reader *reader = kzalloc(sizeof(struct block_buffered_reader));
+    if (!reader) {
+	goto err_reader_alloc;
     }
 
+    fs_private->reader = reader;
+
     return fs_private;
+
+err_reader_alloc:
+    kfree(fs_private);
+    return NULL;
 }
 
 struct filesystem *
@@ -320,4 +306,18 @@ devfs_init()
     strncpy(fs->name, "devfs", FILESYSTEM_NAME_MAX_LEN);
 
     return fs;
+}
+
+int
+devfs_make_node(struct device *device, struct file_operations *fops)
+{
+    struct devfs_node *devfs_node = kzalloc(sizeof(struct devfs_node));
+    if (!devfs_node) {
+	return -ENOMEM;
+    }
+
+    devfs_node->device = device;
+    devfs_node->fops = fops;
+
+    return list_push_back(&node_list, devfs_node);
 }
