@@ -80,7 +80,6 @@ AS_OBJECTS = ./sys/boot/boot.asm.o \
 	./sys/irq/idt.asm.o \
 	./sys/irq/irq.asm.o \
 	./sys/mm/paging/paging.asm.o \
-	./sys/port/io.asm.o \
 	./sys/thread/thread.asm.o
 
 TEST_OBJECTS = ./test/test.o \

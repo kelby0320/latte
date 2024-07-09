@@ -1,9 +1,9 @@
 #include "irq/isr.h"
 
+#include "cpu/port.h"
 #include "irq/irq.h"
 #include "kernel.h"
 #include "mm/vm.h"
-#include "port/io.h"
 #include "proc/process.h"
 #include "sched/sched.h"
 #include "syscall/syscall.h"

@@ -165,10 +165,11 @@ strsep(char **stringp, const char *delim)
 	return NULL;
     }
 
-    char *token, *p = *stringp;
+    char *token = *stringp;
+    char *p = *stringp;
     while (true) {
-	if (is_delim(*p)) {
-	    *p = \0;
+	if (is_delim(*p, delim)) {
+	    *p = '\0';
 	    break;
 	}
 
