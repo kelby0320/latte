@@ -20,7 +20,10 @@ boot_enable_paging();
 extern void
 boot_load_page_directory(uint32_t *page_dir);
 
+__attribute__((aligned(4096)))
 uint32_t kernel_page_directory[PAGE_DIRECTORY_ENTRIES] = {0};
+
+__attribute__((aligned(4096)))
 uint32_t kernel_page_tables[PAGE_DIRECTORY_ENTRIES][PAGE_TABLE_ENTRIES] = {0};
 
 /**
