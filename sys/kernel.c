@@ -3,6 +3,7 @@
 #include "boot/multiboot2.h"
 #include "config.h"
 #include "dev/bus.h"
+#include "drivers/driver.h"
 #include "fs/fs.h"
 #include "gdt/gdt.h"
 #include "gdt/tss.h"
@@ -82,6 +83,8 @@ void
 kernel_late_init()
 {
     bus_init();
+
+    driver_init();
 
     bus_probe();
 

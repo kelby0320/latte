@@ -3,11 +3,29 @@
 #include "block/disk.h"
 #include "config.h"
 #include "dev/device.h"
+#include "drivers/driver.h"
+#include "drivers/platform/platform_driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
-#include "libk/print.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "libk/string.h"
+
+struct platform_driver devfs_pdev = {
+    .driver = {
+	.name = "devfs",
+	.compat = "devfs"
+    },
+    .probe = devfs_probe
+};
+
+int
+devfs_drv_init()
+{
+    platform_driver_register(&devfs_pdev);
+
+    return 0;
+}
 
 int
 devfs_probe(struct platform_device *pdev)

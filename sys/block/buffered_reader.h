@@ -5,7 +5,7 @@ struct block;
 
 struct block_buffered_reader {
     struct block *block;
-    unsigned int lba_offset;
+    unsigned int offset;
 };
 
 void

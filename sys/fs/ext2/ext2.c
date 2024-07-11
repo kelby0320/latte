@@ -27,7 +27,7 @@ static int
 ext2_read_superblock(struct ext2_private *fs_private)
 {
     struct block_buffered_reader *reader = fs_private->reader;
-    block_buffered_reader_seek(reader, EXT2_FS_START + EXT2_SUPERBLOCK_OFFSET);
+    block_buffered_reader_seek(reader, EXT2_SUPERBLOCK_OFFSET);
     int res =
         block_buffered_reader_read(reader, (char *)&fs_private->superblock, EXT2_SUPERBLOCK_SIZE);
     return res;

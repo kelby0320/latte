@@ -1,5 +1,6 @@
 #include "fs/devfs/devfs.h"
 
+#include "block/block.h"
 #include "block/buffered_reader.h"
 #include "config.h"
 #include "dev/device.h"
@@ -59,21 +60,28 @@ static size_t num_nodes = 0;
 static bool
 is_devfs_block_device(struct block *block)
 {
+    if (strncmp(block->name, "devfs", 5) != 0) {
+	return false;
+    }
+    
     char buf[LATTE_SECTOR_SIZE];
 
     struct block_buffered_reader reader;
     block_buffered_reader_init(&reader, block);
 
     int num_read = block_buffered_reader_read(&reader, buf, LATTE_SECTOR_SIZE);
-    if (num_read < 0) {
+    if (num_read != LATTE_SECTOR_SIZE) {
         return false;
     }
 
-    if (strncmp(buf, "devfs", 5) == 0) {
-        return true;
+    /* Devfs should read all 0s */
+    for (int i = 0; i < num_read; i++) {
+	if (buf[i] != 0) {
+	    return false;
+	}
     }
 
-    return false;
+    return true;
 }
 
 /**
@@ -278,6 +286,7 @@ devfs_resolve(struct block *block)
 	goto err_reader_alloc;
     }
 
+    block_buffered_reader_init(reader, block);
     fs_private->reader = reader;
 
     return fs_private;

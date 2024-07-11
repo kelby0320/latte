@@ -1,17 +1,32 @@
 #include "drivers/driver.h"
 
+#include "dev/bus.h"
+#include "drivers/platform/ata/ata.h"
+#include "drivers/platform/devfs/devfs.h"
+#include "drivers/platform/platform_driver.h"
+#include "errno.h"
+#include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/string.h"
-#include "dev/bus.h"
 
 #include <stddef.h>
 
 static struct list_item *driver_list = NULL;
 
+static int
+add_platform_drivers()
+{
+    ata_drv_init();
+    devfs_drv_init();
+    
+    return 0;
+}
+
 int
 driver_init()
 {
-    /* TODO - register drivers */
+    add_platform_drivers();
+    
     return 0;
 }
 
@@ -22,6 +37,8 @@ driver_register(struct device_driver *driver)
 
     bus_match();
     bus_probe();
+
+    return 0;
 }
 
 struct device_driver *
@@ -41,9 +58,14 @@ struct device_driver *
 driver_find_next(const struct device_driver *driver)
 {
     if (driver == NULL) {
-        return driver_list->data;
+	return list_front(driver_list);
     }
 
-    struct list_item *item = list_container_of(driver);
-    return item->next->data;
+    for (struct list_item *p = driver_list; p; p = p->next) {
+	if (p->data == driver) {
+	    return list_next(p);
+	}
+    }
+
+    return NULL;
 }

@@ -4,15 +4,40 @@
 #include "dev/device.h"
 #include "drivers/driver.h"
 #include "errno.h"
+#include "libk/list.h"
+#include "dev/platform/platform_device.h"
+
+static int
+base_and_drive_from_resources(struct device *dev, unsigned int *base_addr, unsigned int *drive_no) {
+    struct platform_device *pdev = as_platform_device(dev);
+
+    struct resource *reg_base_resource = list_front(pdev->resources);
+    if (!reg_base_resource) {
+	return -EINVAL;
+    }
+
+    struct resource *drive_no_resource = list_front(pdev->resources->next);
+    if (!drive_no_resource) {
+	return -EINVAL;
+    }
+
+    *base_addr = reg_base_resource->base_addr;
+    *drive_no  = drive_no_resource->base_addr;
+
+    return 0;
+}
 
 int
 ata_identify(struct device *dev, unsigned short *buf)
 {
-    struct ata_private *private = dev->driver->private;
-
-    unsigned int register_base = private->reg_base;
-    unsigned int drive_no = private->drive_no;
-
+    unsigned int register_base;
+    unsigned int drive_no;
+    
+    int res = base_and_drive_from_resources(dev, &register_base, &drive_no);
+    if (res < 0) {
+	return res;
+    }
+    
     unsigned int data_reg = register_base + ATA_PIO_DATA_REG_OFFSET;
     unsigned int sector_count_reg =
         register_base + ATA_PIO_SECTOR_COUNT_REG_OFFSET;
@@ -69,14 +94,12 @@ ata_identify(struct device *dev, unsigned short *buf)
 int
 ata_read_sectors(struct device *dev, unsigned int lba, char *buf, size_t count)
 {
-    struct ata_private *private = dev->driver->private;
-
-    unsigned int register_base = private->reg_base;
-    unsigned int drive_no = private->drive_no;
-
-    // drive_no must be either 0 or 1
-    if (drive_no > 2) {
-        return -EINVAL;
+    unsigned int register_base;
+    unsigned int drive_no;
+    
+    int res = base_and_drive_from_resources(dev, &register_base, &drive_no);
+    if (res < 0) {
+	return res;
     }
 
     unsigned int data_reg = register_base + ATA_PIO_DATA_REG_OFFSET;

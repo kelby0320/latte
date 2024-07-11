@@ -8,8 +8,6 @@
     T item;                                                                                        \
     for (list = head, item = list->data; list != NULL; list = list->next, item = list->data)
 
-#define list_container_of(item) ((struct list_item *)&item)
-
 struct list_item {
     void *data;
     struct list_item *next;
@@ -52,6 +50,15 @@ list_pop_front(struct list_item **head);
  */
 void *
 list_front(struct list_item *head);
+
+/**
+ * @brief Get the next item in the list
+ *
+ * @param head    The head of the list
+ * @return void*  The data
+ */
+void *
+list_next(struct list_item *head);
 
 /**
  * @brief   Remove an item from the list

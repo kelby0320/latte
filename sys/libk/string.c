@@ -149,7 +149,7 @@ strncpy(char *dest, const char *src, size_t n)
 static bool
 is_delim(char c, const char *delim)
 {
-    for (const char *p = delim; p != NULL; p++) {
+    for (const char *p = delim; *p != '\0'; p++) {
 	if (c == *p) {
 	    return true;
 	}
@@ -167,16 +167,21 @@ strsep(char **stringp, const char *delim)
 
     char *token = *stringp;
     char *p = *stringp;
-    while (true) {
+    while (*p != '\0') {
 	if (is_delim(*p, delim)) {
 	    *p = '\0';
+	    p++;
+	    *stringp = p;
 	    break;
 	}
 
 	p++;
     }
 
-    *stringp = ++p;
+    if (*p == '\0') {
+	*stringp = NULL;
+    }
+
     return token;
 }
 

@@ -6,9 +6,11 @@
 #include "errno.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
+#include "libk/print.h"
 #include "libk/string.h"
 
 #include <stddef.h>
+#include <stdarg.h>
 
 static struct bus platform_bus = {
     .name = "platform",
@@ -37,10 +39,9 @@ platform_bus_get_bus()
 int
 platform_match(struct device *dev, struct device_driver *drv)
 {
-    struct platform_device *pdev = (struct platform_device *)dev;
-    struct platform_driver *pdrv = (struct platform_driver *)drv;
+    struct platform_device *pdev = as_platform_device(dev);
 
-    const char *compat = pdrv->driver.compat;
+    const char *compat = drv->compat;
     const char *pdev_name = pdev->name;
 
     /* strsep will modify strings so make a copy of compat */
@@ -51,10 +52,11 @@ platform_match(struct device *dev, struct device_driver *drv)
     }
 
     strcpy(copy_compat, compat);
+    char *copy_compat_p = copy_compat;
 
     int match = -1;
     do {
-	char *token = strsep(&copy_compat, ",");
+	char *token = strsep(&copy_compat, ","); /* copy_compat is modified here */
 	if (token == NULL) {
 	    break;
 	}
@@ -65,7 +67,7 @@ platform_match(struct device *dev, struct device_driver *drv)
 	}
     } while (true);
 
-    kfree(copy_compat);
+    kfree(copy_compat_p);	/* Make sure to free copy_compat_p, NOT copy_compat */
     return match;
 }
 
@@ -78,6 +80,8 @@ platform_probe(struct device *dev)
     if (pdrv->probe) {
         return pdrv->probe(pdev);
     }
+
+    return 0;
 }
 
 int
@@ -88,4 +92,6 @@ platform_device_register(struct platform_device *pdev)
 
     bus_match();
     bus_probe();
+
+    return 0;
 }

@@ -49,6 +49,9 @@ struct ata_private {
 };
 
 int
+ata_drv_init();
+
+int
 ata_probe(struct platform_device *pdev);
 
 int

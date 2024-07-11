@@ -70,6 +70,20 @@ list_front(struct list_item *head)
     return head->data;
 }
 
+void *
+list_next(struct list_item *head)
+{
+    if (!head) {
+	return NULL;
+    }
+
+    if (!head->next) {
+	return NULL;
+    }
+
+    return head->next->data;
+}
+
 int
 list_remove(struct list_item **head, void *data)
 {

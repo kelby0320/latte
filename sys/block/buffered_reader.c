@@ -8,22 +8,22 @@ void
 block_buffered_reader_init(struct block_buffered_reader *reader, struct block *block)
 {
     reader->block = block;
-    reader->lba_offset = 0;
+    reader->offset = 0;
 }
 
 int
 block_buffered_reader_seek(struct block_buffered_reader *reader, unsigned int offset)
 {
-    reader->lba_offset = offset;
+    reader->offset = offset;
     return 0;
 }
 
 int
 block_buffered_reader_read(struct block_buffered_reader *reader, char *out, unsigned int count)
 {
-    unsigned int lba_start = reader->block->lba_start;
-    unsigned int sector = (lba_start + reader->lba_offset) / DISK_SECTOR_SIZE;
-    unsigned int offset = (lba_start + reader->lba_offset) % DISK_SECTOR_SIZE;
+    unsigned int start_offset = reader->block->lba_start * DISK_SECTOR_SIZE;
+    unsigned int sector = (start_offset + reader->offset) / DISK_SECTOR_SIZE;
+    unsigned int offset = (start_offset + reader->offset) % DISK_SECTOR_SIZE;
 
     char buf[DISK_SECTOR_SIZE];
     unsigned int bytes_read = 0;

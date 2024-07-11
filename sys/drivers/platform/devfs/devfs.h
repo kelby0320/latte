@@ -7,6 +7,9 @@ struct device;
 struct platform_device;
 
 int
+devfs_drv_init();
+
+int
 devfs_probe(struct platform_device *pdev);
 
 int
