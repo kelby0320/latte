@@ -7,7 +7,7 @@ extern int stderr;
 void
 libc_init()
 {
-    stdout = open("/dev/term0", "w");
+    stdout = open("/dev/console", "w");
 
     return;
 }

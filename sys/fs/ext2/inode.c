@@ -183,7 +183,7 @@ static int
 ext2_read_block(struct block_iterator *iter, struct ext2_private *fs_private, char *out)
 {
     int block_no = block_iterator_block_no(iter);
-    int data_offset = EXT2_FS_START + (block_no * fs_private->block_size);
+    int data_offset = (block_no * fs_private->block_size);
 
     block_buffered_reader_seek(fs_private->reader, data_offset);
     return block_buffered_reader_read(fs_private->reader, out, fs_private->block_size);
@@ -219,7 +219,7 @@ ext2_read_block_group_desc(struct ext2_block_group_descriptor **desc_out,
         bg_desc_tbl_start_blk = 2;
     }
 
-    int bg_desc_tbl_start = EXT2_FS_START + (bg_desc_tbl_start_blk * fs_private->block_size);
+    int bg_desc_tbl_start = (bg_desc_tbl_start_blk * fs_private->block_size);
     int bg_desc_start =
         bg_desc_tbl_start + (block_group * sizeof(struct ext2_block_group_descriptor));
 
@@ -253,7 +253,7 @@ static int
 ext2_read_inode_from_tbl(struct ext2_inode **inode_out, struct ext2_private *fs_private,
                          uint32_t inode_tbl, uint32_t inode_no)
 {
-    int inode_tbl_start = EXT2_FS_START + (inode_tbl * fs_private->block_size);
+    int inode_tbl_start = (inode_tbl * fs_private->block_size);
     int inode_start = inode_tbl_start + ((inode_no - 1) * fs_private->superblock.s_inode_size);
 
     struct ext2_inode *inode = kzalloc(sizeof(struct ext2_inode));

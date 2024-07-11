@@ -21,3 +21,4 @@ make_device(struct device *dev, const char *name)
 
     return 0;
 }
+

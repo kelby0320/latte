@@ -35,4 +35,7 @@ platform_probe(struct device *dev);
 int
 platform_device_register(struct platform_device *pdev);
 
+struct platform_device *
+platform_device_find(const char *name);
+
 #endif

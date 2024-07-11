@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #define EXT2_MAGIC_NUMBER      0xEF53
-#define EXT2_FS_START          (1024 * 1024) // 1MB
 #define EXT2_SUPERBLOCK_OFFSET 1024
 #define EXT2_SUPERBLOCK_SIZE   1024
 #define EXT2_ROOT_DIR_INODE    2

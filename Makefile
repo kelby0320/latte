@@ -24,7 +24,10 @@ C_OBJECTS = ./sys/block/block.o \
 	./sys/drivers/platform/platform_driver.o \
 	./sys/drivers/platform/ata/ata.o \
 	./sys/drivers/platform/ata/ata_io.o \
+	./sys/drivers/platform/console/console.o \
+	./sys/drivers/platform/console/console_write.o \
 	./sys/drivers/platform/devfs/devfs.o \
+	./sys/drivers/platform/vga/vga.o \
 	./sys/fs/fs.o \
 	./sys/fs/path.o \
 	./sys/fs/devfs/devfs.o \

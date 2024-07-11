@@ -91,7 +91,18 @@ platform_device_register(struct platform_device *pdev)
     list_push_front(&platform_bus.devices, pdev);
 
     bus_match();
-    bus_probe();
 
     return 0;
+}
+
+struct platform_device *
+platform_device_find(const char *name)
+{
+    for_each_in_list(struct platform_device *, platform_bus.devices, list, pdev) {
+	if (strcmp(pdev->name, name) == 0) {
+	    return pdev;
+	}
+    }
+
+    return NULL;
 }

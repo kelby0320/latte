@@ -3,6 +3,8 @@
 #include "dev/bus.h"
 #include "drivers/platform/ata/ata.h"
 #include "drivers/platform/devfs/devfs.h"
+#include "drivers/platform/vga/vga.h"
+#include "drivers/platform/console/console.h"
 #include "drivers/platform/platform_driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
@@ -18,6 +20,8 @@ add_platform_drivers()
 {
     ata_drv_init();
     devfs_drv_init();
+    vga_drv_init();
+    console_drv_init();
     
     return 0;
 }
@@ -36,7 +40,6 @@ driver_register(struct device_driver *driver)
     list_push_front(&driver_list, driver);
 
     bus_match();
-    bus_probe();
 
     return 0;
 }

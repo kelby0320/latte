@@ -111,9 +111,7 @@ kernel_main(unsigned long magic)
 
     kernel_late_init();
 
-    panic("Early Halt!");
-
-    int out_fd = vfs_open("/dev/term0", "w");
+    int out_fd = vfs_open("/dev/console", "w");
     msgbuf_add_output_fd(out_fd);
 
     process_create_first("/bin/init");

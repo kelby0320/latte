@@ -11,7 +11,7 @@
 
 #include <stddef.h>
 
-#define STATIC_PLATFORM_DEVICE_COUNT 6
+#define STATIC_PLATFORM_DEVICE_COUNT 7
 
 static struct list_item *bus_list = NULL;
 
@@ -79,10 +79,12 @@ add_platform_devices()
     pdevices[2] = make_platform_device("ata1-0", "ata", 2, 0x170, 8, 0, 1);
     /* ATA1 Drive 1 */
     pdevices[3] = make_platform_device("ata1-1", "ata", 2, 0x170, 8, 1, 1);
+    /* Console - must come before vga */
+    pdevices[4] = make_platform_device("console", "console", 0);
     /* VGA0 */
-    pdevices[4] = make_platform_device("vga0", "vga", 1, 0xB8000, 4000);
+    pdevices[5] = make_platform_device("vga0", "vga", 1, 0xB8000, 4000);
     /* DEVFS */
-    pdevices[5] = make_platform_device("devfs", "devfs", 0);
+    pdevices[6] = make_platform_device("devfs", "devfs", 0);
 
     for (int i = 0; i < STATIC_PLATFORM_DEVICE_COUNT; i++) {
         if (!pdevices[i]) {
