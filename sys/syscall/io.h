@@ -31,4 +31,22 @@ do_read(struct thread *current_thread);
 void
 do_write(struct thread *current_thread);
 
+/**
+ * @brief Execute the opendir system call
+ */   
+void
+do_opendir(struct thread *current_thread);
+
+/**
+ * @brief Execute the closedir system call
+ */
+void
+do_closedir(struct thread *current_thread);
+
+/**
+ * @brief Execute the readdir system call
+ */
+void
+do_readdir(struct thread *current_thread);
+
 #endif

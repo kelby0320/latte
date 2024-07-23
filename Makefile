@@ -31,7 +31,9 @@ C_OBJECTS = ./sys/block/block.o \
 	./sys/fs/fs.o \
 	./sys/fs/path.o \
 	./sys/fs/devfs/devfs.o \
+	./sys/fs/ext2/block_iter.o \
 	./sys/fs/ext2/dir.o \
+	./sys/fs/ext2/dir_iter.o \
 	./sys/fs/ext2/ext2.o \
 	./sys/fs/ext2/inode.o \
 	./sys/fs/fat32/fat32.o \

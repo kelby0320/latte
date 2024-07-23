@@ -28,6 +28,7 @@ struct file_stat {
 
 struct path;
 struct file_descriptor;
+struct dir_entry;
 struct mountpoint;
 struct block;
 
@@ -43,7 +44,7 @@ struct filesystem {
     int (*open)(void *fs_private, struct path *path, file_mode_t mode, void **out);
 
     // Pointer to function to close a file
-    int (*close)(void *fs_private);
+    int (*close)(struct file_descriptor *file_descriptor);
 
     // Pointer to function to seek in a file
     int (*seek)(struct file_descriptor *file_descriptor, size_t offset, file_seek_mode_t seek_mode);
@@ -56,6 +57,18 @@ struct filesystem {
 
     // Pointer to function to read file status
     int (*stat)(struct file_descriptor *file_descriptor, struct file_stat *stat);
+
+    // Pointer to function to open a directory
+    int (*opendir)(void *fs_private, struct path *path, void **out);
+
+    // Pointer to function to close a directory
+    int (*closedir)(struct file_descriptor *file_descriptor);
+
+    // Pointer to function to read a directory entry
+    int (*readdir)(struct file_descriptor *file_descriptor, struct dir_entry *dir_entry_out);
+
+    // Pointer to function to make a new directory
+    int (*mkdir)(void *fs_private, struct path *path);
 
     // Filesystem name
     char name[FILESYSTEM_NAME_MAX_LEN];

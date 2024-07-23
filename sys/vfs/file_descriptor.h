@@ -1,13 +1,25 @@
 #ifndef FILE_DESCRIPTOR_H
 #define FILE_DESCRIPTOR_H
 
+#include <stdint.h>
+
 struct mountpoint;
+
+typedef unsigned int file_type_t;
+
+enum file_type {
+    FT_REGULAR_FILE,
+    FT_DIRECTORY
+};
 
 /**
  * @brief Common file descriptor structure
  *
  */
 struct file_descriptor {
+    // File descriptor type
+    file_type_t type;
+    
     // Pointer to the mountpoint for this file
     struct mountpoint *mountpoint;
 
@@ -16,6 +28,11 @@ struct file_descriptor {
 
     // Global file descriptor number
     int index;
+};
+
+struct dir_entry {
+    char name[256];
+    uint32_t inode;
 };
 
 /**

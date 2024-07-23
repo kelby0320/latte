@@ -1,193 +1,11 @@
 #include "fs/ext2/inode.h"
 
 #include "block/buffered_reader.h"
-#include "config.h"
 #include "errno.h"
+#include "fs/ext2/block_iter.h"
 #include "fs/ext2/common.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
-
-/**
- * @brief Block iterator
- *
- * This object is used to iterate through an inode's data blocks
- *
- */
-struct block_iterator {
-    // Pointer to inode
-    const struct ext2_inode *inode;
-
-    // Block size
-    uint32_t block_size;
-
-    // Block index
-    int block_idx;
-
-    // Double indirect block index
-    int dbl_block_idx;
-
-    // Triple indirect block index
-    int tpl_block_idx;
-
-    // Indirect blocks list
-    uint32_t *indirect_blocks;
-
-    // Double indirect blocks lisk
-    uint32_t *dbl_indirect_blocks;
-
-    // Triple indirect blocks list
-    uint32_t *tpl_indirect_blocks;
-};
-
-static int
-block_iterator_init(struct block_iterator *iter, struct ext2_private *fs_private,
-                    const struct ext2_inode *inode)
-{
-    iter->inode = inode;
-    iter->block_size = fs_private->block_size;
-    iter->block_idx = 0;
-    iter->dbl_block_idx = 0;
-    iter->tpl_block_idx = 0;
-    iter->indirect_blocks = 0;
-    iter->dbl_indirect_blocks = 0;
-    iter->tpl_indirect_blocks = 0;
-
-    return 0;
-}
-
-/**
- * @brief Skip reading a number of block
- *
- * @param iter      Pointer to block iterator
- * @param offset    Number of blocks to skip
- * @return int      Status code
- */
-static int
-block_iterator_skip_blocks(struct block_iterator *iter, uint32_t offset)
-{
-    if (offset > 12) {
-        return -EIO; // Only support reading direct block pointers for now
-    }
-
-    iter->block_idx = offset;
-    return 0;
-}
-
-/**
- * @brief Iterate triple indirect blocks
- *
- * @param iter          Pointer to block iterator
- * @param fs_private    Pointer to private fs data
- * @return int          Status code
- */
-static int
-block_iterator_iterate_tpl(struct block_iterator *iter, struct ext2_private *fs_private)
-{
-    // TODO
-    return 0;
-}
-
-/**
- * @brief Iterate doulble indirect blocks
- *
- * @param iter          Pointer to block iterator
- * @param fs_private    Pointer to private fs data
- * @return int          Status code
- */
-static int
-block_iterator_iterate_dbl(struct block_iterator *iter, struct ext2_private *fs_private)
-{
-    // TODO
-    return 0;
-}
-
-/**
- * @brief Iterator indirect blocks
- *
- * @param iter          Pointer to block iterator
- * @param fs_private    Pointer to private fs data
- * @return int          Status code
- */
-static int
-block_iterator_iterate_indirect(struct block_iterator *iter, struct ext2_private *fs_private)
-{
-    // TODO
-    return 0;
-}
-
-/**
- * @brief Set block iterator to iterate indirect blocks
- *
- * @param iter          Pointer to block iterator
- * @param fs_private    Pointer to private fs data
- * @return int          Status code
- */
-static int
-block_iterator_convert_to_indirect(struct block_iterator *iter, struct ext2_private *fs_private)
-{
-    // TODO
-    return 0;
-}
-
-/**
- * @brief Set iterator to read the next block
- *
- * @param iter          Pointer to block iterator
- * @param fs_private    Pointer to private fs data
- * @return int          Status code
- */
-static int
-block_iterator_iterate(struct block_iterator *iter, struct ext2_private *fs_private)
-{
-    if (iter->tpl_indirect_blocks) {
-        return block_iterator_iterate_tpl(iter, fs_private);
-    }
-
-    if (iter->dbl_indirect_blocks) {
-        return block_iterator_iterate_dbl(iter, fs_private);
-    }
-
-    if (iter->indirect_blocks) {
-        return block_iterator_iterate_indirect(iter, fs_private);
-    }
-
-    iter->block_idx++;
-    if (iter->block_idx == 12) {
-        block_iterator_convert_to_indirect(iter, fs_private);
-    }
-
-    return 0;
-}
-
-/**
- * @brief Get this iterators current data block number
- *
- * @param iter  Pointer to the block iterator
- * @return int  Block number
- */
-static int
-block_iterator_block_no(struct block_iterator *iter)
-{
-    return iter->inode->i_block[iter->block_idx];
-}
-
-/**
- * @brief Read the next block of data
- *
- * @param iter          Pointer to the block iterator
- * @param fs_private    Ponter to private fs data
- * @param out           Output data buffer
- * @return int          Number of bytes read
- */
-static int
-ext2_read_block(struct block_iterator *iter, struct ext2_private *fs_private, char *out)
-{
-    int block_no = block_iterator_block_no(iter);
-    int data_offset = (block_no * fs_private->block_size);
-
-    block_buffered_reader_seek(fs_private->reader, data_offset);
-    return block_buffered_reader_read(fs_private->reader, out, fs_private->block_size);
-}
 
 /**
  * @brief Convert inode number to block group
@@ -196,7 +14,7 @@ ext2_read_block(struct block_iterator *iter, struct ext2_private *fs_private, ch
  * @param inode         Inode number
  * @return int          Block group number
  */
-static int
+static inline int
 inode_to_block_group(struct ext2_private *fs_private, uint32_t inode)
 {
     return (inode - 1) / fs_private->superblock.s_inodes_per_group;
@@ -272,6 +90,28 @@ ext2_read_inode_from_tbl(struct ext2_inode **inode_out, struct ext2_private *fs_
     return 0;
 }
 
+/**
+ * @brief Read the next block of data
+ *
+ * @param iter          Pointer to the block iterator
+ * @param fs_private    Ponter to private fs data
+ * @param out           Output data buffer
+ * @return int          Number of bytes read
+ */
+static int
+ext2_read_block(struct ext2_block_iterator *iter, struct ext2_private *fs_private, char *out)
+{
+    int block_no = ext2_block_iterator_block_no(iter);
+    if (block_no == 0) {
+	return -EINVAL; // Invalid block
+    }
+    
+    int data_offset = (block_no * fs_private->block_size);
+
+    block_buffered_reader_seek(fs_private->reader, data_offset);
+    return block_buffered_reader_read(fs_private->reader, out, fs_private->block_size);
+}
+
 int
 ext2_read_inode(struct ext2_inode **inode_out, struct ext2_private *fs_private, uint32_t inode_no)
 {
@@ -297,18 +137,21 @@ int
 ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *inode, char *out,
                      size_t count, unsigned int blk_offset, unsigned int byte_offset)
 {
-    struct block_iterator iter;
-    block_iterator_init(&iter, fs_private, inode);
-    block_iterator_skip_blocks(&iter, blk_offset);
+    struct ext2_block_iterator iter;
+    ext2_block_iterator_init(&iter, fs_private, inode);
+    ext2_block_iterator_skip_blocks(&iter, blk_offset);
 
     char *buf = kzalloc(fs_private->block_size);
-    int bytes_read = 0;
-    int bytes_remaining = count;
+    size_t bytes_read = 0;
+    size_t bytes_remaining = count;
 
     while (bytes_read < count) {
-        ext2_read_block(&iter, fs_private, buf);
+        int num_read = ext2_read_block(&iter, fs_private, buf);
+	if (num_read != (int)fs_private->block_size) {
+	    goto err_read_block;
+	}
 
-        int bytes_to_copy = fs_private->block_size - byte_offset;
+        size_t bytes_to_copy = fs_private->block_size - byte_offset;
         if (bytes_remaining < bytes_to_copy) {
             bytes_to_copy = bytes_remaining;
         }
@@ -322,10 +165,14 @@ ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *i
         bytes_remaining -= bytes_to_copy;
         byte_offset = 0;
 
-        block_iterator_iterate(&iter, fs_private);
+        ext2_block_iterator_next(&iter, fs_private);
     }
 
     kfree(buf);
 
     return bytes_read;
+
+err_read_block:
+    kfree(buf);
+    return -EIO;
 }

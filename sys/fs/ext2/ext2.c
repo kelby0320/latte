@@ -5,6 +5,7 @@
 #include "errno.h"
 #include "fs/ext2/common.h"
 #include "fs/ext2/dir.h"
+#include "fs/ext2/dir_iter.h"
 #include "fs/ext2/inode.h"
 #include "fs/fs.h"
 #include "fs/path.h"
@@ -54,7 +55,7 @@ ext2_path_to_inode(struct path *path, struct ext2_private *fs_private)
 
     while (1) {
         // Read inode from directory
-        res = ext2_get_directory_entry(&inode, fs_private, dir_inode, path_element->element);
+        res = ext2_dir_find_entry(&inode, fs_private, dir_inode, path_element->element);
         if (res < 0) {
             goto err_out;
         }
@@ -132,13 +133,13 @@ ext2_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
 /**
  * @brief Close an Ext2 open file
  *
- * @param private   Pointer to private fs data
- * @return int      Status code
+ * @param file_descriptor    Pointer to the file descriptor
+ * @return int               Status code
  */
 static int
-ext2_close(void *fs_private)
+ext2_close(struct file_descriptor *file_descriptor)
 {
-    return 0;
+    return -1;
 }
 
 /**
@@ -272,6 +273,76 @@ err_reader_alloc:
     return NULL;
 }
 
+static int
+ext2_opendir(void *fs_private, struct path *path, void **out)
+{
+    struct ext2_descriptor_private *descriptor_private = kzalloc(sizeof(struct ext2_descriptor_private));
+    if (!descriptor_private) {
+        return -ENOMEM;
+    }
+
+    struct ext2_inode *inode = ext2_path_to_inode(path, as_ext2_private(fs_private));
+    if (!inode) {
+        kfree(descriptor_private);
+        return -EEXIST;
+    }
+
+    if (!(inode->i_mode & EXT2_S_IFDIR)) {
+        kfree(descriptor_private);
+        return -EACCES;
+    }
+
+    struct ext2_dir_iter *dir_iter = kzalloc(sizeof(struct ext2_dir_iter));
+    if (!dir_iter) {
+	return -ENOMEM;
+    }
+
+    int res = ext2_dir_iter_init(dir_iter, fs_private, inode);
+    if (res < 0) {
+	goto err_iter_init;
+    }
+
+    descriptor_private->inode = inode;
+    descriptor_private->dir_iter = dir_iter;
+    descriptor_private->blk_offset = 0;
+    descriptor_private->byte_offset = 0;
+
+    *out = descriptor_private;
+
+    return 0;
+
+err_iter_init:
+    kfree(dir_iter);
+    return res;
+}
+
+static int
+ext2_closedir(struct file_descriptor *file_descriptor)
+{
+    return -1;
+}
+
+static int
+ext2_readdir(struct file_descriptor *file_descriptor, struct dir_entry *dir_entry_out)
+{
+    if (file_descriptor->type != FT_DIRECTORY) {
+	return -EINVAL;
+    }
+    
+    struct ext2_descriptor_private *descriptor_private = file_descriptor->private;
+    struct ext2_dir_iter *dir_iter = descriptor_private->dir_iter;
+    struct ext2_private *fs_private = file_descriptor->mountpoint->fs_private;
+    
+    return ext2_dir_next_entry(fs_private, descriptor_private->inode,
+			       dir_iter, dir_entry_out);
+}
+
+int
+ext2_mkdir(void *fs_private, struct path *path)
+{
+    return -1;
+}
+
 struct filesystem *
 ext2_init()
 {
@@ -287,6 +358,10 @@ ext2_init()
     fs->stat = ext2_stat;
     fs->seek = ext2_seek;
     fs->resolve = ext2_resolve;
+    fs->opendir = ext2_opendir;
+    fs->closedir = ext2_closedir;
+    fs->readdir = ext2_readdir;
+    fs->mkdir = ext2_mkdir;
 
     strncpy(fs->name, "ext2", FILESYSTEM_NAME_MAX_LEN);
 

@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 struct block;
+struct dir_entry;
 
 /**
  * @brief Initialize Virtual File System
@@ -87,5 +88,29 @@ vfs_stat(int fd, struct file_stat *stat);
  */
 int
 vfs_seek(int fd, int offset, file_seek_mode_t whence);
+
+/**
+ * @brief Open a directory
+ */
+int
+vfs_opendir(const char *dirname);
+
+/**
+ * @brief Close a directory
+ */
+int
+vfs_closedir(int fd);
+
+/**
+ * Read an entry from a directory
+ */
+int
+vfs_readdir(int fd, struct dir_entry *entry);
+
+/**
+ * Make a new directory
+ */
+int
+vfs_mkdir(const char *path);
 
 #endif

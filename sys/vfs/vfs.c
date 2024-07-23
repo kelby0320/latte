@@ -131,19 +131,19 @@ vfs_open(const char *filename, const char *mode_str)
     path_from_str(&path, filename);
     if (!path) {
         res = -EACCES;
-        goto err_out1;
+        goto err_path;
     }
 
     struct mountpoint *mountpoint = mountpoint_find(filename);
     if (!mountpoint) {
         res = -ENOENT;
-        goto err_out2;
+        goto err_mount;
     }
 
     file_mode_t mode = fs_get_mode_from_string(mode_str);
     if (mode == FILE_MODE_INVALID) {
         res = -EINVAL;
-        goto err_out2;
+        goto err_mode;
     }
 
     struct filesystem *filesystem = mountpoint->filesystem;
@@ -151,19 +151,22 @@ vfs_open(const char *filename, const char *mode_str)
 
     res = filesystem->open(fs_private, path, mode, &descriptor->private);
     if (res < 0) {
-        goto err_out2;
+        goto err_open;
     }
 
+    descriptor->type = FT_REGULAR_FILE;
     descriptor->mountpoint = mountpoint;
 
     path_free(path);
 
     return descriptor->index;
 
-err_out2:
+err_open:
+err_mount:
+err_mode:
     path_free(path);
 
-err_out1:
+err_path:
     file_descriptor_free(descriptor);
 
     return res;
@@ -182,6 +185,10 @@ vfs_read(int fd, char *ptr, size_t count)
     struct file_descriptor *descriptor = file_descriptor_get(fd);
     if (!descriptor) {
         return -EINVAL;
+    }
+
+    if (descriptor->type != FT_REGULAR_FILE) {
+	return -EINVAL;
     }
 
     struct filesystem *filesystem = descriptor->mountpoint->filesystem;
@@ -226,4 +233,81 @@ vfs_seek(int fd, int offset, file_seek_mode_t seek_mode)
     struct filesystem *filesystem = descriptor->mountpoint->filesystem;
 
     return filesystem->seek(descriptor, offset, seek_mode);
+}
+
+int
+vfs_opendir(const char *dirname)
+{
+    struct file_descriptor *descriptor;
+    int res = file_descriptor_get_new(&descriptor);
+    if (res < 0) {
+        return res;
+    }
+
+    struct path *path;
+    path_from_str(&path, dirname);
+    if (!path) {
+        res = -EACCES;
+        goto err_path;
+    }
+
+    struct mountpoint *mountpoint = mountpoint_find(dirname);
+    if (!mountpoint) {
+        res = -ENOENT;
+        goto err_mount;
+    }
+
+    struct filesystem *filesystem = mountpoint->filesystem;
+    void *fs_private = mountpoint->fs_private;
+
+    res = filesystem->opendir(fs_private, path, &descriptor->private);
+    if (res < 0) {
+	goto err_opendir;
+    }
+
+    descriptor->type = FT_DIRECTORY;
+    descriptor->mountpoint = mountpoint;
+    
+    path_free(path);
+
+    return descriptor->index;
+
+err_opendir:
+err_mount:
+    path_free(path);
+
+err_path:
+    file_descriptor_free(descriptor);
+
+    return res;
+    
+}
+
+int
+vfs_closedir(int fd)
+{
+    return -1;
+}
+
+int
+vfs_readdir(int fd, struct dir_entry *entry)
+{
+    struct file_descriptor *descriptor = file_descriptor_get(fd);
+    if (!descriptor) {
+        return -EINVAL;
+    }
+
+    if (descriptor->type != FT_DIRECTORY) {
+	return -EINVAL;
+    }
+
+    struct filesystem *filesystem = descriptor->mountpoint->filesystem;
+
+    return filesystem->readdir(descriptor, entry);
+}
+
+int
+vfs_mkdir(const char *path)
+{
+    return -1;
 }

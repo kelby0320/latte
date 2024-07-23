@@ -136,6 +136,7 @@ struct ext2_inode {
 } __attribute((packed));
 
 struct block_buffered_reader;
+struct ext2_dir_iter;
 
 /**
  * @brief Ext2 private filesystem data structure
@@ -159,6 +160,9 @@ struct ext2_private {
 struct ext2_descriptor_private {
     // Pointer to the inode
     struct ext2_inode *inode;
+
+    // Optional directory iterator
+    struct ext2_dir_iter *dir_iter;
 
     // Block offset into the file
     int blk_offset;
