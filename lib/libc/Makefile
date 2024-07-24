@@ -7,7 +7,10 @@ AR = i686-elf-ar
 CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
 ASFLAGS = -f elf -g
 
-C_OBJECTS = ./src/stdio/printf.o \
+C_OBJECTS = ./src/dirent/closedir.o \
+	./src/dirent/opendir.o \
+	./src/dirent/readdir.o \
+	./src/stdio/printf.o \
 	./src/stdio/stdio.o \
 	./src/stdlib/env.o \
 	./src/stdlib/free.o \

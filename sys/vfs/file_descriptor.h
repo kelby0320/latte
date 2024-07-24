@@ -31,8 +31,8 @@ struct file_descriptor {
 };
 
 struct dir_entry {
+    uint32_t inode;    
     char name[256];
-    uint32_t inode;
 };
 
 /**

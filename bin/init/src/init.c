@@ -3,7 +3,33 @@
 #include "sys/wait.h"
 #include "unistd.h"
 
+#include "dirent.h"
+
 #define BUF_SIZE 128
+
+void
+read_bin()
+{
+    printf("Contents of /bin\n");
+
+    DIR *dir = opendir("/bin");
+    if (!dir) {
+	printf("[ERROR] Could not open /bin");
+	return;
+    }
+
+    struct dirent *entry = NULL;
+    do {
+	entry = readdir(dir);
+	if (entry) {
+	    printf("%s\n", entry->d_name);
+	}
+
+	free(entry);
+    } while (entry);
+
+    printf("\n");
+}
 
 int
 main()
@@ -23,6 +49,8 @@ main()
     }
 
     printf(buf);
+
+    read_bin();
 
     pid_t pid = fork();
     if ((int)pid < 0) {
