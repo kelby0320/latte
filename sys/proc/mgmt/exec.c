@@ -10,7 +10,7 @@
 #include "thread/thread.h"
 
 int
-process_execv(struct process *process, const char *path, const char *const *argv)
+process_execv(struct process *process, const char *path, const char *const *argv, size_t argv_len)
 {
     int res = process_free_threads(process);
     if (res < 0) {
@@ -32,9 +32,19 @@ process_execv(struct process *process, const char *path, const char *const *argv
         goto err;
     }
 
-    res = process_add_thread(process);
-    if (res < 0) {
+    int tid = process_add_thread(process);
+    if (tid < 0) {
         goto err;
+    }
+
+    struct thread *thread = thread_get(tid);
+    if (!thread) {
+	goto err;
+    }
+
+    res = process_set_argv(process, thread, argv, argv_len);
+    if (res < 0) {
+	goto err;
     }
 
     return 0;

@@ -179,6 +179,17 @@ int
 process_add_thread(struct process *process);
 
 /**
+ * @brief Add arguments to a process
+ *
+ * @param process    Pointer to the process
+ * @param thread     Pointer to the main thread of the process
+ * @param argv       Arguments vector
+ * @param argv_len   Length of arguments vector
+ */
+int
+process_set_argv(struct process *process, struct thread *thread, const char *const *argv, size_t argv_len);
+
+/**
  * @brief   Create the first user process on the system
  *
  * @param filename  Filename of the executable

@@ -67,7 +67,10 @@ C_OBJECTS = ./sys/block/block.o \
 	./sys/sched/sched.o \
 	./sys/syscall/io.o \
 	./sys/syscall/mmap.o \
-	./sys/syscall/process.o \
+	./sys/syscall/process/exec.o \
+	./sys/syscall/process/exit.o \
+	./sys/syscall/process/fork.o \
+	./sys/syscall/process/wait.o \
 	./sys/syscall/syscall.o \
 	./sys/thread/thread.o \
 	./sys/thread/userio.o \

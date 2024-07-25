@@ -5,5 +5,8 @@
 int
 execv(const char *path, char *const *argv)
 {
-    return do_syscall2(EXECV_SYSCALL_NO, (int)path, (int)argv);
+    int argv_len;
+    for (argv_len = 0; argv[argv_len]; argv_len++);
+    
+    return do_syscall3(EXECV_SYSCALL_NO, (int)path, (int)argv, argv_len);
 }

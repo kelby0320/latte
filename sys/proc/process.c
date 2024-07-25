@@ -213,22 +213,74 @@ err_out:
 int
 process_add_thread(struct process *process)
 {
-    int res = 0;
-
     int tid = thread_create(process);
     if (tid < 0) {
-        res = tid;
-        return res;
+	return tid;
     }
 
     struct thread *thread = thread_get(tid);
 
-    res = list_push_front(&process->threads, thread);
+    int res = list_push_front(&process->threads, thread);
     if (res < 0) {
         return res;
     }
 
+    return tid;
+}
+
+int
+process_set_argv(struct process *process, struct thread *thread, const char *const *argv, size_t argv_len)
+{
+    // Allocate 1 pages for argv
+    char **argv_segment = (char **)kalloc_get_phys_pages(0);
+    if (!argv_segment) {
+        return -ENOMEM;
+    }
+
+    // Zero the page
+    memset(argv_segment, 0, PROCESS_ARGV_SIZE);
+
+    // Map the page to the process's vm_area
+    void *virt = vm_area_map_user_pages(process->vm_area, argv_segment, PROCESS_ARGV_SIZE);
+    if (!virt) {
+        goto err_segment_alloc;
+    }
+
+    char *cur_arg = (char *)(argv_segment + argv_len); // First arg starts after char * ptrs
+    char *vcur_arg = (char *)(virt + (sizeof(char *) * argv_len));
+    
+    for (size_t i = 0; i < argv_len; i++) {
+	int arg_len = strlen(argv[i]);
+	memcpy(cur_arg, argv[i], arg_len); // Copy arg to argv_segment
+	
+	argv_segment[i] = vcur_arg; // Set pointer
+	
+	cur_arg += arg_len + 1; // Next arg is right after the current arg
+	vcur_arg += arg_len + 1;
+    }
+
+    // Create a process allocation entryy
+    struct process_allocation *palloc = kzalloc(sizeof(struct process_allocation));
+    if (!palloc) {
+        goto err_segment_alloc;
+    }
+
+    palloc->type = PROCESS_ALLOCATION_MEMORY_SEGMENT;
+    palloc->paddr = argv_segment;
+    palloc->vaddr = virt;
+    palloc->size = PROCESS_ARGV_SIZE;
+
+    list_push_front(&process->allocations, palloc);
+
+    // Set the ecx/edx register to point to argc and empty argv
+    thread->registers.ecx = argv_len;
+    thread->registers.edx = (uint32_t)virt;
+
     return 0;
+
+err_segment_alloc:
+    kalloc_free_phys_pages(argv_segment);
+    return -ENOMEM;
 }
 
 int

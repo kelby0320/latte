@@ -57,7 +57,8 @@ main()
         printf("Failed to fork\n");
     } else if (pid == 0) {
         // Child
-        execv("/bin/hello", NULL);
+	char *args[] = {"arg1", "arg2", NULL};
+        execv("/bin/hello", args);
     } else {
         // Parent
         int status_code;
