@@ -1,6 +1,8 @@
 #include "gdt/gdt.h"
 #include "mm/vm.h"
 
+#include "cpu/port.h"
+
 #include <stdint.h>
 
 #define KERNEL_HIGHER_HALF_START 0xC0000000

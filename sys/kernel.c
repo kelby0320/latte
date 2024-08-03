@@ -2,6 +2,7 @@
 
 #include "boot/multiboot2.h"
 #include "config.h"
+#include "cpu/cpu.h"
 #include "dev/bus.h"
 #include "drivers/driver.h"
 #include "fs/fs.h"
@@ -71,6 +72,8 @@ kernel_early_init(unsigned long magic)
     irq_init();
 
     tss_init();
+
+    cpu_init();
 }
 
 /**
@@ -114,8 +117,10 @@ kernel_main(unsigned long magic)
     int out_fd = vfs_open("/dev/console", "w");
     msgbuf_add_output_fd(out_fd);
 
-    process_create_first("/bin/init");
-    schedule_first_thread();
+    enable_interrupts();
+
+    /* process_create_first("/bin/init"); */
+    /* schedule_first_thread(); */
 
     while (1) {}
 }

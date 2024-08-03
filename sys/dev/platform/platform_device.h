@@ -27,6 +27,9 @@ struct bus *
 platform_bus_get_bus();
 
 int
+platform_add_devices();
+
+int
 platform_match(struct device *dev, struct device_driver *drv);
 
 int

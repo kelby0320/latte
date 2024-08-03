@@ -1,10 +1,7 @@
 #include "drivers/driver.h"
 
 #include "dev/bus.h"
-#include "drivers/platform/ata/ata.h"
-#include "drivers/platform/devfs/devfs.h"
-#include "drivers/platform/vga/vga.h"
-#include "drivers/platform/console/console.h"
+#include "drivers/input/input_driver.h"
 #include "drivers/platform/platform_driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
@@ -15,21 +12,11 @@
 
 static struct list_item *driver_list = NULL;
 
-static int
-add_platform_drivers()
-{
-    ata_drv_init();
-    devfs_drv_init();
-    vga_drv_init();
-    console_drv_init();
-    
-    return 0;
-}
-
 int
 driver_init()
 {
-    add_platform_drivers();
+    platform_driver_init();
+    input_driver_init();
     
     return 0;
 }

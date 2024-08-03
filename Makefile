@@ -17,10 +17,15 @@ C_OBJECTS = ./sys/block/block.o \
 	./sys/block/partition.o \
 	./sys/boot/boot.o \
 	./sys/boot/multiboot2.o \
+	./sys/cpu/cpu.o \
 	./sys/dev/bus.o \
 	./sys/dev/device.o\
+	./sys/dev/input/input_device.o \
+	./sys/dev/input/input_device_io.o \
 	./sys/dev/platform/platform_device.o \
 	./sys/drivers/driver.o \
+	./sys/drivers/input/input_driver.o \
+	./sys/drivers/input/kbd/kbd.o \
 	./sys/drivers/platform/platform_driver.o \
 	./sys/drivers/platform/ata/ata.o \
 	./sys/drivers/platform/ata/ata_io.o \
