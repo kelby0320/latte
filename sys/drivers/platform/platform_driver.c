@@ -5,6 +5,7 @@
 #include "drivers/platform/ata/ata.h"
 #include "drivers/platform/console/console.h"
 #include "drivers/platform/devfs/devfs.h"
+#include "drivers/platform/kbd/kbd.h"
 #include "drivers/platform/vga/vga.h"
 
 #include <stddef.h>
@@ -16,6 +17,7 @@ platform_driver_init()
     devfs_drv_init();
     vga_drv_init();
     console_drv_init();
+    kbd_drv_init();
     
     return 0;
 }

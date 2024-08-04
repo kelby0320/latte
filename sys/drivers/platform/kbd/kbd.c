@@ -1,11 +1,13 @@
-#include "drivers/input/kbd/kbd.h"
+#include "drivers/platform/kbd/kbd.h"
 
 #include "cpu/port.h"
 #include "dev/input/input_device.h"
-#include "drivers/input/input_driver.h"
-#include "drivers/input/kbd/scancode.h"
+#include "dev/platform/platform_device.h"
+#include "drivers/platform/kbd/scancode.h"
+#include "drivers/platform/platform_driver.h"
 #include "errno.h"
 #include "irq/irq.h"
+#include "libk/alloc.h"
 
 #define KBD_INTERRUPT_NO             0x21
 #define KBD_PS2_DATA_PORT            0x60
@@ -17,10 +19,10 @@
 
 static struct kbd_private kbd_private = {
     .caps_lock = false,
-    .scancode_set = scancode_set_one
+    .scancode_set = scancode_set_two
 };
 
-struct input_driver    kbd_drv = {
+struct platform_driver kbd_drv = {
     .driver = {
 	.name = "kbd",
 	.compat = "kbd"
@@ -29,22 +31,15 @@ struct input_driver    kbd_drv = {
     .probe = kbd_probe
 };
 
-static char
-scancode_to_char(uint8_t scancode)
+static unsigned int
+scancode_to_keycode(uint8_t scancode)
 {
     size_t scanset_size = sizeof(scancode_set_two) / sizeof(uint8_t);
     if (scancode > scanset_size) {
 	return 0;
     }
 
-    char c = scancode_set_two[scancode];
-    if (!kbd_private.caps_lock) {
-	if (c >= 'A' && c <= 'Z') {
-	    c += 32;
-	}
-    }
-
-    return c;
+    return scancode_set_two[scancode];
 }
 
 static void
@@ -53,37 +48,23 @@ kbd_interrupt_handler()
     uint8_t scancode = insb(KBD_PS2_DATA_PORT);
     insb(KBD_PS2_DATA_PORT);
 
+    unsigned int keycode= scancode_to_keycode(scancode);
+
+    struct input_event event = {
+	    .type = INPUT_EVENT_TYPE_KEY_PRESSED,
+	    .keycode = keycode	    
+	};
+
     if (scancode & KBD_SC_KEY_RELEASED) {
-	return;
+	event.type = INPUT_EVENT_TYPE_KEY_RELEASED;
     }
 
-    if (scancode == KBD_SC_CAPSLOCK) {
-	kbd_private.caps_lock = !kbd_private.caps_lock;
-	return;
-    }
-
-    char c = scancode_to_char(scancode);
-
-    if (c != 0) {
-	input_device_put_key(kbd_private.idev, c);
-    }
+    input_device_event(kbd_private.idev, event);
 }
 
-
-int
-kbd_drv_init()
+static int
+ps2_init()
 {
-    input_driver_register(&kbd_drv);
-
-    return 0;
-}
-
-int
-kbd_probe(struct device *dev)
-{
-    struct input_device *idev = as_input_device(dev);
-    kbd_private.idev = idev;
-
     /* Disable PS2 devices */
     outb(KBD_PS2_CMD_PORT, 0xAD);
     outb(KBD_PS2_CMD_PORT, 0xA7);
@@ -157,7 +138,47 @@ kbd_probe(struct device *dev)
     status = insb(KBD_PS2_DATA_PORT);
     type = insb(KBD_PS2_DATA_PORT);
 
+    return 0;
+}
+
+
+int
+kbd_drv_init()
+{
+    platform_driver_register(&kbd_drv);
+
+    return 0;
+}
+
+int
+kbd_probe(struct device *dev)
+{
+    struct input_device *idev = kzalloc(sizeof(struct input_device));
+    if (!idev) {
+	return -ENOMEM;
+    }
+
+    int res = input_device_init(idev, "kbd", INPUT_DEVICE_TYPE_KEYBOARD);
+    if (res < 0) {
+	goto err_input;
+    }
+
+    kbd_private.idev = idev;
+
+    res = ps2_init();
+    if (res < 0) {
+	goto err_ps2;
+    }
+
     register_irq(KBD_INTERRUPT_NO, kbd_interrupt_handler);
 
     return 0;
+
+err_ps2:
+    kbd_private.idev = NULL;
+
+err_input:
+    kfree(idev);
+    
+    return res;
 }

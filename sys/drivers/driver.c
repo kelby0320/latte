@@ -1,7 +1,6 @@
 #include "drivers/driver.h"
 
 #include "dev/bus.h"
-#include "drivers/input/input_driver.h"
 #include "drivers/platform/platform_driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
@@ -16,7 +15,6 @@ int
 driver_init()
 {
     platform_driver_init();
-    input_driver_init();
     
     return 0;
 }

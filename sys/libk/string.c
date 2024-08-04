@@ -234,3 +234,23 @@ islower(char c)
 
     return false;
 }
+
+char
+toupper(char c)
+{
+    if (!islower(c)) {
+	return c;
+    }
+
+    return c - 32;
+}
+
+char
+tolower(char c)
+{
+    if (!isupper(c)) {
+	return c;
+    }
+
+    return c + 32;
+}

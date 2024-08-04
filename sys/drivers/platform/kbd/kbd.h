@@ -10,7 +10,7 @@ struct input_device;
 
 struct kbd_private {
     bool caps_lock;
-    uint8_t *scancode_set;
+    unsigned int *scancode_set;
     struct input_device *idev;
 };
 

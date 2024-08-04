@@ -12,7 +12,7 @@
 #include <stddef.h>
 #include <stdarg.h>
 
-#define STATIC_PLATFORM_DEVICE_COUNT 7
+#define STATIC_PLATFORM_DEVICE_COUNT 8
 
 static struct bus platform_bus = {
     .name = "platform",
@@ -108,6 +108,8 @@ platform_add_devices()
     pdevices[5] = make_platform_device("vga0", "vga", 1, 0xB8000, 4000);
     /* DEVFS */
     pdevices[6] = make_platform_device("devfs", "devfs", 0);
+    /* KBD0 */
+    pdevices[7] = make_platform_device("kbd0", "kbd", 0);
 
     for (int i = 0; i < STATIC_PLATFORM_DEVICE_COUNT; i++) {
         if (!pdevices[i]) {

@@ -54,10 +54,7 @@ int
 bus_init()
 {
     platform_bus_init();
-    input_bus_init();
-    
     platform_add_devices();
-    input_add_devices();
 
     return 0;
 }

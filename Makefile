@@ -21,17 +21,16 @@ C_OBJECTS = ./sys/block/block.o \
 	./sys/dev/bus.o \
 	./sys/dev/device.o\
 	./sys/dev/input/input_device.o \
-	./sys/dev/input/input_device_io.o \
+	./sys/dev/input/keycode.o \
 	./sys/dev/platform/platform_device.o \
 	./sys/drivers/driver.o \
-	./sys/drivers/input/input_driver.o \
-	./sys/drivers/input/kbd/kbd.o \
 	./sys/drivers/platform/platform_driver.o \
 	./sys/drivers/platform/ata/ata.o \
 	./sys/drivers/platform/ata/ata_io.o \
 	./sys/drivers/platform/console/console.o \
 	./sys/drivers/platform/console/console_write.o \
 	./sys/drivers/platform/devfs/devfs.o \
+	./sys/drivers/platform/kbd/kbd.o \
 	./sys/drivers/platform/vga/vga.o \
 	./sys/fs/fs.o \
 	./sys/fs/path.o \
