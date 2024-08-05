@@ -10,7 +10,7 @@ struct platform_device;
 struct platform_driver {
     struct device_driver driver;
     void *private;
-    int (*probe)(struct device *dev);
+    int (*probe)(struct platform_device *dev);
 };
 
 int

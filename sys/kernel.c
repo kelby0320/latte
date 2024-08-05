@@ -119,8 +119,8 @@ kernel_main(unsigned long magic)
 
     enable_interrupts();
 
-    /* process_create_first("/bin/init"); */
-    /* schedule_first_thread(); */
+    process_create_first("/bin/init");
+    schedule_first_thread();
 
     while (1) {}
 }

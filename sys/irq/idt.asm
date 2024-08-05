@@ -43,10 +43,7 @@ isr_syscall_wrapper:
     push    esp
     push    eax                         ; Push syscall number
     call    isr_syscall_handler_wrapper ; No return
-    ; mov     dword[syscall_result], eax
-    ; add     esp, 8
-    ; popad
-    ; mov     eax, [syscall_result]
+    add esp, 8
     iretd
 
 section .data
@@ -63,6 +60,3 @@ isr_wrapper_table:
 isr_wrapper_table_entry i
 %assign i i+1
 %endrep
-
-; syscall_result:
-;     dd 0

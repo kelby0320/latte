@@ -66,5 +66,7 @@ main()
         printf("Child process (%d) exited with status code %d\n", child_pid, status_code);
     }
 
+    while (1) {} // Spin forever
+
     return 0;
 }

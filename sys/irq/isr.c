@@ -14,9 +14,18 @@ isr_handler_wrapper(int interrupt_no, struct isr_frame *isr_frame)
 {
     switch_to_kernel_vm_area();
 
+    struct thread *current_thread = sched_get_current();
+    if (current_thread) {
+	thread_save_state(current_thread, isr_frame);
+    }
+
     do_irq(interrupt_no);
 
-    outb(0x20, 0x20);
+    outb(0x20, 0x20); // Acknowledge interrupt
+
+    if (current_thread) {
+	schedule(); // No return
+    }
 }
 
 void

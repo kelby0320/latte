@@ -8,17 +8,17 @@
 #include "errno.h"
 #include "irq/irq.h"
 #include "libk/alloc.h"
+#include "libk/print.h"
 
 #define KBD_INTERRUPT_NO             0x21
 #define KBD_PS2_DATA_PORT            0x60
 #define KBD_PS2_CMD_PORT             0x64
 #define KBD_PS2_CMD_EN_FIRST_PORT    0xAE
 
-#define KBD_SC_KEY_RELEASED 0x80
-#define KBD_SC_CAPSLOCK     0x3A
+#define KBD_SC_KEY_RELEASED 0xF0
 
 static struct kbd_private kbd_private = {
-    .caps_lock = false,
+    .key_release = false,
     .scancode_set = scancode_set_two
 };
 
@@ -48,16 +48,23 @@ kbd_interrupt_handler()
     uint8_t scancode = insb(KBD_PS2_DATA_PORT);
     insb(KBD_PS2_DATA_PORT);
 
-    unsigned int keycode= scancode_to_keycode(scancode);
+    if (scancode == KBD_SC_KEY_RELEASED) {
+	kbd_private.key_release = true;
+	return;
+    }
+
+    unsigned int keycode = scancode_to_keycode(scancode);
 
     struct input_event event = {
 	    .type = INPUT_EVENT_TYPE_KEY_PRESSED,
 	    .keycode = keycode	    
 	};
 
-    if (scancode & KBD_SC_KEY_RELEASED) {
+    if (kbd_private.key_release) {
 	event.type = INPUT_EVENT_TYPE_KEY_RELEASED;
     }
+
+    kbd_private.key_release = false;
 
     input_device_event(kbd_private.idev, event);
 }
@@ -151,7 +158,7 @@ kbd_drv_init()
 }
 
 int
-kbd_probe(struct device *dev)
+kbd_probe(struct platform_device *dev)
 {
     struct input_device *idev = kzalloc(sizeof(struct input_device));
     if (!idev) {
@@ -171,6 +178,8 @@ kbd_probe(struct device *dev)
     }
 
     register_irq(KBD_INTERRUPT_NO, kbd_interrupt_handler);
+
+    input_device_register(idev);
 
     return 0;
 

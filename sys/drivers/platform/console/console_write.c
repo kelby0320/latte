@@ -19,8 +19,8 @@ console_scroll_screen(struct console_private *private)
     size_t console_width_bytes = console_width * sizeof(uint16_t);
 
     for (size_t row = 1; row < console_height; row++) {
-        uint16_t *dest_row = framebuffer + (row - 1);
-        uint16_t *src_row = framebuffer + row;
+        uint16_t *dest_row = framebuffer + ((row - 1) * console_width);
+        uint16_t *src_row = framebuffer + (row * console_width);
         memcpy(dest_row, src_row, console_width_bytes);
     }
 }

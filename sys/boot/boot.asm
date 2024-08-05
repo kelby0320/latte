@@ -51,17 +51,6 @@ _higher_half_start:
 
 	call 	late_init
 
-	; Remap the master PIC
-	mov		al, 0x11
-	out 		0x20, al					; Tell master PIC
-
-	mov		al, 0x20					; Interrupt 0x20 is where master ISR should start
-	out		0x21, al
-
-	mov		al, 0x1
-	out		0x21, al
-	; End remap of the master PIC
-
 	; Reset flags
 	push	0
 	popf
