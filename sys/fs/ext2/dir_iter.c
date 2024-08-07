@@ -8,7 +8,7 @@ int
 ext2_dir_iter_init(struct ext2_dir_iter *iter, struct ext2_private *fs_private,
               const struct ext2_inode *dir_inode)
 {
-    char *buf = kzalloc(fs_private->block_size);
+    char *buf = vzalloc(fs_private->block_size);
     if (!buf) {
         return -ENOMEM;
     }
@@ -32,7 +32,7 @@ ext2_dir_iter_init(struct ext2_dir_iter *iter, struct ext2_private *fs_private,
 void
 ext2_dir_iter_free(struct ext2_dir_iter *iter)
 {
-    kfree(iter->buf);
+    vfree(iter->buf);
 }
 
 int

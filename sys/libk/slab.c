@@ -48,12 +48,11 @@ slab_free(struct slab *slab)
 static void
 slab_append_slab(struct slab *slab_head, struct slab *new_slab)
 {
-    struct slab *slab = slab_head;
-    while (slab->next) {
-        slab = slab->next;
-    }
-
-    slab->next = new_slab;
+    struct slab *slab;
+    struct slab *p;
+    for (p = NULL, slab = slab_head; slab != NULL; p = slab, slab = slab->next);
+    
+    p->next = new_slab;
 }
 
 /**
@@ -92,7 +91,7 @@ static int
 slab_dealloc(struct slab *slab, void *ptr)
 {
     size_t idx = (ptr - slab->slab_objs) / slab->obj_size;
-    if (idx >= FREE_LIST_SIZE) {
+    if (idx >= slab->slab_len) {
         return -ENOENT;
     }
 

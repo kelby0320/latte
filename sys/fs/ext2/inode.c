@@ -141,7 +141,7 @@ ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *i
     ext2_block_iterator_init(&iter, fs_private, inode);
     ext2_block_iterator_skip_blocks(&iter, blk_offset);
 
-    char *buf = kzalloc(fs_private->block_size);
+    char *buf = vzalloc(fs_private->block_size);
     size_t bytes_read = 0;
     size_t bytes_remaining = count;
 
@@ -168,11 +168,11 @@ ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *i
         ext2_block_iterator_next(&iter, fs_private);
     }
 
-    kfree(buf);
+    vfree(buf);
 
     return bytes_read;
 
 err_read_block:
-    kfree(buf);
+    vfree(buf);
     return -EIO;
 }

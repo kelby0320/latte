@@ -150,6 +150,8 @@ vzalloc(size_t size)
     size_t mem_size = kalloc_order_to_size(order);
 
     memset(vaddr, 0, mem_size);
+
+    return vaddr;
 }
 
 void

@@ -184,6 +184,7 @@ vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t fla
     // Create new page directory entry if on doesn't exists
     if (page_dir_entry == 0) {
         page_tbl_t page_tbl = kalloc_get_phys_page();
+	memset(page_tbl, 0, PAGING_PAGE_SIZE);
         page_dir_entry = page_dir_add_page_tbl(vm_area->page_directory, virt, page_tbl, flags);
     }
 
