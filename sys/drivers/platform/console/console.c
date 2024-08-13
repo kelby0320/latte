@@ -42,25 +42,40 @@ console_input_recv_callback(struct input_device *idev, struct input_event event)
 {
     struct console_private *private = console_drv.driver.private;
 
+    // Handle shift press/release
     if (event.keycode == KEYCODE_LSHIFT || event.keycode == KEYCODE_RSHIFT) {
 	if (event.type == INPUT_EVENT_TYPE_KEY_PRESSED) {
 	    private->shift_enabled = true;
 	} else {
 	    private->shift_enabled = false;
 	}
+
+	return;
     }
 
+    // Handle capslock toggle
     if (event.keycode == KEYCODE_CAPSLOCK) {
 	private->capslock_enabled = !private->capslock_enabled;
+
+	return;
     }
 
-    bool shift_state = (private->shift_enabled || private->capslock_enabled);
+    // Handle key pressed event
+    if (event.type == INPUT_EVENT_TYPE_KEY_PRESSED) {
+	bool shift_state = (private->shift_enabled || private->capslock_enabled);
     
-    char c = keycode_to_ascii(event.keycode, shift_state);
+	char c = keycode_to_ascii(event.keycode, shift_state);
 
-    if (isalnum(c)) {
-	add_to_input_buffer(private, c);
-    }
+	// Added character to input buffer
+	if (isalnum(c) || c == '\n') {
+	    add_to_input_buffer(private, c);
+	}
+
+	// Echo character to console
+	if (isalnum(c)) {
+	    console_write(as_device(private->console_device), 0, &c, 1);
+	}
+    }   
 }
 
 int
@@ -88,6 +103,8 @@ console_probe(struct platform_device *pdev)
     if (!private) {
 	return -ENOMEM;
     }
+
+    private->console_device = pdev;
 
     private->vga = vga;
     private->cur_col = 0;

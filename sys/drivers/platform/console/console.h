@@ -12,6 +12,8 @@ struct platform_device;
 struct input_device;
 
 struct console_private {
+    struct platform_device *console_device;
+    
     struct device *vga;
     uint16_t cur_col;
     uint16_t cur_row;

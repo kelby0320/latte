@@ -73,16 +73,22 @@ do_read(struct thread *current_thread)
         return;
     }
 
-    int res = vfs_read(gfd, buf, count);
-    if (res < 0) {
+    int num_read = vfs_read(gfd, buf, count);
+    if (num_read < 0) {
         goto out_free_buf;
     }
 
-    res = thread_copy_to_user(current_thread, (void *)user_buf, buf, count);
+    /*
+     * If we haven't read all of the data,
+     * then, put this thread into a blocked state,
+     * waiting on more data
+     */
+
+    thread_copy_to_user(current_thread, (void *)user_buf, buf, num_read);
 
 out_free_buf:
     kfree(buf);
-    thread_set_return_value(current_thread, res);
+    thread_set_return_value(current_thread, num_read);
 }
 
 void
