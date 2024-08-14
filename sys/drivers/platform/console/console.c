@@ -32,26 +32,30 @@ is_valid_console_char(char c)
     return c >= 32 && c <= 126;
 }
 
-static void
+static int
 add_to_input_buffer(struct console_private *private, char c)
 {
     if (private->input_buffer_len == CONSOLE_INPUT_BUFFER_SIZE - 1) {
-	return; // buffer is full
+	return 0; // buffer is full
     }
 
     private->input_buffer[private->input_buffer_len] = c;
     private->input_buffer_len++;
+
+    return 1;
 }
 
-static void
+static int
 remove_from_input_buffer(struct console_private *private)
 {
     if (private->input_buffer_len == 0) {
-	return;
+	return 0;
     }
 
     private->input_buffer[private->input_buffer_len - 1] = 0;
     private->input_buffer_len--;
+
+    return 1;
 }
 
 static void
@@ -79,16 +83,21 @@ console_input_recv_callback(struct input_device *idev, struct input_event event)
 
     // Handle key pressed event
     if (event.type == INPUT_EVENT_TYPE_KEY_PRESSED) {
-	private->input_ready = false;
+	/* private->input_ready = false; */
 	
 	bool shift_state = (private->shift_enabled || private->capslock_enabled);
 	char c = keycode_to_ascii(event.keycode, shift_state);
 
 	if (c == 8) { // Delete key
-	    remove_from_input_buffer(private);
+	    int key_removed = remove_from_input_buffer(private);
+	    if (key_removed == 1) {
+		console_write(as_device(private->console_device), 0, &c, 1);
+	    }
+
+	    return;
 	}
 
-	// Added character to input buffer
+	// Add character to input buffer
 	if (is_valid_console_char(c)) {
 	    add_to_input_buffer(private, c);
 	}

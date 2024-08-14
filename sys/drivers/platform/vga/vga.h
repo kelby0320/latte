@@ -60,4 +60,14 @@ vga_max_row(struct device *dev);
 uint8_t
 vga_current_color(struct device *dev);
 
+void
+vga_enable_cursor();
+
+void
+vga_disable_cursor();
+
+void
+vga_set_cursor(struct device *dev, uint16_t row, uint16_t col);
+
+
 #endif

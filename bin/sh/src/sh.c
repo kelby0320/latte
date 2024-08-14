@@ -137,6 +137,9 @@ main(int argc, char **argv)
 	sh_reset_input();
 	
 	int line_length = readline(input_line, 256);
+	if (line_length == 0) {
+	    continue; // User pressed enter, but no other input
+	}
 
 	char *arg_start = parse_program_name(input_line);
 	int argc = parse_program_args(arg_start);
@@ -156,6 +159,10 @@ main(int argc, char **argv)
 	    // Parent
 	    int status_code;
 	    pid_t child_pid = wait(&status_code);
+
+	    if (status_code != 0) {
+		printf("Command \'%s\' not found\n", program_name);
+	    }
 	}
     }
 }

@@ -67,6 +67,8 @@ console_put_char(struct console_private *private, char c)
     if (private->cur_col > private->max_col) {
         console_newline(private);
     }
+
+    vga_set_cursor(private->vga, private->cur_row, private->cur_col);
 }
 
 static void
@@ -88,6 +90,7 @@ console_remove_char(struct console_private *private, char c)
     uint16_t ch = vga_make_char(private->vga, ' ');
 
     vga_set_char(private->vga, private->cur_row, private->cur_col, ch);
+    vga_set_cursor(private->vga, private->cur_row, private->cur_col);
 }
 
 /**

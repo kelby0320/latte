@@ -53,6 +53,11 @@ ext2_path_to_inode(struct path *path, struct ext2_private *fs_private)
         return 0;
     }
 
+    // If path_element is any empty string return root directory inode
+    if (path_element->element[0] == 0) {
+	return dir_inode;
+    }
+
     while (1) {
         // Read inode from directory
         res = ext2_dir_find_entry(&inode, fs_private, dir_inode, path_element->element);

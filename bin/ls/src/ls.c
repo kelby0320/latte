@@ -33,12 +33,17 @@ print_dir(char *dir_path)
 int
 main(int argc, char **argv)
 {
-    if (argc < 1) {
+    char *dir_path = "/";
+    
+    if (argc > 1) {
 	print_help();
 	_exit(EXIT_FAILURE);
     }
 
-    char *dir_path = argv[0];
+    if (argc == 1) {
+	dir_path = argv[0];
+    }
+
     print_dir(dir_path);
 
     return 0;

@@ -2,6 +2,7 @@
 
 #include "dev/device.h"
 #include "drivers/driver.h"
+#include "errno.h"
 #include "libk/memory.h"
 
 int
@@ -10,12 +11,8 @@ console_read(struct device *dev, size_t offset, char *buf, size_t count)
     struct console_private *private = dev->driver->private;
 
     if (!private->input_ready) {
-	return 0;
+	return -EAGAIN;
     }
-
-    /* if (private->input_buffer_len == 0) { */
-    /* 	return 0; */
-    /* } */
 
     if (count > private->input_buffer_len) {
 	count = private->input_buffer_len;
@@ -32,6 +29,7 @@ console_read(struct device *dev, size_t offset, char *buf, size_t count)
     memset(private->input_buffer + shift_amt, 0, count);
 
     private->input_buffer_len -= count;
+    private->input_ready = false;
     
     return count;
 }

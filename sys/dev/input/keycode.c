@@ -19,6 +19,61 @@ static uint8_t keycode_to_ascii_tbl[] = {
 };
 
 char
+shift_character(char c)
+{
+    if (islower(c)) {
+	return toupper(c);
+    }
+
+    switch (c) {
+    case '`':
+	return '~';
+    case '1':
+	return '!';
+    case '2':
+	return '@';
+    case '3':
+	return '#';
+    case '4':
+	return '$';
+    case '5':
+	return '%';
+    case '6':
+	return '^';
+    case '7':
+	return '&';
+    case '8':
+	return '*';
+    case '9':
+	return '(';
+    case '0':
+	return ')';
+    case '-':
+	return '_';
+    case '=':
+	return '+';
+    case '[':
+	return '{';
+    case ']':
+	return '}';
+    case '\\':
+	return '|';
+    case ';':
+	return ':';
+    case '\'':
+	return '\"';
+    case ',':
+	return '<';
+    case '.':
+	return '>';
+    case '/':
+	return '?';
+    default:
+	return c;
+    }
+}
+
+char
 keycode_to_ascii(unsigned int keycode, bool shift_enabled)
 {
     if (keycode >= sizeof(keycode_to_ascii_tbl)) {
@@ -27,8 +82,8 @@ keycode_to_ascii(unsigned int keycode, bool shift_enabled)
     
     char c = keycode_to_ascii_tbl[keycode];
 
-    if (islower(c) && shift_enabled) {
-	c =  toupper(c);
+    if (shift_enabled) {
+	c = shift_character(c);
     }
 
     return c;

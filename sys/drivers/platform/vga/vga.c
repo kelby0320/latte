@@ -1,5 +1,6 @@
 #include "drivers/platform/vga/vga.h"
 
+#include "cpu/port.h"
 #include "dev/device.h"
 #include "dev/platform/platform_device.h"
 #include "drivers/driver.h"
@@ -57,6 +58,9 @@ vga_probe(struct platform_device *pdev)
 
     pdev->device.driver->private = private;
 
+    vga_enable_cursor();
+    vga_set_cursor(as_device(pdev), 0, 0);
+
     return 0;
 }
 
@@ -100,4 +104,36 @@ vga_current_color(struct device *dev)
 {
     struct vga_private *private = dev->driver->private;
     return private->cur_char_color;
+}
+
+void
+vga_enable_cursor()
+{
+    uint8_t cursor_start = 14;
+    uint8_t cursor_end = 15;
+    
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, (insb(0x3D5) & 0xC0) | cursor_start);
+
+    outb(0x3D4, 0x0B);
+    outb(0x3D5, (insb(0x3D5) & 0xE0) | cursor_end);
+}
+
+void
+vga_disable_cursor()
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, 0x20);
+}
+
+void
+vga_set_cursor(struct device *dev, uint16_t row, uint16_t col)
+{
+    struct vga_private *private = dev->driver->private;
+    uint16_t cursor_pos = row * private->fb_width + col;
+
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t)(cursor_pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t)((cursor_pos >> 8) & 0xFF));
 }
