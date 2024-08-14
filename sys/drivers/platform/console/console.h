@@ -24,6 +24,7 @@ struct console_private {
     struct input_device *kbd_idev;
     char input_buffer[CONSOLE_INPUT_BUFFER_SIZE];
     unsigned int input_buffer_len;
+    bool input_ready;
     bool shift_enabled;
     bool capslock_enabled;
 };

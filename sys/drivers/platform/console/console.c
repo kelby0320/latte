@@ -26,6 +26,12 @@ struct platform_driver console_drv = {
     .probe = console_probe
 };
 
+static bool
+is_valid_console_char(char c)
+{
+    return c >= 32 && c <= 126;
+}
+
 static void
 add_to_input_buffer(struct console_private *private, char c)
 {
@@ -35,6 +41,17 @@ add_to_input_buffer(struct console_private *private, char c)
 
     private->input_buffer[private->input_buffer_len] = c;
     private->input_buffer_len++;
+}
+
+static void
+remove_from_input_buffer(struct console_private *private)
+{
+    if (private->input_buffer_len == 0) {
+	return;
+    }
+
+    private->input_buffer[private->input_buffer_len - 1] = 0;
+    private->input_buffer_len--;
 }
 
 static void
@@ -62,19 +79,25 @@ console_input_recv_callback(struct input_device *idev, struct input_event event)
 
     // Handle key pressed event
     if (event.type == INPUT_EVENT_TYPE_KEY_PRESSED) {
+	private->input_ready = false;
+	
 	bool shift_state = (private->shift_enabled || private->capslock_enabled);
-    
 	char c = keycode_to_ascii(event.keycode, shift_state);
 
+	if (c == 8) { // Delete key
+	    remove_from_input_buffer(private);
+	}
+
 	// Added character to input buffer
-	if (isalnum(c) || c == '\n') {
+	if (is_valid_console_char(c)) {
 	    add_to_input_buffer(private, c);
 	}
 
-	// Echo character to console
-	if (isalnum(c)) {
-	    console_write(as_device(private->console_device), 0, &c, 1);
+	if (c == '\n') {
+	    private->input_ready = true;
 	}
+	
+	console_write(as_device(private->console_device), 0, &c, 1);
     }   
 }
 
@@ -115,6 +138,7 @@ console_probe(struct platform_device *pdev)
 
     private->kbd_idev = kbd_idev;
     private->input_buffer_len = 0;
+    private->input_ready = false;
     private->shift_enabled = false;
     private->capslock_enabled = false;
     input_device_add_callback(kbd_idev, console_input_recv_callback);

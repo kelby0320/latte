@@ -173,15 +173,21 @@ libs:
 	cd ./lib/libc && $(MAKE) all
 
 bin: libs
+	cd ./bin/cat && $(MAKE) all
 	cd ./bin/hello && $(MAKE) all
 	cd ./bin/init && $(MAKE) all
+	cd ./bin/ls && $(MAKE) all
+	cd ./bin/sh && $(MAKE) all
 
 clean_libs:
 	cd ./lib/libc && $(MAKE) clean
 
 clean_bin:
-	cd ./bin/hello && $(MAKE) clean
+	cd ./bin/sh && $(MAKE) clean
+	cd ./bin/ls && $(MAKE) clean
 	cd ./bin/init && $(MAKE) clean
+	cd ./bin/hello && $(MAKE) clean
+	cd ./bin/cat ** $(MAKE) clean
 
 clean: clean_libs clean_bin
 	-rm -r $(C_OBJECTS) $(AS_OBJECTS)

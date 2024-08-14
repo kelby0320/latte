@@ -36,7 +36,9 @@ ext2_dir_find_entry(struct ext2_inode **inode_out, struct ext2_private *fs_priva
             goto out;
         }
 
-        if (strcmp(entry.name, name) == 0) {
+	size_t name_len = strlen(name);
+        if (entry.name_len == name_len &&
+	    memcmp(entry.name, name, name_len) == 0) {
             // Found matching entry
             res = ext2_read_inode(inode_out, fs_private, entry.inode);
             goto out;

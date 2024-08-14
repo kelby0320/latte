@@ -231,6 +231,12 @@ process_add_thread(struct process *process)
 int
 process_set_argv(struct process *process, struct thread *thread, const char *const *argv, size_t argv_len)
 {
+    if (argv_len == 0) {
+	thread->registers.ecx = 0;
+	thread->registers.edx = 0;
+	return 0;
+    }
+    
     // Allocate 1 pages for argv
     char **argv_segment = (char **)kalloc_get_phys_pages(0);
     if (!argv_segment) {

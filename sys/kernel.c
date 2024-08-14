@@ -119,6 +119,8 @@ kernel_main(unsigned long magic)
 
     enable_interrupts();
 
+    printk("Starting init program\n\n");
+    
     process_create_first("/bin/init");
     schedule_first_thread();
 

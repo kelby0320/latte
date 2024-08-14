@@ -1,5 +1,7 @@
 #include "string.h"
 
+static char *strtok_input = NULL;
+
 int
 memcmp(const void *ptr1, const void *ptr2, size_t n)
 {
@@ -115,6 +117,41 @@ strlen(const char *str)
     }
 
     return len;
+}
+
+static bool
+strtok_is_delim(char c, const char *delim)
+{
+
+}
+
+static char *
+strtok_next(const char *delim)
+{
+    char *str_start = strtok_input;
+    
+    while (*strtok_input && !strtok_is_delim(*strtok_input, delim)) {
+	strtok_input++;
+    }
+
+    while (*strtok_input && strtok_is_delim(*strtok_input, delim)) {
+	*strtok_input = 0;
+	strtok_input++;
+    }
+
+    return str_start;
+}
+
+char *
+strtok(char *str, const char *delim)
+{
+    if (!str) {
+	return strtok_next(delim);
+    }
+
+    strtok_input = str;
+
+    return strtok_next(delim);
 }
 
 char *
