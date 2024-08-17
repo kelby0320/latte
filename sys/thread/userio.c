@@ -1,7 +1,7 @@
 #include "thread/userio.h"
 
 #include "errno.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/memory.h"
 #include "mm/kalloc.h"
 #include "mm/vm.h"

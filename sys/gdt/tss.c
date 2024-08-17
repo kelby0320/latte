@@ -1,7 +1,8 @@
 #include "gdt/tss.h"
 
 #include "config.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
+#include "libk/print.h"
 #include "libk/memory.h"
 #include "mm/kalloc.h"
 #include "mm/paging/paging.h"
@@ -34,6 +35,8 @@ tss_map_esp()
 void
 tss_init()
 {
+    printk("Init TSS at %d\n", (int)&tss);
+    
     memset(&tss, 0, sizeof(tss));
     tss.esp0 = TSS_STACK_TOP;
     tss.ss0 = LATTE_KERNEL_DATA_SEGMENT;
@@ -41,4 +44,6 @@ tss_init()
     tss_map_esp();
 
     tss_load(LATTE_TSS_SEGMENT);
+
+    printk("Loaded TSS\n");
 }

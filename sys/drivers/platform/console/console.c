@@ -123,16 +123,19 @@ console_probe(struct platform_device *pdev)
 {
     struct device *vga = as_device(platform_device_find("vga"));
     if (!vga) {
+	printk("console_probe - failed to find vga device\n");
 	return -EAGAIN;
     }
 
     struct input_device *kbd_idev = input_device_find("kbd");
     if (!kbd_idev) {
+	printk("console_probe - failed to find kbd device\n");
 	return -EAGAIN;
     }
 
     struct console_private *private = kzalloc(sizeof(struct console_private));
     if (!private) {
+	printk("console_probe - failed to allocate console_private\n");
 	return -ENOMEM;
     }
 
@@ -154,7 +157,10 @@ console_probe(struct platform_device *pdev)
 
     pdev->device.driver->private = private;
 
-    devfs_make_node(as_device(pdev), &console_fops);
+    int res = devfs_make_node(as_device(pdev), &console_fops);
+    if (res < 0) {
+	printk("Failed to add devfs node for console - %d\n", res);
+    }
 
     return 0;
 }

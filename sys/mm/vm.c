@@ -1,7 +1,7 @@
 #include "mm/vm.h"
 
 #include "errno.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "mm/kalloc.h"

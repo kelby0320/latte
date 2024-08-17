@@ -1,6 +1,6 @@
 #include "mm/paging/paging.h"
 
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/memory.h"
 #include "mm/kalloc.h"
 #include "mm/paging/page_dir.h"

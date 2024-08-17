@@ -7,7 +7,7 @@
 #include "fs/ext2/ext2.h"
 #include "fs/fat32/fat32.h"
 #include "fs/path.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 #include "libk/string.h"
@@ -46,12 +46,12 @@ fs_load()
     // fs_insert_filesystem(fat32_init());
     int res = fs_insert_filesystem(ext2_init());
     if (res < 0) {
-        printk("Failed to load EXT2 filesystem driver\n");
-    }
+        printk("Failed to load ext2 filesystem driver\n");
+    }    
 
     res = fs_insert_filesystem(devfs_init());
     if (res < 0) {
-        printk("Failed to load DEVFS filesystem driver\n");
+        printk("Failed to load devfs filesystem driver\n");
     }
 
     return res;

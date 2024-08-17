@@ -1,4 +1,4 @@
-#include "msgbuf.h"
+#include "kernel/msgbuf.h"
 
 #include "config.h"
 #include "errno.h"

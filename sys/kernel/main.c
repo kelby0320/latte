@@ -1,4 +1,4 @@
-#include "kernel.h"
+#include "kernel/kernel.h"
 
 #include "boot/multiboot2.h"
 #include "config.h"
@@ -9,12 +9,13 @@
 #include "gdt/gdt.h"
 #include "gdt/tss.h"
 #include "irq/irq.h"
+#include "kernel/msgbuf.h"
+#include "kernel/term.h"
 #include "libk/alloc.h"
 #include "libk/print.h"
 #include "libk/string.h"
 #include "mm/kalloc.h"
 #include "mm/vm.h"
-#include "msgbuf.h"
 #include "proc/process.h"
 #include "sched/sched.h"
 #include "vfs/vfs.h"
@@ -115,6 +116,11 @@ kernel_main(unsigned long magic)
     kernel_late_init();
 
     int out_fd = vfs_open("/dev/console", "w");
+    if (out_fd < 0) {
+	panic("Failed to open /dev/console\n");
+    }
+
+    term_clear_screen();
     msgbuf_add_output_fd(out_fd);
 
     enable_interrupts();

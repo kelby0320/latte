@@ -134,6 +134,10 @@ slab_cache_alloc(struct slab_cache *cache)
     }
 
     struct slab *new_slab = vzalloc(sizeof(struct slab));
+    if (!new_slab) {
+	return NULL;
+    }
+
     slab_init(new_slab, cache->obj_size);
     slab_append_slab(cache->slab_head, new_slab);
 

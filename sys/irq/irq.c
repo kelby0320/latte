@@ -5,12 +5,11 @@
 #include "irq/idt.h"
 #include "libk/memory.h"
 
-IRQ_HANDLER irq_handlers[LATTE_TOTAL_IDT_ENTRIES];
+IRQ_HANDLER irq_handlers[LATTE_TOTAL_IDT_ENTRIES] = {0};
 
 void
 irq_init()
 {
-    memset(irq_handlers, 0, sizeof(irq_handlers));
     idt_init();
 }
 

@@ -1,13 +1,13 @@
 
-%define MULTIBOOT2_HEADER_MAGIC 0xE85250D6
-%define MULTIBOOT2_ARCH_I386 0
+%define MULTIBOOT_HEADER_MAGIC 0x1BADB002
+%define MULTIBOOT_HEADER_FLAGS 0x3
+%define MULTIBOOT_HEADER_CHECKSUM -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)	
 
 ; Multiboot header
 section .multiboot
-align 8
+align 4	
 
 multiboot_header_start:
-dd MULTIBOOT2_HEADER_MAGIC
-dd MULTIBOOT2_ARCH_I386
-dd ((multiboot_header_start + 16) - multiboot_header_start)
-dd -(MULTIBOOT2_HEADER_MAGIC + MULTIBOOT2_ARCH_I386 + ((multiboot_header_start + 16) - multiboot_header_start))
+dd MULTIBOOT_HEADER_MAGIC
+dd MULTIBOOT_HEADER_FLAGS
+dd MULTIBOOT_HEADER_CHECKSUM	

@@ -8,7 +8,7 @@
 #include "errno.h"
 #include "fs/fs.h"
 #include "fs/path.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/print.h"
@@ -94,7 +94,7 @@ is_devfs_block_device(struct block *block)
 static struct devfs_node *
 match_device(struct devfs_private *devfs_private, struct path *path)
 {
-    char *match_name = path->root->next->element; // Second elemnt in the path, e.g. /dev/device0
+    char *match_name = path->root->next->element; // Second element in the path, e.g. /dev/device0
 
     for_each_in_list(struct devfs_node *, node_list, list, node) {
 	struct device *device = node->device;
@@ -176,7 +176,7 @@ devfs_open(void *fs_private, struct path *path, file_mode_t mode, void **out)
  * @return int
  */
 static int
-devfs_close(void *fs_private)
+devfs_close(struct file_descriptor *file_descriptor)
 {
     // TODO
     return -EIO;
@@ -301,7 +301,7 @@ devfs_init()
 {
     struct filesystem *fs = kzalloc(sizeof(struct filesystem));
     if (!fs) {
-        panic("Unable to initialize dev filesystem");
+        panic("Unable to initialize devfs filesystem");
     }
 
     fs->open = devfs_open;
@@ -320,8 +320,11 @@ devfs_init()
 int
 devfs_make_node(struct device *device, struct file_operations *fops)
 {
+    printk("Added new node for device %s\n", device->name);
+    
     struct devfs_node *devfs_node = kzalloc(sizeof(struct devfs_node));
     if (!devfs_node) {
+	printk("Error adding new devfs node\n");
 	return -ENOMEM;
     }
 

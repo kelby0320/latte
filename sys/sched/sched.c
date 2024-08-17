@@ -1,7 +1,7 @@
 #include "sched/sched.h"
 
 #include "errno.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/memory.h"
 #include "libk/queue.h"
 #include "mm/vm.h"

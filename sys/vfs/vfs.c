@@ -7,7 +7,7 @@
 #include "errno.h"
 #include "fs/fs.h"
 #include "fs/path.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/print.h"

@@ -33,6 +33,7 @@ bus_match_devices(const struct bus *bus)
 
             if (bus->match(dev, drv) == 0) {
                 dev->driver = drv;
+		printk("driver %s bound to device %s\n", drv->name, dev->name);
                 break;
             }
         }
@@ -45,6 +46,7 @@ bus_probe_devices(const struct bus *bus)
     for_each_in_list(struct device *, bus->devices, list, dev)
     {
         if (dev->driver) {
+	    printk("driver %s probing device %s\n", dev->driver->name, dev->name);
             bus->probe(dev);
         }
     }
@@ -62,7 +64,14 @@ bus_init()
 int
 bus_register(struct bus *bus)
 {
-    return list_push_back(&bus_list, bus);
+    int res = list_push_back(&bus_list, bus);
+    if (res < 0) {
+	printk("Failed to register new bus, %s\n", bus->name);
+	return res;
+    }
+    
+    printk("Registered new bus %s\n", bus->name);
+    return 0;
 }
 
 int
@@ -72,6 +81,8 @@ bus_match()
     {
         bus_match_devices(bus);
     }
+
+    return 0;
 }
 
 int
@@ -81,4 +92,6 @@ bus_probe()
     {
         bus_probe_devices(bus);
     }
+
+    return 0;
 }

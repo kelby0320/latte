@@ -166,7 +166,7 @@ platform_probe(struct device *dev)
     struct platform_driver *pdrv = as_platform_driver(dev->driver);
 
     if (pdrv->probe) {
-        return pdrv->probe(dev);
+        return pdrv->probe(as_platform_device(dev));
     }
 
     return 0;

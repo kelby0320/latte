@@ -5,6 +5,7 @@
 #include "errno.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
+#include "libk/print.h"
 #include "libk/string.h"
 
 #include <stddef.h>
@@ -22,8 +23,14 @@ driver_init()
 int
 driver_register(struct device_driver *driver)
 {
-    list_push_front(&driver_list, driver);
-
+    int res = list_push_front(&driver_list, driver);
+    if (res < 0) {
+	printk("Failed to register new driver, %s\n", driver->name);
+	return res;
+    }
+    
+    printk("Registered new driver %s\n", driver->name);
+    
     bus_match();
 
     return 0;

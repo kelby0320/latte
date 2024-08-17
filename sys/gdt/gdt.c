@@ -2,7 +2,7 @@
 
 #include "config.h"
 #include "gdt/tss.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/memory.h"
 
 struct gdtr gdtr;

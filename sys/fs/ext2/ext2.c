@@ -9,12 +9,14 @@
 #include "fs/ext2/inode.h"
 #include "fs/fs.h"
 #include "fs/path.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/string.h"
 #include "vfs/file_descriptor.h"
 #include "vfs/mountpoint.h"
+
+#include "libk/print.h"
 
 #include <stdint.h>
 
@@ -50,7 +52,7 @@ ext2_path_to_inode(struct path *path, struct ext2_private *fs_private)
     // Read root directory
     int res = ext2_read_inode(&dir_inode, fs_private, EXT2_ROOT_DIR_INODE);
     if (res < 0) {
-        return 0;
+        return NULL;
     }
 
     // If path_element is any empty string return root directory inode
@@ -353,6 +355,7 @@ ext2_init()
 {
     struct filesystem *fs = kzalloc(sizeof(struct filesystem));
     if (!fs) {
+	printk("ext2 *fs %d\n", (unsigned int)fs);
         panic("Unable to initialize ext2 filesystem");
     }
 

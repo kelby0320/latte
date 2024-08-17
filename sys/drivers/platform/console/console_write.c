@@ -128,7 +128,7 @@ console_write(struct device *dev, size_t offset, const char *buf, size_t count)
     return count;
 }
 
-int
+void
 console_clear_screen(struct device *dev)
 {
     struct device_driver *drv = dev->driver;
@@ -140,7 +140,7 @@ console_clear_screen(struct device *dev)
     for (size_t y = 0; y < console_height; y++) {
         for (size_t x = 0; x < console_width; x++) {
             uint16_t ch = vga_make_char(private->vga, ' ');
-            vga_set_char(private->vga, x, y, ch);
+            vga_set_char(private->vga, y, x, ch);
         }
     }
 }

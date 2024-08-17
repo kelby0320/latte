@@ -32,6 +32,7 @@ C_OBJECTS = ./sys/block/block.o \
 	./sys/drivers/platform/console/console_write.o \
 	./sys/drivers/platform/devfs/devfs.o \
 	./sys/drivers/platform/kbd/kbd.o \
+	./sys/drivers/platform/kbd/ps2.o \
 	./sys/drivers/platform/vga/vga.o \
 	./sys/fs/fs.o \
 	./sys/fs/path.o \
@@ -47,6 +48,9 @@ C_OBJECTS = ./sys/block/block.o \
 	./sys/irq/idt.o \
 	./sys/irq/irq.o \
 	./sys/irq/isr.o \
+	./sys/kernel/main.o \
+	./sys/kernel/msgbuf.o \
+	./sys/kernel/term.o \
 	./sys/libk/alloc.o \
 	./sys/libk/list.o \
 	./sys/libk/memory.o \
@@ -82,8 +86,6 @@ C_OBJECTS = ./sys/block/block.o \
 	./sys/vfs/file_descriptor.o \
 	./sys/vfs/mountpoint.o \
 	./sys/vfs/vfs.o \
-	./sys/kernel.o \
-	./sys/msgbuf.o
 
 AS_OBJECTS = ./sys/boot/boot.asm.o \
 	./sys/boot/header.asm.o \

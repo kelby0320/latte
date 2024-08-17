@@ -41,7 +41,7 @@ console_write(struct device *dev, size_t offset, const char *buf, size_t count);
 int
 console_read(struct device *dev, size_t offset, char *buf, size_t count);
 
-int
+void
 console_clear_screen(struct device *dev);
 
 #endif

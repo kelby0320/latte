@@ -1,8 +1,9 @@
 #include "libk/alloc.h"
 
 #include "errno.h"
-#include "kernel.h"
+#include "kernel/kernel.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "libk/slab.h"
 #include "mm/kalloc.h"
 #include "mm/vm.h"
@@ -94,7 +95,10 @@ void
 libk_alloc_init()
 {
     for (int i = 0; i < KMALLOC_SLAB_CACHES; i++) {
-        slab_cache_create(&kmalloc_slab_cache[i], KMALLOC_IDX_TO_CACHE_SIZE(i));
+	int cache_size = KMALLOC_IDX_TO_CACHE_SIZE(i);
+	
+	printk("Creating slab cache (obj size %d)\n", cache_size);
+        slab_cache_create(&kmalloc_slab_cache[i], cache_size);
     }
 }
 
@@ -192,6 +196,9 @@ kzalloc(size_t size)
     int idx = size_to_cache_idx(size);
 
     void *ptr = slab_cache_alloc(&kmalloc_slab_cache[idx]);
+    if (!ptr) {
+	return NULL;
+    }
 
     size_t slab_size = KMALLOC_IDX_TO_CACHE_SIZE(idx);
     memset(ptr, 0, slab_size);

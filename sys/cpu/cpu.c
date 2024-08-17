@@ -1,6 +1,7 @@
 #include "cpu/cpu.h"
 
 #include "cpu/port.h"
+#include "libk/print.h"
 
 #include <stdint.h>
 
@@ -32,6 +33,8 @@ io_wait()
 static int
 remap_pic()
 {
+    printk("Remap PIC to 0x20\n");
+    
     uint8_t mask1 = insb(PIC1_DATA);
     uint8_t mask2 = insb(PIC2_DATA);
 

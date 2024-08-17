@@ -2,6 +2,7 @@
 
 #include "errno.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "mm/buddy.h"
 
 #define paddr_to_idx(paddr) (((size_t)paddr - allocators_offset) / BUDDY_BLOCK_MAX_SIZE)
@@ -14,6 +15,8 @@ static size_t contiguous_allocations[MAX_ALLOCATORS] = {0};
 void
 kalloc_init(void *saddr, size_t mem_size)
 {
+    printk("Init physical memory allocator starting at %d\n", (int)saddr);
+    
     allocators_offset = (size_t)saddr;
     allocators_len = (mem_size - allocators_offset) / BUDDY_BLOCK_MAX_SIZE;
 
