@@ -1,13 +1,13 @@
-#include "syscall/syscall.h"
+#include "syscall.h"
 
 #include "config.h"
 #include "errno.h"
-#include "irq/isr.h"
-#include "sched/sched.h"
+#include "isr.h"
+#include "sched.h"
 #include "syscall/io.h"
 #include "syscall/mmap.h"
 #include "syscall/process.h"
-#include "thread/thread.h"
+#include "thread.h"
 
 typedef void (*syscall_t)();
 

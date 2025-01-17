@@ -1,7 +1,6 @@
-#include "gdt/gdt.h"
-#include "mm/vm.h"
-
-#include "cpu/port.h"
+#include "gdt.h"
+#include "port.h"
+#include "vm.h"
 
 #include <stdint.h>
 

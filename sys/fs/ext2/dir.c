@@ -6,7 +6,7 @@
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/string.h"
-#include "vfs/file_descriptor.h"
+#include "file_descriptor.h"
 
 #include <stdint.h>
 

@@ -1,8 +1,8 @@
-#include "irq/irq.h"
+#include "irq.h"
 
 #include "config.h"
 #include "errno.h"
-#include "irq/idt.h"
+#include "idt.h"
 #include "libk/memory.h"
 
 IRQ_HANDLER irq_handlers[LATTE_TOTAL_IDT_ENTRIES] = {0};

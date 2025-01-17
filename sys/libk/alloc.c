@@ -1,12 +1,12 @@
 #include "libk/alloc.h"
 
 #include "errno.h"
-#include "kernel/kernel.h"
+#include "kernel.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 #include "libk/slab.h"
-#include "mm/kalloc.h"
-#include "mm/vm.h"
+#include "kalloc.h"
+#include "vm.h"
 
 #define KMALLOC_SLAB_CACHE_MIN_SIZE    32
 #define KMALLOC_SLAB_CACHE_MAX_SIZE    2048

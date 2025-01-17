@@ -1,6 +1,6 @@
-#include "block/partition.h"
+#include "partition.h"
 
-#include "block/disk.h"
+#include "disk.h"
 #include "libk/memory.h"
 
 int

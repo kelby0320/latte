@@ -1,13 +1,13 @@
-#include "mm/vm.h"
+#include "vm.h"
 
 #include "errno.h"
-#include "kernel/kernel.h"
+#include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
-#include "mm/kalloc.h"
-#include "mm/paging/page_dir.h"
-#include "mm/paging/page_tbl.h"
-#include "mm/paging/paging.h"
+#include "kalloc.h"
+#include "paging/page_dir.h"
+#include "paging/page_tbl.h"
+#include "paging.h"
 
 #include <stdint.h>
 

@@ -1,4 +1,4 @@
-#include "dev/input/keycode.h"
+#include "dev/keycode.h"
 
 #include "libk/string.h"
 

@@ -2,7 +2,7 @@
 
 #include "errno.h"
 #include "libk/string.h"
-#include "kernel/msgbuf.h"
+#include "msgbuf.h"
 
 /**
  * @brief Convert an int to a string

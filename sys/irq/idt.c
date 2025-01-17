@@ -1,8 +1,8 @@
-#include "irq/idt.h"
+#include "idt.h"
 
 #include "config.h"
 #include "errno.h"
-#include "irq/isr.h"
+#include "isr.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 

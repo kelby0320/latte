@@ -1,11 +1,11 @@
-#include "thread/userio.h"
+#include "userio.h"
 
 #include "errno.h"
-#include "kernel/kernel.h"
+#include "kernel.h"
 #include "libk/memory.h"
-#include "mm/kalloc.h"
-#include "mm/vm.h"
-#include "proc/process.h"
+#include "kalloc.h"
+#include "vm.h"
+#include "process.h"
 
 #include <stdint.h>
 

@@ -1,4 +1,4 @@
-#include "vfs/file_descriptor.h"
+#include "file_descriptor.h"
 
 #include "config.h"
 #include "errno.h"

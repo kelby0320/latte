@@ -1,19 +1,19 @@
-#include "fs/devfs/devfs.h"
+#include "fs/devfs.h"
 
-#include "block/block.h"
-#include "block/buffered_reader.h"
+#include "block.h"
+#include "buffered_reader.h"
 #include "config.h"
-#include "dev/device.h"
-#include "drivers/driver.h"
+#include "device.h"
+#include "driver.h"
 #include "errno.h"
-#include "fs/fs.h"
-#include "fs/path.h"
-#include "kernel/kernel.h"
+#include "fs.h"
+#include "path.h"
+#include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/print.h"
 #include "libk/string.h"
-#include "vfs/file_descriptor.h"
+#include "file_descriptor.h"
 
 #include <stdbool.h>
 #include <stddef.h>

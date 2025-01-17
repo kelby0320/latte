@@ -1,12 +1,12 @@
-#include "gdt/tss.h"
+#include "tss.h"
 
 #include "config.h"
-#include "kernel/kernel.h"
+#include "kernel.h"
 #include "libk/print.h"
 #include "libk/memory.h"
-#include "mm/kalloc.h"
-#include "mm/paging/paging.h"
-#include "mm/vm.h"
+#include "kalloc.h"
+#include "paging.h"
+#include "vm.h"
 
 struct tss tss;
 

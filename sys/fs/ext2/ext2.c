@@ -1,22 +1,20 @@
-#include "fs/ext2/ext2.h"
+#include "fs/ext2.h"
 
-#include "block/buffered_reader.h"
+#include "buffered_reader.h"
 #include "config.h"
 #include "errno.h"
 #include "fs/ext2/common.h"
 #include "fs/ext2/dir.h"
 #include "fs/ext2/dir_iter.h"
 #include "fs/ext2/inode.h"
-#include "fs/fs.h"
-#include "fs/path.h"
-#include "kernel/kernel.h"
+#include "fs.h"
+#include "path.h"
+#include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/string.h"
-#include "vfs/file_descriptor.h"
-#include "vfs/mountpoint.h"
-
-#include "libk/print.h"
+#include "file_descriptor.h"
+#include "mountpoint.h"
 
 #include <stdint.h>
 

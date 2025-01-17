@@ -1,8 +1,8 @@
-#include "dev/platform/platform_device.h"
+#include "dev/platform_device.h"
 
-#include "dev/bus.h"
-#include "drivers/driver.h"
-#include "drivers/platform/platform_driver.h"
+#include "bus.h"
+#include "driver.h"
+#include "driver/platform_driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
 #include "libk/list.h"

@@ -9,7 +9,7 @@
  *
  * @license SPDX-License-Identifier: MIT
  */
-#include "boot/multiboot2.h"
+#include "multiboot2.h"
 
 #include "errno.h"
 

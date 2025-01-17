@@ -1,8 +1,8 @@
 #include "syscall/process.h"
 
-#include "proc/mgmt/exit.h"
-#include "proc/process.h"
-#include "thread/userio.h"
+#include "proc/exit.h"
+#include "process.h"
+#include "userio.h"
 
 void
 do_exit(struct thread *current_thread)

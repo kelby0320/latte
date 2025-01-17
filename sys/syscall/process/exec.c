@@ -3,14 +3,14 @@
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/string.h"
-#include "proc/mgmt/exec.h"
-#include "proc/mgmt/exit.h"
-#include "proc/mgmt/fork.h"
-#include "proc/mgmt/wait.h"
-#include "proc/process.h"
-#include "sched/sched.h"
-#include "thread/thread.h"
-#include "thread/userio.h"
+#include "proc/exec.h"
+#include "proc/exit.h"
+#include "proc/fork.h"
+#include "proc/wait.h"
+#include "process.h"
+#include "sched.h"
+#include "thread.h"
+#include "userio.h"
 
 #define MAX_ARGS 32
 #define MAX_ARG_LEN 256

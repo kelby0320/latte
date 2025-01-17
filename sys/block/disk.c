@@ -1,8 +1,8 @@
-#include "block/disk.h"
+#include "disk.h"
 
-#include "block/block.h"
-#include "block/partition.h"
-#include "dev/device.h"
+#include "block.h"
+#include "partition.h"
+#include "device.h"
 #include "errno.h"
 #include "libk/alloc.h"
 #include "libk/list.h"

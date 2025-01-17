@@ -1,4 +1,4 @@
-#include "fs/path.h"
+#include "path.h"
 
 #include "config.h"
 #include "errno.h"

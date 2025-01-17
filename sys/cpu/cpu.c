@@ -1,6 +1,6 @@
-#include "cpu/cpu.h"
+#include "cpu.h"
 
-#include "cpu/port.h"
+#include "port.h"
 #include "libk/print.h"
 
 #include <stdint.h>

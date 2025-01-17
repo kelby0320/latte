@@ -1,10 +1,10 @@
 #include "syscall/process.h"
 
-#include "proc/mgmt/wait.h"
-#include "proc/process.h"
-#include "sched/sched.h"
-#include "thread/thread.h"
-#include "thread/userio.h"
+#include "proc/wait.h"
+#include "process.h"
+#include "sched.h"
+#include "thread.h"
+#include "userio.h"
 
 void
 do_wait(struct thread *current_thread)

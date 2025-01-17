@@ -1,10 +1,10 @@
-#include "mm/paging/paging.h"
+#include "paging.h"
 
-#include "kernel/kernel.h"
+#include "kernel.h"
 #include "libk/memory.h"
-#include "mm/kalloc.h"
-#include "mm/paging/page_dir.h"
-#include "mm/paging/page_tbl.h"
+#include "kalloc.h"
+#include "paging/page_dir.h"
+#include "paging/page_tbl.h"
 
 #define is_page_dir_entry_free(page_dir_entry) (((uint32_t)page_dir_entry & 0xFFFFF000) == 0)
 #define is_page_tbl_entry_free(page_tbl_entry) (((uint32_t)page_tbl_entry & 0xFFFFF000) == 0)

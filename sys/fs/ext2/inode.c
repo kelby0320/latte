@@ -1,6 +1,6 @@
 #include "fs/ext2/inode.h"
 
-#include "block/buffered_reader.h"
+#include "buffered_reader.h"
 #include "errno.h"
 #include "fs/ext2/block_iter.h"
 #include "fs/ext2/common.h"

@@ -1,9 +1,9 @@
-#include "mm/kalloc.h"
+#include "kalloc.h"
 
 #include "errno.h"
 #include "libk/memory.h"
 #include "libk/print.h"
-#include "mm/buddy.h"
+#include "buddy.h"
 
 #define paddr_to_idx(paddr) (((size_t)paddr - allocators_offset) / BUDDY_BLOCK_MAX_SIZE)
 

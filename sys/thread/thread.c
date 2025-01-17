@@ -1,17 +1,17 @@
-#include "thread/thread.h"
+#include "thread.h"
 
 #include "config.h"
 #include "errno.h"
-#include "irq/isr.h"
+#include "isr.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/memory.h"
 #include "libk/print.h"
-#include "mm/kalloc.h"
-#include "mm/paging/paging.h"
-#include "mm/vm.h"
-#include "proc/process.h"
-#include "sched/sched.h"
+#include "kalloc.h"
+#include "paging.h"
+#include "vm.h"
+#include "process.h"
+#include "sched.h"
 
 #include <stddef.h>
 

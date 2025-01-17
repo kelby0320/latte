@@ -1,8 +1,8 @@
 #include "gdt.h"
 
 #include "config.h"
-#include "gdt/tss.h"
-#include "kernel/kernel.h"
+#include "tss.h"
+#include "kernel.h"
 #include "libk/memory.h"
 
 struct gdtr gdtr;

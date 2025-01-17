@@ -1,6 +1,7 @@
-#include "mm/paging/page_tbl.h"
+#include "paging/page_tbl.h"
 
-#include "mm/paging/paging.h"
+#include "paging.h"
+
 #include <stdint.h>
 
 page_tbl_entry_t

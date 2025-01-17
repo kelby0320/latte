@@ -1,4 +1,4 @@
-#include "dev/device.h"
+#include "device.h"
 
 #include "errno.h"
 #include "libk/alloc.h"
@@ -10,7 +10,6 @@ int
 make_device(struct device *dev, const char *name)
 {
     int name_len = strlen(name);
-
     dev->name = kzalloc(name_len + 1);
     if (!dev->name) {
         return -ENOMEM;
@@ -21,4 +20,3 @@ make_device(struct device *dev, const char *name)
 
     return 0;
 }
-

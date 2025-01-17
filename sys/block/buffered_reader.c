@@ -1,8 +1,8 @@
-#include "block/buffered_reader.h"
+#include "buffered_reader.h"
 
-#include "block/block.h"
-#include "block/disk.h"
-#include "dev/device.h"
+#include "block.h"
+#include "disk.h"
+#include "device.h"
 
 void
 block_buffered_reader_init(struct block_buffered_reader *reader, struct block *block)

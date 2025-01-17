@@ -1,12 +1,12 @@
 #include "syscall/mmap.h"
 
 #include "errno.h"
-#include "irq/isr.h"
-#include "proc/mmap.h"
-#include "proc/process.h"
-#include "sched/sched.h"
-#include "thread/thread.h"
-#include "thread/userio.h"
+#include "isr.h"
+#include "mmap.h"
+#include "process.h"
+#include "sched.h"
+#include "thread.h"
+#include "userio.h"
 
 #include <stddef.h>
 #include <stdint.h>

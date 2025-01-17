@@ -2,15 +2,15 @@
 
 #include "config.h"
 #include "errno.h"
-#include "irq/isr.h"
+#include "isr.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
-#include "proc/fd.h"
-#include "sched/sched.h"
-#include "thread/thread.h"
-#include "thread/userio.h"
-#include "vfs/file_descriptor.h"
-#include "vfs/vfs.h"
+#include "fd.h"
+#include "sched.h"
+#include "thread.h"
+#include "userio.h"
+#include "file_descriptor.h"
+#include "vfs.h"
 
 #include <stddef.h>
 

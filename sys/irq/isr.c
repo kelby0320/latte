@@ -1,14 +1,13 @@
-#include "irq/isr.h"
+#include "isr.h"
 
-#include "cpu/port.h"
-#include "irq/irq.h"
-#include "kernel/kernel.h"
-#include "mm/vm.h"
-#include "proc/process.h"
-#include "sched/sched.h"
-#include "syscall/syscall.h"
-#include "thread/thread.h"
-
+#include "port.h"
+#include "irq.h"
+#include "kernel.h"
+#include "vm.h"
+#include "process.h"
+#include "sched.h"
+#include "syscall.h"
+#include "thread.h"
 #include "libk/print.h"
 
 static void

@@ -1,0 +1,2 @@
+bins:
+	echo "Build bin"

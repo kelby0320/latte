@@ -1,19 +1,20 @@
-#include "vfs/vfs.h"
+#include "vfs.h"
 
-#include "dev/bus.h"
+#include "bus.h"
 #include "config.h"
-#include "block/block.h"
-#include "dev/device.h"
+#include "block.h"
+#include "device.h"
 #include "errno.h"
-#include "fs/fs.h"
-#include "fs/path.h"
-#include "kernel/kernel.h"
+#include "fs.h"
+#include "path.h"
+#include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 #include "libk/string.h"
-#include "vfs/file_descriptor.h"
-#include "vfs/mountpoint.h"
+#include "file_descriptor.h"
+#include "mountpoint.h"
+
 #include <stdbool.h>
 
 /**

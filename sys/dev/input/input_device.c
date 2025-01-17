@@ -1,7 +1,7 @@
-#include "dev/input/input_device.h"
+#include "dev/input_device.h"
 
-#include "dev/bus.h"
-#include "drivers/driver.h"
+#include "bus.h"
+#include "driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
@@ -9,7 +9,6 @@
 #include "libk/print.h"
 #include "libk/string.h"
 #include "libk/list.h"
-#include "errno.h"
 
 #include <stdbool.h>
 
