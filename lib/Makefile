@@ -1,2 +1,3 @@
-libs:
-	echo "Build libs"
+all:
+	cd ./libc && $(MAKE) all
+
