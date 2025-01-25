@@ -14,10 +14,13 @@ endif
 
 INCLUDES = -Isys/include
 
-all: kernel libs bin
+all: kernel libs bins
 
 libs:
 	cd ./lib && $(MAKE) all
+
+bins:
+	cd ./bin && $(MAKE) all
 
 clean:
 	rm -r $(builddir)

@@ -1,23 +1,17 @@
-INIT = ./init
-
-LIBC = ../../lib/libc/libc.a
+version = 0.1
+builddir = ../../build
 
 CC = i686-elf-gcc
 
-CFLAGS = -g -std=gnu99 -ffreestanding -O0 -Wall -Wextra
+CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-C_OBJECTS = ./src/init.o
+ifdef $(DEBUG)
+CFLAGS += -g
+endif
 
-INCLUDES=-I../../include
+INCLUDES = -I../../include
 
-all: $(INIT)
+all: init
+	$(CC) $(CFLAGS) -nostdlib -fpic -T ./linker.ld -o $(builddir)/bin/init/init $(shell find $(builddir)/bin/init -name *.o) $(builddir)/lib/libc/libc.a
 
-$(INIT): $(C_OBJECTS)
-	$(CC) -g -T ./linker.ld -o $(INIT) -ffreestanding -O0 -nostdlib -fpic $(C_OBJECTS) $(LIBC)
-
-$(filter %.o,$(C_OBJECTS)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-clean:
-	-rm -r $(C_OBJECTS)
-	-rm $(INIT)
+include src/Makefile
