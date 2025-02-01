@@ -9,8 +9,8 @@
 #include "libk/print.h"
 #include "libk/string.h"
 
-#include <stddef.h>
 #include <stdarg.h>
+#include <stddef.h>
 
 #define STATIC_PLATFORM_DEVICE_COUNT 8
 
@@ -22,7 +22,8 @@ static struct bus platform_bus = {
 };
 
 static struct platform_device *
-make_platform_device(const char *dev_name, const char *pdev_name,  int num_resources, ...)
+make_platform_device(
+    const char *dev_name, const char *pdev_name, int num_resources, ...)
 {
     struct platform_device *pdev = kzalloc(sizeof(struct platform_device));
     if (!pdev) {
@@ -43,31 +44,32 @@ make_platform_device(const char *dev_name, const char *pdev_name,  int num_resou
     va_start(args, num_resources);
 
     for (int i = 0; i < num_resources; i++) {
-	unsigned int base_addr = va_arg(args, unsigned int);
-	unsigned int length = va_arg(args, unsigned int);
+        unsigned int base_addr = va_arg(args, unsigned int);
+        unsigned int length = va_arg(args, unsigned int);
 
-	struct resource *res = kzalloc(sizeof(struct resource));
-	if (!res) {
-	    for_each_in_list(struct resource *, pdev->resources, list, resource) {
-		kfree(resource);
-	    }
-	    
-	    list_destroy(pdev->resources);
-	    kfree((void *)pdev->name);
-	    
-	    goto err_exit;
-	}
+        struct resource *res = kzalloc(sizeof(struct resource));
+        if (!res) {
+            for_each_in_list(struct resource *, pdev->resources, list, resource)
+            {
+                kfree(resource);
+            }
 
-	res->base_addr = base_addr;
-	res->length = length;
+            list_destroy(pdev->resources);
+            kfree((void *)pdev->name);
 
-	list_push_back(&pdev->resources, res);
+            goto err_exit;
+        }
+
+        res->base_addr = base_addr;
+        res->length = length;
+
+        list_push_back(&pdev->resources, res);
     }
 
     va_end(args);
 
     return pdev;
-    
+
 err_exit:
     kfree(pdev);
     return NULL;
@@ -118,7 +120,8 @@ platform_add_devices()
 
         int res = platform_device_register(pdevices[i]);
         if (res < 0) {
-            printk("Failed to register platform device: %s\n", pdevices[i]->name);
+            printk(
+                "Failed to register platform device: %s\n", pdevices[i]->name);
         }
     }
 
@@ -145,18 +148,19 @@ platform_match(struct device *dev, struct device_driver *drv)
 
     int match = -1;
     do {
-	char *token = strsep(&copy_compat, ","); /* copy_compat is modified here */
-	if (token == NULL) {
-	    break;
-	}
+        char *token =
+            strsep(&copy_compat, ","); /* copy_compat is modified here */
+        if (token == NULL) {
+            break;
+        }
 
-	match = strcmp(token, pdev_name);
-	if (match == 0) {
-	    break;
-	}
+        match = strcmp(token, pdev_name);
+        if (match == 0) {
+            break;
+        }
     } while (true);
 
-    kfree(copy_compat_p);	/* Make sure to free copy_compat_p, NOT copy_compat */
+    kfree(copy_compat_p); /* Make sure to free copy_compat_p, NOT copy_compat */
     return match;
 }
 
@@ -186,10 +190,11 @@ platform_device_register(struct platform_device *pdev)
 struct platform_device *
 platform_device_find(const char *name)
 {
-    for_each_in_list(struct platform_device *, platform_bus.devices, list, pdev) {
-	if (strcmp(pdev->name, name) == 0) {
-	    return pdev;
-	}
+    for_each_in_list(struct platform_device *, platform_bus.devices, list, pdev)
+    {
+        if (strcmp(pdev->name, name) == 0) {
+            return pdev;
+        }
     }
 
     return NULL;

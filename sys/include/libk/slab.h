@@ -8,7 +8,8 @@
 
 // The size of the free list is determined by subtracting the sizes of the
 // other fields in the struct slab from the SLAB_SIZE, e.g. 4096
-#define FREE_LIST_SIZE (SLAB_SIZE - sizeof(void *) - (4 * sizeof(size_t)) - sizeof(struct slab *))
+#define FREE_LIST_SIZE                                                         \
+    (SLAB_SIZE - sizeof(void *) - (4 * sizeof(size_t)) - sizeof(struct slab *))
 
 /**
  * @brief   The slab structure

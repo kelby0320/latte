@@ -7,10 +7,7 @@ struct mountpoint;
 
 typedef unsigned int file_type_t;
 
-enum file_type {
-    FT_REGULAR_FILE,
-    FT_DIRECTORY
-};
+enum file_type { FT_REGULAR_FILE, FT_DIRECTORY };
 
 /**
  * @brief Common file descriptor structure
@@ -19,7 +16,7 @@ enum file_type {
 struct file_descriptor {
     // File descriptor type
     file_type_t type;
-    
+
     // Pointer to the mountpoint for this file
     struct mountpoint *mountpoint;
 
@@ -31,7 +28,7 @@ struct file_descriptor {
 };
 
 struct dir_entry {
-    uint32_t inode;    
+    uint32_t inode;
     char name[256];
 };
 

@@ -3,10 +3,9 @@
 
 #include <stdint.h>
 
-#define TSS_STACK_SIZE      0x10000 // 64KB
-#define TSS_STACK_TOP       0xFFFFF000
-#define TSS_STACK_BOTTOM    (TSS_STACK_TOP - TSS_STACK_SIZE)
-
+#define TSS_STACK_SIZE   0x10000 // 64KB
+#define TSS_STACK_TOP    0xFFFFF000
+#define TSS_STACK_BOTTOM (TSS_STACK_TOP - TSS_STACK_SIZE)
 
 struct tss {
     uint32_t link;

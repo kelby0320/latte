@@ -33,7 +33,7 @@ do_write(struct thread *current_thread);
 
 /**
  * @brief Execute the opendir system call
- */   
+ */
 void
 do_opendir(struct thread *current_thread);
 

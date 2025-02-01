@@ -18,7 +18,8 @@ page_tbl_get_entry(page_tbl_t page_tbl, void *vaddr)
 }
 
 void
-page_tbl_set_entry(page_tbl_t page_tbl, void *vaddr, page_tbl_entry_t page_tbl_entry)
+page_tbl_set_entry(
+    page_tbl_t page_tbl, void *vaddr, page_tbl_entry_t page_tbl_entry)
 {
     uint32_t page_tbl_idx = ((uint32_t)vaddr & PAGING_PAGE_TBL_MASK) >> 12;
 

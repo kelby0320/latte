@@ -1,9 +1,9 @@
 #include "gdt.h"
 
 #include "config.h"
-#include "tss.h"
 #include "kernel.h"
 #include "libk/memory.h"
+#include "tss.h"
 
 struct gdtr gdtr;
 struct gdt gdt[LATTE_TOTAL_GDT_SEGMENTS];
@@ -21,12 +21,14 @@ struct gdt_structured {
 };
 
 struct gdt_structured gdt_structured[LATTE_TOTAL_GDT_SEGMENTS] = {
-    {.base = 0x00, .limit = 0x00, .type = 0x00},                 /* Null Segment */
-    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x9A},           /* Kernel Code Segment */
-    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x92},           /* Kernel Data Segment */
-    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF8},           /* User Code Segment */
-    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF2},           /* User Data Segment */
-    {.base = (uint32_t)&tss, .limit = sizeof(tss), .type = 0xE9} /* TSS Segment*/
+    {.base = 0x00, .limit = 0x00, .type = 0x00},       /* Null Segment */
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x9A}, /* Kernel Code Segment */
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x92}, /* Kernel Data Segment */
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF8}, /* User Code Segment */
+    {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF2}, /* User Data Segment */
+    {.base = (uint32_t)&tss,
+     .limit = sizeof(tss),
+     .type = 0xE9} /* TSS Segment*/
 };
 
 /**
@@ -55,7 +57,8 @@ gdt_fix_kernel_registers();
 static void
 encode_gdt_structured(struct gdt *gdt, struct gdt_structured *gdt_structured)
 {
-    if (gdt_structured->limit > 0xFFFFF && ((gdt_structured->limit & 0xFFF) != 0xFFF)) {
+    if (gdt_structured->limit > 0xFFFFF &&
+        ((gdt_structured->limit & 0xFFF) != 0xFFF)) {
         panic("Unable to encode gdt segment limit");
     }
 
@@ -87,7 +90,8 @@ encode_gdt_structured(struct gdt *gdt, struct gdt_structured *gdt_structured)
  * @param total_entries     Total entries in gdt
  */
 static void
-gdt_structured_to_gdt(struct gdt *gdt, struct gdt_structured *structured_gdt, int total_entries)
+gdt_structured_to_gdt(
+    struct gdt *gdt, struct gdt_structured *structured_gdt, int total_entries)
 {
     for (int i = 0; i < total_entries; i++) {
         encode_gdt_structured(&gdt[i], &structured_gdt[i]);

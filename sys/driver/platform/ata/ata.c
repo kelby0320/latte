@@ -1,9 +1,9 @@
 #include "driver/platform/ata.h"
 
 #include "block.h"
-#include "disk.h"
-#include "device.h"
 #include "dev/platform_device.h"
+#include "device.h"
+#include "disk.h"
 #include "driver.h"
 #include "driver/platform_driver.h"
 #include "errno.h"
@@ -13,12 +13,7 @@
 static unsigned int ata_disk_no = 0;
 
 struct platform_driver ata_pdev = {
-    .driver = {
-	.name = "ata",
-	.compat = "ata"
-    },
-    .probe = ata_probe
-};
+    .driver = {.name = "ata", .compat = "ata"}, .probe = ata_probe};
 
 int
 ata_drv_init()
@@ -34,21 +29,21 @@ ata_probe(struct platform_device *pdev)
     unsigned short id_buf[256];
     int res = ata_identify(as_device(pdev), id_buf);
     if (res < 0) {
-	/* No drive connected */
-	return res;
+        /* No drive connected */
+        return res;
     }
-    
+
     /* Add new disk for pdev */
     struct disk *disk = kzalloc(sizeof(struct disk));
     if (!disk) {
-	return -ENOMEM;
+        return -ENOMEM;
     }
 
     char *name = kzalloc(8);
     if (!name) {
-	goto err_name_alloc;
+        goto err_name_alloc;
     }
-    
+
     sprintk(name, "hdd%d", ata_disk_no++);
 
     disk->name = name;

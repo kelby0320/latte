@@ -1,8 +1,8 @@
 #include "driver/platform/devfs.h"
 
-#include "disk.h"
 #include "config.h"
 #include "device.h"
+#include "disk.h"
 #include "driver.h"
 #include "driver/platform_driver.h"
 #include "errno.h"
@@ -12,12 +12,7 @@
 #include "libk/string.h"
 
 struct platform_driver devfs_pdev = {
-    .driver = {
-	.name = "devfs",
-	.compat = "devfs"
-    },
-    .probe = devfs_probe
-};
+    .driver = {.name = "devfs", .compat = "devfs"}, .probe = devfs_probe};
 
 int
 devfs_drv_init()
@@ -32,12 +27,12 @@ devfs_probe(struct platform_device *pdev)
 {
     struct disk *disk = kzalloc(sizeof(struct disk));
     if (!disk) {
-	return -ENOMEM;
+        return -ENOMEM;
     }
 
     char *name = kzalloc(8);
     if (!name) {
-	goto err_name_alloc;
+        goto err_name_alloc;
     }
 
     sprintk(name, "devfs");
@@ -54,12 +49,13 @@ err_name_alloc:
 }
 
 int
-devfs_read_sectors(struct device *dev, unsigned int lba, char *buf, size_t count)
+devfs_read_sectors(
+    struct device *dev, unsigned int lba, char *buf, size_t count)
 {
     // Set the buffer to zero for the prescribed number of sectors
     for (size_t i = 0; i < count; i++) {
-	unsigned int offset = i * LATTE_SECTOR_SIZE;
-	memset(buf + offset, 0, LATTE_SECTOR_SIZE);
+        unsigned int offset = i * LATTE_SECTOR_SIZE;
+        memset(buf + offset, 0, LATTE_SECTOR_SIZE);
     }
 
     return 0;

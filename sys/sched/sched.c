@@ -4,8 +4,8 @@
 #include "kernel.h"
 #include "libk/memory.h"
 #include "libk/queue.h"
-#include "vm.h"
 #include "thread.h"
+#include "vm.h"
 
 static struct queue ready_queue = {0};
 static struct queue blocked_queue = {0};

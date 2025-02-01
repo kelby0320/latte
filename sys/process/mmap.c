@@ -1,18 +1,18 @@
 #include "mmap.h"
 
 #include "errno.h"
+#include "kalloc.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/memory.h"
-#include "kalloc.h"
 #include "paging.h"
 #include "process.h"
 #include "vm.h"
 
-
 void *
-process_mmap(struct process *process, void *addr, size_t size, int prot, int flags, int fd,
-             size_t offset)
+process_mmap(
+    struct process *process, void *addr, size_t size, int prot, int flags,
+    int fd, size_t offset)
 {
     int order = kalloc_size_to_order(size);
     void *segment = kalloc_get_phys_pages(order);
@@ -23,13 +23,15 @@ process_mmap(struct process *process, void *addr, size_t size, int prot, int fla
 
     memset(segment, 0, segment_size);
 
-    void *virt = vm_area_map_user_pages(process->vm_area, segment, segment_size);
+    void *virt =
+        vm_area_map_user_pages(process->vm_area, segment, segment_size);
     if (!virt) {
         kalloc_free_phys_pages(segment);
         goto err_out;
     }
 
-    struct process_allocation *palloc = kzalloc(sizeof(struct process_allocation));
+    struct process_allocation *palloc =
+        kzalloc(sizeof(struct process_allocation));
     palloc->type = PROCESS_ALLOCATION_MEMORY_SEGMENT;
     palloc->paddr = segment;
     palloc->vaddr = virt;
@@ -48,7 +50,8 @@ process_munmap(struct process *process, void *addr, size_t length)
 {
     // Find the corresponding allocation
     struct process_allocation *palloc = NULL;
-    for_each_in_list(struct process_allocation *, process->allocations, list, allocation)
+    for_each_in_list(
+        struct process_allocation *, process->allocations, list, allocation)
     {
         if (allocation->vaddr == addr) {
             palloc = allocation;

@@ -14,8 +14,9 @@
 
 #define THREAD_STACK_SIZE 0x10000 // 64KB
 
-#define THREAD_STACK_VIRT_ADDR_TOP    0xBFFFF000 // 3GB - 4KB
-#define THREAD_STACK_VIRT_ADDR_BOTTOM (THREAD_STACK_VIRT_ADDR_TOP - THREAD_STACK_SIZE)
+#define THREAD_STACK_VIRT_ADDR_TOP 0xBFFFF000 // 3GB - 4KB
+#define THREAD_STACK_VIRT_ADDR_BOTTOM                                          \
+    (THREAD_STACK_VIRT_ADDR_TOP - THREAD_STACK_SIZE)
 
 /**
  * @brief Saved registers
@@ -85,11 +86,13 @@ thread_get(uint32_t tid);
  * @brief   Copy a thread
  *
  * @param thread            Pointer to the thread
- * @param child_process     Pointer to the child process the thread will belong to
+ * @param child_process     Pointer to the child process the thread will belong
+ * to
  * @return struct thread*   Pointer to the new thread
  */
 struct thread *
-thread_copy_to(const struct thread *thread, const struct process *child_process);
+thread_copy_to(
+    const struct thread *thread, const struct process *child_process);
 
 /**
  * @brief Destroy a thread

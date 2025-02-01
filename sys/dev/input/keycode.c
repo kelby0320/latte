@@ -3,73 +3,67 @@
 #include "libk/string.h"
 
 static uint8_t keycode_to_ascii_tbl[] = {
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, '1', '2', '3', '4', '5', '6', '7',
-    '8', '9', '0', '-', '=', 0x8, 0, 0,
-    0, 0, '/', '*', '-', '\t', 'q', 'w',
-    'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
-    '[', ']', '\\', 0x7f, 0, 0, '7', '8',
-    '9', '+', 0, 'a', 's', 'd', 'f', 'g',
-    'h', 'j', 'k', 'l', ';', '\'', '\n', '4',
-    '5', '6', 0, 'z', 'x', 'c', 'v', 'b',
-    'n', 'm', ',', '.', '/', 0, 0, '1',
-    '2', '3', '\n', 0, 0, 0, ' ', 0,
-    0, 0, 0, 0, 0, 0, '0', 0x7f
-};
+    0,   0,   0,   0,   0,    0,    0,   0,   0,   0,   0,   0,    0,
+    0,   0,   0,   0,   '1',  '2',  '3', '4', '5', '6', '7', '8',  '9',
+    '0', '-', '=', 0x8, 0,    0,    0,   0,   '/', '*', '-', '\t', 'q',
+    'w', 'e', 'r', 't', 'y',  'u',  'i', 'o', 'p', '[', ']', '\\', 0x7f,
+    0,   0,   '7', '8', '9',  '+',  0,   'a', 's', 'd', 'f', 'g',  'h',
+    'j', 'k', 'l', ';', '\'', '\n', '4', '5', '6', 0,   'z', 'x',  'c',
+    'v', 'b', 'n', 'm', ',',  '.',  '/', 0,   0,   '1', '2', '3',  '\n',
+    0,   0,   0,   ' ', 0,    0,    0,   0,   0,   0,   0,   '0',  0x7f};
 
 char
 shift_character(char c)
 {
     if (islower(c)) {
-	return toupper(c);
+        return toupper(c);
     }
 
     switch (c) {
     case '`':
-	return '~';
+        return '~';
     case '1':
-	return '!';
+        return '!';
     case '2':
-	return '@';
+        return '@';
     case '3':
-	return '#';
+        return '#';
     case '4':
-	return '$';
+        return '$';
     case '5':
-	return '%';
+        return '%';
     case '6':
-	return '^';
+        return '^';
     case '7':
-	return '&';
+        return '&';
     case '8':
-	return '*';
+        return '*';
     case '9':
-	return '(';
+        return '(';
     case '0':
-	return ')';
+        return ')';
     case '-':
-	return '_';
+        return '_';
     case '=':
-	return '+';
+        return '+';
     case '[':
-	return '{';
+        return '{';
     case ']':
-	return '}';
+        return '}';
     case '\\':
-	return '|';
+        return '|';
     case ';':
-	return ':';
+        return ':';
     case '\'':
-	return '\"';
+        return '\"';
     case ',':
-	return '<';
+        return '<';
     case '.':
-	return '>';
+        return '>';
     case '/':
-	return '?';
+        return '?';
     default:
-	return c;
+        return c;
     }
 }
 
@@ -77,13 +71,13 @@ char
 keycode_to_ascii(unsigned int keycode, bool shift_enabled)
 {
     if (keycode >= sizeof(keycode_to_ascii_tbl)) {
-	return 0;
+        return 0;
     }
-    
+
     char c = keycode_to_ascii_tbl[keycode];
 
     if (shift_enabled) {
-	c = shift_character(c);
+        c = shift_character(c);
     }
 
     return c;

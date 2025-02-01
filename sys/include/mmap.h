@@ -6,8 +6,9 @@
 #include <stddef.h>
 
 void *
-process_mmap(struct process *process, void *addr, size_t length, int prot, int flags, int fd,
-             size_t offset);
+process_mmap(
+    struct process *process, void *addr, size_t length, int prot, int flags,
+    int fd, size_t offset);
 
 int
 process_munmap(struct process *process, void *addr, size_t length);

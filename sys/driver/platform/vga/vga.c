@@ -1,26 +1,21 @@
 #include "driver/platform/vga.h"
 
-#include "port.h"
-#include "device.h"
 #include "dev/platform_device.h"
+#include "device.h"
 #include "driver.h"
 #include "driver/platform_driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
+#include "port.h"
 
 #include <stdint.h>
 
 #define VGA_FRAMEBUFFER_ADDRESS (uint16_t *)0xB8000
-#define VGA_FB_HEIGHT 24
-#define VGA_FB_WIDTH 80
+#define VGA_FB_HEIGHT           24
+#define VGA_FB_WIDTH            80
 
 struct platform_driver vga_drv = {
-    .driver = {
-	.name = "vga",
-	.compat = "vga"
-    },
-    .probe = vga_probe
-};
+    .driver = {.name = "vga", .compat = "vga"}, .probe = vga_probe};
 
 /**
  * @brief Make a VGA color byte
@@ -48,7 +43,7 @@ vga_probe(struct platform_device *pdev)
 {
     struct vga_private *private = kzalloc(sizeof(struct vga_private));
     if (!private) {
-	return -ENOMEM;
+        return -ENOMEM;
     }
 
     private->framebuffer = VGA_FRAMEBUFFER_ADDRESS;
@@ -68,7 +63,7 @@ uint16_t *
 vga_framebuffer(struct device *dev)
 {
     struct vga_private *private = dev->driver->private;
-    return private->framebuffer;   
+    return private->framebuffer;
 }
 
 uint16_t
@@ -96,7 +91,7 @@ uint16_t
 vga_max_row(struct device *dev)
 {
     struct vga_private *private = dev->driver->private;
-    return private->fb_height; 
+    return private->fb_height;
 }
 
 uint8_t
@@ -111,7 +106,7 @@ vga_enable_cursor()
 {
     uint8_t cursor_start = 14;
     uint8_t cursor_end = 15;
-    
+
     outb(0x3D4, 0x0A);
     outb(0x3D5, (insb(0x3D5) & 0xC0) | cursor_start);
 

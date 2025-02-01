@@ -1,16 +1,18 @@
 #include "proc/exec.h"
 
 #include "errno.h"
+#include "kalloc.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
-#include "kalloc.h"
-#include "vm.h"
 #include "proc/exit.h"
 #include "process.h"
 #include "thread.h"
+#include "vm.h"
 
 int
-process_execv(struct process *process, const char *path, const char *const *argv, size_t argv_len)
+process_execv(
+    struct process *process, const char *path, const char *const *argv,
+    size_t argv_len)
 {
     int res = process_free_threads(process);
     if (res < 0) {
@@ -39,12 +41,12 @@ process_execv(struct process *process, const char *path, const char *const *argv
 
     struct thread *thread = thread_get(tid);
     if (!thread) {
-	goto err;
+        goto err;
     }
 
     res = process_set_argv(process, thread, argv, argv_len);
     if (res < 0) {
-	goto err;
+        goto err;
     }
 
     return 0;

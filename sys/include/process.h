@@ -2,8 +2,8 @@
 #define PROCESS_H
 
 #include "config.h"
-#include "libk/list.h"
 #include "ld.h"
+#include "libk/list.h"
 #include "thread.h"
 
 #include <stddef.h>
@@ -187,7 +187,9 @@ process_add_thread(struct process *process);
  * @param argv_len   Length of arguments vector
  */
 int
-process_set_argv(struct process *process, struct thread *thread, const char *const *argv, size_t argv_len);
+process_set_argv(
+    struct process *process, struct thread *thread, const char *const *argv,
+    size_t argv_len);
 
 /**
  * @brief   Create the first user process on the system

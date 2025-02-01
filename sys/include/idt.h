@@ -29,7 +29,8 @@ struct idt_entry {
     // Reserved
     uint8_t reserved;
 
-    // Attributes - Bit 0 - 3 Gate Type, Bit 4 is 0, Bits 5 - 6 Privilege Level, Bit 7 Present
+    // Attributes - Bit 0 - 3 Gate Type, Bit 4 is 0, Bits 5 - 6 Privilege Level,
+    // Bit 7 Present
     uint8_t attr;
     // Bits 16 - 31 of the interrupt handler address
     uint16_t offset2;

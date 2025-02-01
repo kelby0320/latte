@@ -9,7 +9,7 @@ extern int stderr;
 
 /**
  * @brief Write a formatted string to a buffer
- * 
+ *
  * @param buf       Pointer the the buffer
  * @param fmt       Format string to print
  * @param vlist     Format string argument list
@@ -20,7 +20,7 @@ vsprintf(char *buf, const char *fmt, va_list vlist);
 
 /**
  * @brief Write a formatted string to a buffer
- * 
+ *
  * @param buf       Pointer the the buffer
  * @param fmt       Format string to print
  * @param ...       Format string argument list
@@ -31,7 +31,7 @@ sprintf(char *buf, const char *fmt, ...);
 
 /**
  * @brief Write a formatted string to stdout
- * 
+ *
  * @param fmt       Format string
  * @param ...       Format string argument list
  * @return int      Number of characters written

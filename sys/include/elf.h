@@ -49,29 +49,31 @@
 typedef uint32_t elf32_addr;
 typedef uint16_t elf32_half;
 typedef uint32_t elf32_off;
-typedef int32_t  elf32_sword;
+typedef int32_t elf32_sword;
 typedef uint32_t elf32_word;
 
 struct elf32_ehdr {
-    unsigned char e_ident[EI_NIDENT]; /* ELF marker and machine independent data */
-    elf32_half    e_type;             /* ELF file type */
-    elf32_half    e_machine;          /* ELF machine architecture */
-    elf32_word    e_version;          /* ELF version */
-    elf32_addr    e_entry;            /* Virtual address program entry point */
-    elf32_off     e_phoff;            /* Program header table file offset */
-    elf32_off     e_shoff;            /* Section header table file offset */
-    elf32_word    e_flags;            /* Processor specific flags */
-    elf32_half    e_ehsize;           /* ELF header size in bytes */
-    elf32_half    e_phentsize;        /* Program header table entry size in bytes */
-    elf32_half    e_phnum;            /* Number of program header table entries */
-    elf32_half    e_shentsize;        /* Section header table entry size in bytes */
-    elf32_half    e_shnum;            /* Number of section header table entries */
-    elf32_half    e_shstrndx; /* Section header table entry of the section name string table */
+    unsigned char
+        e_ident[EI_NIDENT]; /* ELF marker and machine independent data */
+    elf32_half e_type;      /* ELF file type */
+    elf32_half e_machine;   /* ELF machine architecture */
+    elf32_word e_version;   /* ELF version */
+    elf32_addr e_entry;     /* Virtual address program entry point */
+    elf32_off e_phoff;      /* Program header table file offset */
+    elf32_off e_shoff;      /* Section header table file offset */
+    elf32_word e_flags;     /* Processor specific flags */
+    elf32_half e_ehsize;    /* ELF header size in bytes */
+    elf32_half e_phentsize; /* Program header table entry size in bytes */
+    elf32_half e_phnum;     /* Number of program header table entries */
+    elf32_half e_shentsize; /* Section header table entry size in bytes */
+    elf32_half e_shnum;     /* Number of section header table entries */
+    elf32_half e_shstrndx;  /* Section header table entry of the section name
+                               string table */
 } __attribute__((packed));
 
 struct elf32_phdr {
     elf32_word p_type;   /* Segment type */
-    elf32_off  p_offset; /* File offset of segment */
+    elf32_off p_offset;  /* File offset of segment */
     elf32_addr p_vaddr;  /* Segment virtual address */
     elf32_addr p_paddr;  /* Segment physical address */
     elf32_word p_filesz; /* Segment size in file */
@@ -81,11 +83,12 @@ struct elf32_phdr {
 } __attribute__((packed));
 
 struct elf32_shdr {
-    elf32_word sh_name;      /* Section name (index into section header string table)*/
+    elf32_word
+        sh_name; /* Section name (index into section header string table)*/
     elf32_word sh_type;      /* Section type */
     elf32_word sh_flags;     /* Section flags */
     elf32_addr sh_addr;      /* Section memory address */
-    elf32_off  sh_off;       /* Section file offset */
+    elf32_off sh_off;        /* Section file offset */
     elf32_word sh_size;      /* Section size in bytes */
     elf32_word sh_link;      /* Section header table index link */
     elf32_word sh_info;      /* Section information */

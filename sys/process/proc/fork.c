@@ -1,15 +1,15 @@
 #include "proc/fork.h"
 
 #include "errno.h"
+#include "kalloc.h"
+#include "ld.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/memory.h"
-#include "kalloc.h"
-#include "vm.h"
-#include "ld.h"
 #include "process.h"
 #include "sched.h"
 #include "thread.h"
+#include "vm.h"
 
 /**
  * @brief   Copy the process structure from the parent to the child.
@@ -72,9 +72,11 @@ process_copy_threads(const struct process *parent, struct process *child)
 static int
 process_copy_allocations(const struct process *parent, struct process *child)
 {
-    for_each_in_list(struct process_allocation *, parent->allocations, alloc_list, alloc)
+    for_each_in_list(
+        struct process_allocation *, parent->allocations, alloc_list, alloc)
     {
-        struct process_allocation *child_alloc = kzalloc(sizeof(struct process_allocation));
+        struct process_allocation *child_alloc =
+            kzalloc(sizeof(struct process_allocation));
         if (!child_alloc) {
             goto err_alloc;
         }
@@ -90,8 +92,9 @@ process_copy_allocations(const struct process *parent, struct process *child)
 
         memcpy(segment, alloc->paddr, child_alloc->size);
 
-        vm_area_map_pages_to(child->vm_area, alloc->vaddr, segment, segment + child_alloc->size,
-                             PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
+        vm_area_map_pages_to(
+            child->vm_area, alloc->vaddr, segment, segment + child_alloc->size,
+            PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
 
         child_alloc->paddr = segment;
         child_alloc->vaddr = alloc->vaddr;
@@ -102,7 +105,8 @@ process_copy_allocations(const struct process *parent, struct process *child)
     return 0;
 
 err_alloc:
-    for_each_in_list(struct process_allocation *, child->allocations, alist, allocation)
+    for_each_in_list(
+        struct process_allocation *, child->allocations, alist, allocation)
     {
         kalloc_free_phys_pages(allocation->paddr);
         kfree(alloc);
@@ -112,7 +116,8 @@ err_alloc:
 }
 
 /**
- * @brief   Copy the open file descriptors from the parent process to the child process.
+ * @brief   Copy the open file descriptors from the parent process to the child
+ * process.
  *
  * @param parent    The parent process.
  * @param child     The child process.

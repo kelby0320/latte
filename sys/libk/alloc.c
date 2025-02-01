@@ -1,11 +1,11 @@
 #include "libk/alloc.h"
 
 #include "errno.h"
+#include "kalloc.h"
 #include "kernel.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 #include "libk/slab.h"
-#include "kalloc.h"
 #include "vm.h"
 
 #define KMALLOC_SLAB_CACHE_MIN_SIZE    32
@@ -18,7 +18,8 @@ static struct slab_cache kmalloc_slab_cache[KMALLOC_SLAB_CACHES];
 extern struct vm_area kernel_vm_area;
 
 /**
- * @brief   Converts a size to the number of extents required to allocate that size
+ * @brief   Converts a size to the number of extents required to allocate that
+ * size
  *
  * @param size  Size to convert
  * @return int  Number of extents required
@@ -95,9 +96,9 @@ void
 libk_alloc_init()
 {
     for (int i = 0; i < KMALLOC_SLAB_CACHES; i++) {
-	int cache_size = KMALLOC_IDX_TO_CACHE_SIZE(i);
-	
-	printk("Creating slab cache (obj size %d)\n", cache_size);
+        int cache_size = KMALLOC_IDX_TO_CACHE_SIZE(i);
+
+        printk("Creating slab cache (obj size %d)\n", cache_size);
         slab_cache_create(&kmalloc_slab_cache[i], cache_size);
     }
 }
@@ -197,7 +198,7 @@ kzalloc(size_t size)
 
     void *ptr = slab_cache_alloc(&kmalloc_slab_cache[idx]);
     if (!ptr) {
-	return NULL;
+        return NULL;
     }
 
     size_t slab_size = KMALLOC_IDX_TO_CACHE_SIZE(idx);

@@ -74,11 +74,11 @@ void *
 list_next(struct list_item *head)
 {
     if (!head) {
-	return NULL;
+        return NULL;
     }
 
     if (!head->next) {
-	return NULL;
+        return NULL;
     }
 
     return head->next->data;

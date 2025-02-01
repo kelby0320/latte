@@ -150,9 +150,9 @@ static bool
 is_delim(char c, const char *delim)
 {
     for (const char *p = delim; *p != '\0'; p++) {
-	if (c == *p) {
-	    return true;
-	}
+        if (c == *p) {
+            return true;
+        }
     }
 
     return false;
@@ -162,24 +162,24 @@ char *
 strsep(char **stringp, const char *delim)
 {
     if (*stringp == NULL) {
-	return NULL;
+        return NULL;
     }
 
     char *token = *stringp;
     char *p = *stringp;
     while (*p != '\0') {
-	if (is_delim(*p, delim)) {
-	    *p = '\0';
-	    p++;
-	    *stringp = p;
-	    break;
-	}
+        if (is_delim(*p, delim)) {
+            *p = '\0';
+            p++;
+            *stringp = p;
+            break;
+        }
 
-	p++;
+        p++;
     }
 
     if (*p == '\0') {
-	*stringp = NULL;
+        *stringp = NULL;
     }
 
     return token;
@@ -239,7 +239,7 @@ char
 toupper(char c)
 {
     if (!islower(c)) {
-	return c;
+        return c;
     }
 
     return c - 32;
@@ -249,7 +249,7 @@ char
 tolower(char c)
 {
     if (!isupper(c)) {
-	return c;
+        return c;
     }
 
     return c + 32;

@@ -1,24 +1,24 @@
 #include "kernel.h"
 
-#include "multiboot2.h"
+#include "bus.h"
 #include "config.h"
 #include "cpu.h"
-#include "bus.h"
 #include "driver.h"
 #include "fs.h"
 #include "gdt.h"
-#include "tss.h"
 #include "irq.h"
-#include "msgbuf.h"
-#include "term.h"
+#include "kalloc.h"
 #include "libk/alloc.h"
 #include "libk/print.h"
 #include "libk/string.h"
-#include "kalloc.h"
-#include "vm.h"
+#include "msgbuf.h"
+#include "multiboot2.h"
 #include "process.h"
 #include "sched.h"
+#include "term.h"
+#include "tss.h"
 #include "vfs.h"
+#include "vm.h"
 
 extern uint32_t kernel_page_directory;
 
@@ -117,7 +117,7 @@ kernel_main(unsigned long magic)
 
     int out_fd = vfs_open("/dev/console", "w");
     if (out_fd < 0) {
-	panic("Failed to open /dev/console\n");
+        panic("Failed to open /dev/console\n");
     }
 
     term_clear_screen();
@@ -126,7 +126,7 @@ kernel_main(unsigned long magic)
     enable_interrupts();
 
     printk("Starting init program\n\n");
-    
+
     process_create_first("/bin/init");
     schedule_first_thread();
 

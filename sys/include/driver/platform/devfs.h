@@ -13,6 +13,7 @@ int
 devfs_probe(struct platform_device *pdev);
 
 int
-devfs_read_sectors(struct device *dev, unsigned int lba, char *buf, size_t count);
+devfs_read_sectors(
+    struct device *dev, unsigned int lba, char *buf, size_t count);
 
 #endif

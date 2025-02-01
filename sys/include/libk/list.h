@@ -3,10 +3,11 @@
 
 #include <stdbool.h>
 
-#define for_each_in_list(T, head, list, item)                                                      \
-    struct list_item *list;                                                                        \
-    T item;                                                                                        \
-    for (list = head, item = list->data; list != NULL; list = list->next, item = list->data)
+#define for_each_in_list(T, head, list, item)                                  \
+    struct list_item *list;                                                    \
+    T item;                                                                    \
+    for (list = head, item = list->data; list != NULL;                         \
+         list = list->next, item = list->data)
 
 struct list_item {
     void *data;

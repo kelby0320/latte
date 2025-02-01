@@ -1,8 +1,8 @@
 #include "driver/platform/kbd/ps2.h"
 
-#include "port.h"
 #include "errno.h"
 #include "libk/print.h"
+#include "port.h"
 
 #include <stdint.h>
 
@@ -16,13 +16,13 @@ ps2_wait_for_input(uint8_t port)
 {
     int i = 0;
     do {
-	uint8_t status = insb(PS2_STATUS_PORT);
-	if ((status & PS2_STATUS_IN_RDY) == 0) {
-	    break;
-	}
+        uint8_t status = insb(PS2_STATUS_PORT);
+        if ((status & PS2_STATUS_IN_RDY) == 0) {
+            break;
+        }
 
-	uint8_t data = insb(port);
-	i++;
+        uint8_t data = insb(port);
+        i++;
     } while (i < PS2_POLL_LIMIT);
 }
 
@@ -34,12 +34,12 @@ ps2_wait_for_output()
 {
     int i = 0;
     do {
-	uint8_t status = insb(PS2_STATUS_PORT);
-	if (status & PS2_STATUS_OUT_RDY) {
-	    break;
-	}
-	i++;
-    } while(i < PS2_POLL_LIMIT);
+        uint8_t status = insb(PS2_STATUS_PORT);
+        if (status & PS2_STATUS_OUT_RDY) {
+            break;
+        }
+        i++;
+    } while (i < PS2_POLL_LIMIT);
 }
 
 void
@@ -62,4 +62,3 @@ ps2_read_data()
     ps2_wait_for_output();
     return insb(PS2_DATA_PORT);
 }
-

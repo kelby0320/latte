@@ -20,7 +20,8 @@ struct device_driver {
 
 struct file_operations {
     int (*read)(struct device *dev, size_t offset, char *buf, size_t count);
-    int (*write)(struct device *dev, size_t offset, const char *buf, size_t count);
+    int (*write)(
+        struct device *dev, size_t offset, const char *buf, size_t count);
     int (*seek)(struct device *dev, size_t offset, file_seek_mode_t seek_mode);
 };
 

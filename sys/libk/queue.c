@@ -49,7 +49,8 @@ int
 queue_remove(struct queue *queue, void *data)
 {
     struct _queue_item *prev = NULL;
-    for (struct _queue_item *item = queue->head; item != NULL; item = item->next) {
+    for (struct _queue_item *item = queue->head; item != NULL;
+         item = item->next) {
         if (item->data == data) {
             if (prev) {
                 prev->next = item->next;
@@ -74,7 +75,8 @@ queue_remove(struct queue *queue, void *data)
 void
 queue_destroy(struct queue *queue)
 {
-    for (struct _queue_item *item = queue->head; item != NULL; item = item->next) {
+    for (struct _queue_item *item = queue->head; item != NULL;
+         item = item->next) {
         kfree(item);
     }
 }

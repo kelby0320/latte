@@ -1,8 +1,8 @@
 #ifndef INPUT_DEVICE_KEYCODE_H
 #define INPUT_DEVICE_KEYCODE_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 enum {
     KEYCODE_ESC,

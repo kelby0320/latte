@@ -1,14 +1,14 @@
 #include "ld.h"
 
+#include "elf.h"
 #include "errno.h"
+#include "kalloc.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
-#include "kalloc.h"
 #include "paging.h"
-#include "vm.h"
-#include "elf.h"
 #include "process.h"
 #include "vfs.h"
+#include "vm.h"
 
 #include <stdint.h>
 
@@ -38,7 +38,8 @@ ld_map_program_header(struct process *process, int idx)
 
     // Ensure segment size aligned with the page size
     if (elf_segment_size % PAGING_PAGE_SIZE) {
-        elf_segment_size += PAGING_PAGE_SIZE - (elf_segment_size % PAGING_PAGE_SIZE);
+        elf_segment_size +=
+            PAGING_PAGE_SIZE - (elf_segment_size % PAGING_PAGE_SIZE);
     }
 
     int order = kalloc_size_to_order(elf_segment_size);
@@ -67,13 +68,15 @@ ld_map_program_header(struct process *process, int idx)
         flags |= PAGING_PAGE_WRITABLE;
     }
 
-    res = vm_area_map_pages_to(process->vm_area, (void *)phdr->p_vaddr, segment,
-                               segment + segment_size, flags);
+    res = vm_area_map_pages_to(
+        process->vm_area, (void *)phdr->p_vaddr, segment,
+        segment + segment_size, flags);
     if (res < 0) {
         goto err_out;
     }
 
-    struct process_allocation *segment_allocation = kzalloc(sizeof(struct process_allocation));
+    struct process_allocation *segment_allocation =
+        kzalloc(sizeof(struct process_allocation));
     segment_allocation->type = PROCESS_ALLOCATION_PROGRAM_SEGMENT;
     segment_allocation->paddr = segment;
     segment_allocation->vaddr = (void *)phdr->p_vaddr;
@@ -108,8 +111,9 @@ ld_read_program_headers(struct elf_img_desc *img_desc)
         return -EINVAL;
     }
 
-    res = vfs_read(img_desc->fd, (char *)&img_desc->elf_pheaders,
-                   (sizeof(struct elf32_phdr) * num_pheaders));
+    res = vfs_read(
+        img_desc->fd, (char *)&img_desc->elf_pheaders,
+        (sizeof(struct elf32_phdr) * num_pheaders));
     if (res < 0) {
         return -EIO;
     }
@@ -128,7 +132,8 @@ ld_read_program_headers(struct elf_img_desc *img_desc)
 static int
 ld_read_elf_header(struct elf_img_desc *img_desc)
 {
-    int res = vfs_read(img_desc->fd, (char *)&img_desc->elf_header, sizeof(struct elf32_ehdr));
+    int res = vfs_read(
+        img_desc->fd, (char *)&img_desc->elf_header, sizeof(struct elf32_ehdr));
     if (res < 0) {
         return -EIO;
     }

@@ -16,7 +16,7 @@ int
 driver_init()
 {
     platform_driver_init();
-    
+
     return 0;
 }
 
@@ -25,12 +25,12 @@ driver_register(struct device_driver *driver)
 {
     int res = list_push_front(&driver_list, driver);
     if (res < 0) {
-	printk("Failed to register new driver, %s\n", driver->name);
-	return res;
+        printk("Failed to register new driver, %s\n", driver->name);
+        return res;
     }
-    
+
     printk("Registered new driver %s\n", driver->name);
-    
+
     bus_match();
 
     return 0;
@@ -53,13 +53,13 @@ struct device_driver *
 driver_find_next(const struct device_driver *driver)
 {
     if (driver == NULL) {
-	return list_front(driver_list);
+        return list_front(driver_list);
     }
 
     for (struct list_item *p = driver_list; p; p = p->next) {
-	if (p->data == driver) {
-	    return list_next(p);
-	}
+        if (p->data == driver) {
+            return list_next(p);
+        }
     }
 
     return NULL;

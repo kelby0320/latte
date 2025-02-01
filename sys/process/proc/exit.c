@@ -1,9 +1,9 @@
 #include "proc/exit.h"
 
+#include "fd.h"
+#include "kalloc.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
-#include "kalloc.h"
-#include "fd.h"
 #include "process.h"
 #include "sched.h"
 #include "thread.h"
@@ -25,7 +25,8 @@ process_exit(struct process *process, uint8_t status_code)
     process->status_code = status_code;
 
     if (process->parent) {
-        for_each_in_list(struct thread *, process->parent->threads, list, thread)
+        for_each_in_list(
+            struct thread *, process->parent->threads, list, thread)
         {
             sched_unblock_thread(thread);
         }

@@ -16,7 +16,9 @@ struct disk;
  * @return int          Status code
  */
 int
-ext2_read_inode(struct ext2_inode **inode_out, struct ext2_private *fs_private, uint32_t inode_no);
+ext2_read_inode(
+    struct ext2_inode **inode_out, struct ext2_private *fs_private,
+    uint32_t inode_no);
 
 /**
  * @brief Read an inodes file data
@@ -30,7 +32,8 @@ ext2_read_inode(struct ext2_inode **inode_out, struct ext2_private *fs_private, 
  * @return int          Status code
  */
 int
-ext2_read_inode_data(struct ext2_private *fs_private, const struct ext2_inode *inode, char *out, size_t count,
-                     unsigned int blk_offset, unsigned int byte_offset);
+ext2_read_inode_data(
+    struct ext2_private *fs_private, const struct ext2_inode *inode, char *out,
+    size_t count, unsigned int blk_offset, unsigned int byte_offset);
 
 #endif

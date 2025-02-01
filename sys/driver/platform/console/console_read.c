@@ -11,11 +11,11 @@ console_read(struct device *dev, size_t offset, char *buf, size_t count)
     struct console_private *private = dev->driver->private;
 
     if (!private->input_ready) {
-	return -EAGAIN;
+        return -EAGAIN;
     }
 
     if (count > private->input_buffer_len) {
-	count = private->input_buffer_len;
+        count = private->input_buffer_len;
     }
 
     // Copy input data to buf
@@ -30,6 +30,6 @@ console_read(struct device *dev, size_t offset, char *buf, size_t count)
 
     private->input_buffer_len -= count;
     private->input_ready = false;
-    
+
     return count;
 }

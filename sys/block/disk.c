@@ -1,13 +1,13 @@
 #include "disk.h"
 
 #include "block.h"
-#include "partition.h"
 #include "device.h"
 #include "errno.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/print.h"
 #include "libk/string.h"
+#include "partition.h"
 
 static struct list_item *disk_list = NULL;
 
@@ -21,16 +21,16 @@ static int
 add_disk_block(struct disk *disk)
 {
     int res = 0;
-    
+
     struct block *disk_block = kzalloc(sizeof(struct block));
     if (!disk_block) {
-	return -ENOMEM;
+        return -ENOMEM;
     }
 
     char *disk_block_name = kzalloc(16);
     if (!disk_block_name) {
-	res = -ENOMEM;
-	goto err_name_alloc;
+        res = -ENOMEM;
+        goto err_name_alloc;
     }
 
     strcpy(disk_block_name, disk->name);
@@ -66,43 +66,44 @@ add_disk_partitions(struct disk *disk)
     struct partition_table_entry *partition_table = disk->partition_table;
     int res = partition_read_partition_table(disk, partition_table);
     if (res < 0) {
-	return -EIO;
+        return -EIO;
     }
 
-    
-   // Add a block device for each valid partition on the disk
+    // Add a block device for each valid partition on the disk
     for (int i = 0; i < 4; i++) {
-	if (partition_table[i].sector_count == 0) {
+        if (partition_table[i].sector_count == 0) {
             continue; // Table entry doesn't correspond to a partition
         }
 
-	unsigned int lba_start = partition_table[i].lba_start;
-	printk("Found partition starting at %d on %s\n", lba_start, disk->device->name);
+        unsigned int lba_start = partition_table[i].lba_start;
+        printk(
+            "Found partition starting at %d on %s\n", lba_start,
+            disk->device->name);
 
-	bool bootable = partition_table[i].attrib & PARTITION_ATTRIB_BOOTABLE;
-	
-	struct block *block = kzalloc(sizeof(struct block));
-	if (!block) {
-	    return -ENOMEM;
-	}
+        bool bootable = partition_table[i].attrib & PARTITION_ATTRIB_BOOTABLE;
 
-	char *name = kzalloc(8);
-	if (!name) {
-	    kfree(block);
-	    return -ENOMEM;
-	}
+        struct block *block = kzalloc(sizeof(struct block));
+        if (!block) {
+            return -ENOMEM;
+        }
 
-	sprintk(name, "%sp%d", disk->name, i);
+        char *name = kzalloc(8);
+        if (!name) {
+            kfree(block);
+            return -ENOMEM;
+        }
 
-	block->name = name;
-	block->disk = disk;
-	block->lba_start = lba_start;
-	block->bootable = bootable;
-	
-	res = block_add(block);
-	if (res < 0) {
-	    return res;
-	}
+        sprintk(name, "%sp%d", disk->name, i);
+
+        block->name = name;
+        block->disk = disk;
+        block->lba_start = lba_start;
+        block->bootable = bootable;
+
+        res = block_add(block);
+        if (res < 0) {
+            return res;
+        }
     }
 
     return 0;
@@ -113,17 +114,17 @@ disk_register(struct disk *disk)
 {
     int res = list_push_back(&disk_list, disk);
     if (res < 0) {
-	return res;
+        return res;
     }
-    
+
     res = add_disk_block(disk);
     if (res < 0) {
-	return res;
+        return res;
     }
 
     res = add_disk_partitions(disk);
     if (res < 0) {
-	return res;
+        return res;
     }
 
     return 0;

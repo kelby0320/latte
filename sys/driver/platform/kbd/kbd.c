@@ -1,39 +1,33 @@
 #include "driver/platform/kbd.h"
 
-#include "port.h"
 #include "dev/input_device.h"
 #include "dev/platform_device.h"
-#include "driver/platform_driver.h"
 #include "driver/platform/kbd/ps2.h"
 #include "driver/platform/kbd/scancode.h"
+#include "driver/platform_driver.h"
 #include "errno.h"
 #include "irq.h"
 #include "libk/alloc.h"
 #include "libk/print.h"
+#include "port.h"
 
-#define KBD_INTERRUPT_NO             0x21
+#define KBD_INTERRUPT_NO    0x21
 #define KBD_SC_KEY_RELEASED 0xF0
 
 static struct kbd_private kbd_private = {
-    .key_release = false,
-    .scancode_set = scancode_set_two
-};
+    .key_release = false, .scancode_set = scancode_set_two};
 
 struct platform_driver kbd_drv = {
-    .driver = {
-	.name = "kbd",
-	.compat = "kbd"
-    },
+    .driver = {.name = "kbd", .compat = "kbd"},
     .private = &kbd_private,
-    .probe = kbd_probe
-};
+    .probe = kbd_probe};
 
 static unsigned int
 scancode_to_keycode(uint8_t scancode)
 {
     size_t scanset_size = sizeof(scancode_set_two) / sizeof(uint8_t);
     if (scancode > scanset_size) {
-	return 0;
+        return 0;
     }
 
     return scancode_set_two[scancode];
@@ -46,19 +40,17 @@ kbd_interrupt_handler()
     ps2_read_data();
 
     if (scancode == KBD_SC_KEY_RELEASED) {
-	kbd_private.key_release = true;
-	return;
+        kbd_private.key_release = true;
+        return;
     }
 
     unsigned int keycode = scancode_to_keycode(scancode);
 
     struct input_event event = {
-	    .type = INPUT_EVENT_TYPE_KEY_PRESSED,
-	    .keycode = keycode	    
-	};
+        .type = INPUT_EVENT_TYPE_KEY_PRESSED, .keycode = keycode};
 
     if (kbd_private.key_release) {
-	event.type = INPUT_EVENT_TYPE_KEY_RELEASED;
+        event.type = INPUT_EVENT_TYPE_KEY_RELEASED;
     }
 
     kbd_private.key_release = false;
@@ -85,23 +77,23 @@ kbd_ps2_init()
     ps2_write_cmd(PS2_CMD_CTRL_SELF_TEST);
     uint8_t test_result = ps2_read_data();
     if (test_result != PS2_CTRL_SELF_TEST_PASS) {
-	printk("PS2 controller failed self test with result %d\n", test_result);
-	return -EIO;
+        printk("PS2 controller failed self test with result %d\n", test_result);
+        return -EIO;
     }
 
     /* Test port 1 */
     ps2_write_cmd(PS2_CMD_TEST_PORT1);
     test_result = ps2_read_data();
     if (test_result != 0x0) {
-	printk("PS2 port 1 failed self test with result %d\n", test_result);
-	return -EIO;
+        printk("PS2 port 1 failed self test with result %d\n", test_result);
+        return -EIO;
     }
 
     /* Test port 2 */
     ps2_write_cmd(PS2_CMD_TEST_PORT2);
     test_result = ps2_read_data();
     if (test_result != 0x0) {
-	printk("PS2 port 2 failed self test with result %d\n", test_result);
+        printk("PS2 port 2 failed self test with result %d\n", test_result);
     }
 
     /* Enable port 1 */
@@ -133,32 +125,32 @@ kbd_probe(struct platform_device *dev)
 {
     struct input_device *idev = kzalloc(sizeof(struct input_device));
     if (!idev) {
-	printk("kbd_probe - FAILED to allocate input_device\n");
-	return -ENOMEM;
+        printk("kbd_probe - FAILED to allocate input_device\n");
+        return -ENOMEM;
     }
 
     int res = input_device_init(idev, "kbd", INPUT_DEVICE_TYPE_KEYBOARD);
     if (res < 0) {
-	printk("kbd_probe - input_device_init FAILED\n");
-	goto err_input;
+        printk("kbd_probe - input_device_init FAILED\n");
+        goto err_input;
     }
 
     kbd_private.idev = idev;
 
     res = kbd_ps2_init();
     if (res < 0) {
-	printk("kbd_probe - ps2_init FAILED\n");
-	goto err_ps2;
+        printk("kbd_probe - ps2_init FAILED\n");
+        goto err_ps2;
     }
 
     res = register_irq(KBD_INTERRUPT_NO, kbd_interrupt_handler);
     if (res < 0) {
-	printk("kbd_probe - register_irq FAILED\n");
+        printk("kbd_probe - register_irq FAILED\n");
     }
 
     res = input_device_register(idev);
     if (res < 0) {
-	printk("kbd_probe - input_device_register FAILED\n");
+        printk("kbd_probe - input_device_register FAILED\n");
     }
 
     return 0;
@@ -168,6 +160,6 @@ err_ps2:
 
 err_input:
     kfree(idev);
-    
+
     return res;
 }

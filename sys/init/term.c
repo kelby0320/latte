@@ -1,14 +1,14 @@
 #include "term.h"
 
-#include "libk/string.h"
 #include "libk/memory.h"
+#include "libk/string.h"
 
 #include <stdint.h>
 
-#define VGA_FRAMEBUFFER    (uint16_t *)0XB8000
-#define VGA_HEIGHT         24
-#define VGA_WIDTH          80
-#define VGA_CHAR_COLOR     (uint16_t)(0x0F)
+#define VGA_FRAMEBUFFER (uint16_t *)0XB8000
+#define VGA_HEIGHT      24
+#define VGA_WIDTH       80
+#define VGA_CHAR_COLOR  (uint16_t)(0x0F)
 
 static uint16_t row = 0;
 static uint16_t col = 0;
@@ -22,26 +22,26 @@ vga_char(char c)
 static void
 set_char(uint16_t row, uint16_t col, char c)
 {
-   uint16_t vchar = vga_char(c);
-   uint16_t *fb = VGA_FRAMEBUFFER;
-   
-   fb[(row * VGA_WIDTH) + col] = vchar;
+    uint16_t vchar = vga_char(c);
+    uint16_t *fb = VGA_FRAMEBUFFER;
+
+    fb[(row * VGA_WIDTH) + col] = vchar;
 }
 
 static void
 term_scroll()
 {
     uint16_t *fb = VGA_FRAMEBUFFER;
-    
+
     for (size_t row = 1; row <= VGA_HEIGHT; row++) {
         uint16_t *dest_row = fb + ((row - 1) * VGA_WIDTH);
         uint16_t *src_row = fb + (row * VGA_WIDTH);
-        memcpy(dest_row, src_row, VGA_WIDTH  * 2);
+        memcpy(dest_row, src_row, VGA_WIDTH * 2);
     }
 
     uint16_t ch = vga_char(' ');
     for (int i = 0; i < VGA_WIDTH; i++) {
-	set_char(VGA_HEIGHT, i, ch);
+        set_char(VGA_HEIGHT, i, ch);
     }
 }
 
@@ -49,9 +49,9 @@ static void
 term_newline()
 {
     if (row == VGA_HEIGHT) {
-	term_scroll();
-	col = 0;
-	return;
+        term_scroll();
+        col = 0;
+        return;
     }
 
     row++;
@@ -62,15 +62,15 @@ static void
 term_put_char(char c)
 {
     if (c == '\n') {
-	term_newline();
-	return;
+        term_newline();
+        return;
     }
 
     set_char(row, col, c);
 
     col++;
     if (col > VGA_WIDTH) {
-	term_newline();
+        term_newline();
     }
 }
 
@@ -95,9 +95,9 @@ int
 term_write(const char *str)
 {
     int len = strlen(str);
-    
+
     for (int i = 0; i < len; i++) {
-	term_put_char(str[i]);
+        term_put_char(str[i]);
     }
 
     return len;

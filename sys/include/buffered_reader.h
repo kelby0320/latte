@@ -9,12 +9,15 @@ struct block_buffered_reader {
 };
 
 void
-block_buffered_reader_init(struct block_buffered_reader *reader, struct block *block);
+block_buffered_reader_init(
+    struct block_buffered_reader *reader, struct block *block);
 
 int
-block_buffered_reader_seek(struct block_buffered_reader *reader, unsigned int pos);
+block_buffered_reader_seek(
+    struct block_buffered_reader *reader, unsigned int pos);
 
 int
-block_buffered_reader_read(struct block_buffered_reader *reader, char *out, unsigned int count);
+block_buffered_reader_read(
+    struct block_buffered_reader *reader, char *out, unsigned int count);
 
 #endif

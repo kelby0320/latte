@@ -3,8 +3,8 @@
 
 #include "fs/ext2/inode.h"
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 
 /**
  * @brief Directory iterator
@@ -38,8 +38,9 @@ struct ext2_dir_iter {
  * @return int          Status code
  */
 int
-ext2_dir_iter_init(struct ext2_dir_iter *iter, struct ext2_private *fs_private,
-		   const struct ext2_inode *dir_inode);
+ext2_dir_iter_init(
+    struct ext2_dir_iter *iter, struct ext2_private *fs_private,
+    const struct ext2_inode *dir_inode);
 
 /**
  * @brief Free a directory iterator
@@ -58,7 +59,8 @@ ext2_dir_iter_free(struct ext2_dir_iter *iter);
  * @return int          Status code
  */
 int
-ext2_dir_iter_next(struct ext2_dir_iter *iter, struct ext2_private *fs_private,
-		   struct ext2_directory_entry *dir_entry_out);
+ext2_dir_iter_next(
+    struct ext2_dir_iter *iter, struct ext2_private *fs_private,
+    struct ext2_directory_entry *dir_entry_out);
 
 #endif

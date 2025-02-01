@@ -77,8 +77,10 @@ struct ext2_superblock {
     char s_last_mounted[64];      /* Directory where last mounted */
     uint32_t s_algo_bitmap;       /* For compression */
     /* Performance Hints */
-    uint8_t s_prealloc_blocks;     /* Number of blocks to preallocate for regular files */
-    uint8_t s_prealloc_dir_blocks; /* Number of blocks to preallocate for directories */
+    uint8_t s_prealloc_blocks; /* Number of blocks to preallocate for regular
+                                  files */
+    uint8_t s_prealloc_dir_blocks; /* Number of blocks to preallocate for
+                                      directories */
     uint8_t s_padding1[2];
     /* Journaling Support */
     uint8_t s_journal_uuid[16]; /* UUID of journal superblock */
@@ -111,7 +113,7 @@ struct ext2_directory_entry {
     uint16_t rec_len;  /* Directory entry length */
     uint8_t name_len;  /* Name length */
     uint8_t file_type; /* File type */
-    char name[256];    /* File name, up to 255 characters, plus null terminator */
+    char name[256]; /* File name, up to 255 characters, plus null terminator */
 } __attribute((packed));
 
 struct ext2_inode {

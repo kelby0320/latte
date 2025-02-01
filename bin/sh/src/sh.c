@@ -3,9 +3,8 @@
 #include "sys/wait.h"
 #include "unistd.h"
 
-#define MAX_LINE_LENGTH 256
+#define MAX_LINE_LENGTH  256
 #define MAX_PROGRAM_ARGS 8
-
 
 const char *PATH = "/bin/";
 char CWD[MAX_LINE_LENGTH] = {0};
@@ -59,8 +58,8 @@ readline(char *buf, size_t len)
 {
     int num_read = read(stdin, buf, len);
     if (buf[num_read - 1] == '\n') {
-	buf[num_read - 1] = 0;
-	num_read--;
+        buf[num_read - 1] = 0;
+        num_read--;
     }
 
     return num_read;
@@ -71,12 +70,12 @@ parse_program_name(char *line)
 {
     char *prog_start = line;
     while (*line && *line != ' ') {
-	line++;
+        line++;
     }
 
     while (*line && *line == ' ') {
-	*line = 0;
-	line++;
+        *line = 0;
+        line++;
     }
 
     sprintf(program_name, "%s%s", PATH, prog_start);
@@ -87,17 +86,17 @@ static char *
 parse_arg(char *line, char **arg)
 {
     if (!*line) {
-	return NULL;
+        return NULL;
     }
-    
+
     char *arg_start = line;
     while (*line && *line != ' ') {
-	line++;
+        line++;
     }
 
     while (*line && *line == ' ') {
-	*line = 0;
-	line++;
+        *line = 0;
+        line++;
     }
 
     *arg = arg_start;
@@ -109,13 +108,13 @@ parse_program_args(char *line)
 {
     int i;
     for (i = 0; i < 8; i++) {
-	char *arg = NULL;
-	line = parse_arg(line, &arg);
-	if (!arg) {
-	    break;
-	}
+        char *arg = NULL;
+        line = parse_arg(line, &arg);
+        if (!arg) {
+            break;
+        }
 
-	program_args[i] = arg;
+        program_args[i] = arg;
     }
 
     return i;
@@ -125,44 +124,44 @@ int
 main(int argc, char **argv)
 {
     if (argc > 0) {
-	sh_help();
-	return 0;
+        sh_help();
+        return 0;
     }
-    
+
     sh_init();
-    
+
     while (1) {
-	sh_prompt();
+        sh_prompt();
 
-	sh_reset_input();
-	
-	int line_length = readline(input_line, 256);
-	if (line_length == 0) {
-	    continue; // User pressed enter, but no other input
-	}
+        sh_reset_input();
 
-	char *arg_start = parse_program_name(input_line);
-	int argc = parse_program_args(arg_start);
+        int line_length = readline(input_line, 256);
+        if (line_length == 0) {
+            continue; // User pressed enter, but no other input
+        }
 
-	if (strcmp(program_name, "cd") == 0) {
-	    sh_cd(program_args[0]);
-	    continue;
-	}
+        char *arg_start = parse_program_name(input_line);
+        int argc = parse_program_args(arg_start);
 
-	pid_t pid = fork();
-	if ((int)pid < 0) {
-	    printf("sh ERROR: Failed to fork()");
-	} else if (pid == 0) {
-	    // Child
-	    execv(program_name, program_args);
-	} else {
-	    // Parent
-	    int status_code;
-	    pid_t child_pid = wait(&status_code);
+        if (strcmp(program_name, "cd") == 0) {
+            sh_cd(program_args[0]);
+            continue;
+        }
 
-	    if (status_code != 0) {
-		printf("Command \'%s\' not found\n", program_name);
-	    }
-	}
+        pid_t pid = fork();
+        if ((int)pid < 0) {
+            printf("sh ERROR: Failed to fork()");
+        } else if (pid == 0) {
+            // Child
+            execv(program_name, program_args);
+        } else {
+            // Parent
+            int status_code;
+            pid_t child_pid = wait(&status_code);
+
+            if (status_code != 0) {
+                printf("Command \'%s\' not found\n", program_name);
+            }
+        }
     }
 }

@@ -7,7 +7,8 @@
 #define BUDDY_BLOCK_MAX_ORDER 10
 #define BUDDY_BLOCK_LIST_LEN  (1 << BUDDY_BLOCK_MAX_ORDER)
 #define BUDDY_BLOCK_MIN_SIZE  4096
-#define BUDDY_BLOCK_MAX_SIZE  (BUDDY_BLOCK_MIN_SIZE * (1 << BUDDY_BLOCK_MAX_ORDER))
+#define BUDDY_BLOCK_MAX_SIZE                                                   \
+    (BUDDY_BLOCK_MIN_SIZE * (1 << BUDDY_BLOCK_MAX_ORDER))
 
 /**
  * @brief Buddy block structure
@@ -34,7 +35,8 @@ struct buddy_allocator {
  * @brief   Initialize a buddy allocator
  *
  * @param allocator     Pointer to the buddy allocator
- * @param base_addr     Base address of the memory to be managed by the buddy allocator
+ * @param base_addr     Base address of the memory to be managed by the buddy
+ * allocator
  */
 void
 buddy_allocator_init(struct buddy_allocator *allocator, void *base_addr);

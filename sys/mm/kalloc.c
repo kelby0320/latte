@@ -1,11 +1,12 @@
 #include "kalloc.h"
 
+#include "buddy.h"
 #include "errno.h"
 #include "libk/memory.h"
 #include "libk/print.h"
-#include "buddy.h"
 
-#define paddr_to_idx(paddr) (((size_t)paddr - allocators_offset) / BUDDY_BLOCK_MAX_SIZE)
+#define paddr_to_idx(paddr)                                                    \
+    (((size_t)paddr - allocators_offset) / BUDDY_BLOCK_MAX_SIZE)
 
 static struct buddy_allocator allocators[MAX_ALLOCATORS] = {0};
 static size_t allocators_len = 0;
@@ -16,12 +17,13 @@ void
 kalloc_init(void *saddr, size_t mem_size)
 {
     printk("Init physical memory allocator starting at %d\n", (int)saddr);
-    
+
     allocators_offset = (size_t)saddr;
     allocators_len = (mem_size - allocators_offset) / BUDDY_BLOCK_MAX_SIZE;
 
     for (size_t i = 0; i < allocators_len; i++) {
-        buddy_allocator_init(&allocators[i], saddr + (i * BUDDY_BLOCK_MAX_SIZE));
+        buddy_allocator_init(
+            &allocators[i], saddr + (i * BUDDY_BLOCK_MAX_SIZE));
     }
 }
 

@@ -69,5 +69,4 @@ vga_disable_cursor();
 void
 vga_set_cursor(struct device *dev, uint16_t row, uint16_t col);
 
-
 #endif

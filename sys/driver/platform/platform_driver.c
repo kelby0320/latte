@@ -18,7 +18,7 @@ platform_driver_init()
     vga_drv_init();
     console_drv_init();
     kbd_drv_init();
-    
+
     return 0;
 }
 

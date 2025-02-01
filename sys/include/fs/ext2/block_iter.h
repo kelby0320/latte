@@ -46,8 +46,9 @@ struct ext2_block_iterator {
  * @return int          Status code
  */
 int
-ext2_block_iterator_init(struct ext2_block_iterator *iter,
-			 struct ext2_private *fs_private, const struct ext2_inode *inode);
+ext2_block_iterator_init(
+    struct ext2_block_iterator *iter, struct ext2_private *fs_private,
+    const struct ext2_inode *inode);
 
 /**
  * @brief Skip reading a number of block
@@ -57,7 +58,8 @@ ext2_block_iterator_init(struct ext2_block_iterator *iter,
  * @return int      Status code
  */
 int
-ext2_block_iterator_skip_blocks(struct ext2_block_iterator *iter, uint32_t offset);
+ext2_block_iterator_skip_blocks(
+    struct ext2_block_iterator *iter, uint32_t offset);
 
 /**
  * @brief Set iterator to read the next block
@@ -67,7 +69,8 @@ ext2_block_iterator_skip_blocks(struct ext2_block_iterator *iter, uint32_t offse
  * @return int          Status code
  */
 int
-ext2_block_iterator_next(struct ext2_block_iterator *iter, struct ext2_private *fs_private);
+ext2_block_iterator_next(
+    struct ext2_block_iterator *iter, struct ext2_private *fs_private);
 
 /**
  * @brief Get this iterators current data block number

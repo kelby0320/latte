@@ -25,7 +25,8 @@ thread_get_stack_item(struct thread *thread, int index);
  * @return int          Number of bytes copied or negative error code
  */
 int
-thread_copy_from_user(struct thread *thread, void *user_buf, void *kernel_buf, size_t size);
+thread_copy_from_user(
+    struct thread *thread, void *user_buf, void *kernel_buf, size_t size);
 
 /**
  * @brief   Copy data from a kernel space buffer to a user space buffer
@@ -37,6 +38,7 @@ thread_copy_from_user(struct thread *thread, void *user_buf, void *kernel_buf, s
  * @return int          Number of bytes copied or negative error code
  */
 int
-thread_copy_to_user(struct thread *thread, void *user_buf, void *kernel_buf, size_t size);
+thread_copy_to_user(
+    struct thread *thread, void *user_buf, void *kernel_buf, size_t size);
 
 #endif

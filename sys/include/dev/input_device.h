@@ -11,7 +11,8 @@
 
 #define INPUT_DEVICE_KEYBOARD_ROWS 8
 #define INPUT_DEVICE_KEYBOARD_COLS 24
-#define INPUT_DEVICE_KEYBOARD_STATE_SIZE (INPUT_DEVICE_KEYBOARD_ROWS * INPUT_DEVICE_KEYBOARD_COLS)
+#define INPUT_DEVICE_KEYBOARD_STATE_SIZE                                       \
+    (INPUT_DEVICE_KEYBOARD_ROWS * INPUT_DEVICE_KEYBOARD_COLS)
 
 struct device_driver;
 struct input_device;
@@ -21,7 +22,8 @@ typedef uint8_t input_device_type_t;
 typedef uint8_t input_event_type_t;
 typedef uint8_t input_device_button_state_t;
 typedef uint8_t input_device_key_state_t;
-typedef void (*input_recv_callback_t)(struct input_device *idev, struct input_event event);
+typedef void (*input_recv_callback_t)(
+    struct input_device *idev, struct input_event event);
 
 enum {
     INPUT_DEVICE_TYPE_BUTTON,
@@ -36,10 +38,7 @@ enum {
     INPUT_EVENT_TYPE_KEY_RELEASED
 };
 
-enum {
-    INPUT_DEVICE_BUTTON_STATE_PRESSED,
-    INPUT_DEVICE_BUTTON_STATE_RELEASED
-};
+enum { INPUT_DEVICE_BUTTON_STATE_PRESSED, INPUT_DEVICE_BUTTON_STATE_RELEASED };
 
 enum {
     INPUT_DEVICE_KEY_STATE_NULL,
@@ -61,10 +60,12 @@ struct input_device {
 };
 
 int
-input_device_init(struct input_device *idev, const char *name, input_device_type_t type);
+input_device_init(
+    struct input_device *idev, const char *name, input_device_type_t type);
 
 int
-input_device_add_callback(struct input_device *idev, input_recv_callback_t callback);
+input_device_add_callback(
+    struct input_device *idev, input_recv_callback_t callback);
 
 int
 input_device_register(struct input_device *idev);
@@ -75,4 +76,3 @@ int
 input_device_event(struct input_device *idev, struct input_event event);
 
 #endif
-

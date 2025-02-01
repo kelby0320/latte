@@ -41,22 +41,28 @@ struct filesystem {
     void *(*resolve)(struct block *block);
 
     // Pointer to function to open a file
-    int (*open)(void *fs_private, struct path *path, file_mode_t mode, void **out);
+    int (*open)(
+        void *fs_private, struct path *path, file_mode_t mode, void **out);
 
     // Pointer to function to close a file
     int (*close)(struct file_descriptor *file_descriptor);
 
     // Pointer to function to seek in a file
-    int (*seek)(struct file_descriptor *file_descriptor, size_t offset, file_seek_mode_t seek_mode);
+    int (*seek)(
+        struct file_descriptor *file_descriptor, size_t offset,
+        file_seek_mode_t seek_mode);
 
     // Pointer to function to read from a file
-    int (*read)(struct file_descriptor *file_descriptor, char *buf, size_t count);
+    int (*read)(
+        struct file_descriptor *file_descriptor, char *buf, size_t count);
 
     // Pointer to function to write to a file
-    int (*write)(struct file_descriptor *file_descriptor, const char *buf, size_t count);
+    int (*write)(
+        struct file_descriptor *file_descriptor, const char *buf, size_t count);
 
     // Pointer to function to read file status
-    int (*stat)(struct file_descriptor *file_descriptor, struct file_stat *stat);
+    int (*stat)(
+        struct file_descriptor *file_descriptor, struct file_stat *stat);
 
     // Pointer to function to open a directory
     int (*opendir)(void *fs_private, struct path *path, void **out);
@@ -65,7 +71,9 @@ struct filesystem {
     int (*closedir)(struct file_descriptor *file_descriptor);
 
     // Pointer to function to read a directory entry
-    int (*readdir)(struct file_descriptor *file_descriptor, struct dir_entry *dir_entry_out);
+    int (*readdir)(
+        struct file_descriptor *file_descriptor,
+        struct dir_entry *dir_entry_out);
 
     // Pointer to function to make a new directory
     int (*mkdir)(void *fs_private, struct path *path);

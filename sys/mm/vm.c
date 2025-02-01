@@ -1,13 +1,13 @@
 #include "vm.h"
 
 #include "errno.h"
+#include "kalloc.h"
 #include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
-#include "kalloc.h"
+#include "paging.h"
 #include "paging/page_dir.h"
 #include "paging/page_tbl.h"
-#include "paging.h"
 
 #include <stdint.h>
 
@@ -16,7 +16,8 @@ extern struct vm_area kernel_vm_area;
 void
 vm_area_kernel_init(struct vm_area *vm_area, uint32_t *page_dir)
 {
-    page_dir_t phys_page_dir = (page_dir_t)((uint32_t)page_dir - KERNEL_HIGHER_HALF_START);
+    page_dir_t phys_page_dir =
+        (page_dir_t)((uint32_t)page_dir - KERNEL_HIGHER_HALF_START);
     vm_area->page_directory = phys_page_dir;
 }
 
@@ -51,7 +52,8 @@ vm_area_switch_map(struct vm_area *vm_area)
 void *
 vm_area_virt_to_phys(struct vm_area *vm_area, void *vaddr)
 {
-    page_dir_entry_t page_dir_entry = page_dir_get_entry(vm_area->page_directory, vaddr);
+    page_dir_entry_t page_dir_entry =
+        page_dir_get_entry(vm_area->page_directory, vaddr);
     if (page_dir_entry == 0) {
         return NULL;
     }
@@ -66,9 +68,11 @@ vm_area_virt_to_phys(struct vm_area *vm_area, void *vaddr)
 }
 
 void *
-vm_area_map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
+vm_area_map_page(
+    struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t flags)
 {
-    void *free_page = paging_find_free_page(vm_area->page_directory, base_vaddr);
+    void *free_page =
+        paging_find_free_page(vm_area->page_directory, base_vaddr);
     if (!free_page) {
         return NULL;
     }
@@ -83,7 +87,9 @@ vm_area_map_page(struct vm_area *vm_area, void *base_vaddr, void *phys, uint8_t 
 }
 
 void *
-vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size, uint8_t flags)
+vm_area_map_pages(
+    struct vm_area *vm_area, void *base_vaddr, void *phys, size_t size,
+    uint8_t flags)
 {
     // Size must be a multiple of the page size
     if (size % PAGING_PAGE_SIZE != 0) {
@@ -92,12 +98,14 @@ vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t 
 
     size_t num_pages = size / PAGING_PAGE_SIZE;
 
-    void *free_extent = paging_find_free_extent(vm_area->page_directory, base_vaddr, num_pages);
+    void *free_extent =
+        paging_find_free_extent(vm_area->page_directory, base_vaddr, num_pages);
     if (!free_extent) {
         return NULL;
     }
 
-    int res = vm_area_map_pages_to(vm_area, free_extent, phys, phys + size, flags);
+    int res =
+        vm_area_map_pages_to(vm_area, free_extent, phys, phys + size, flags);
     if (res < 0) {
         // This needs to be cleaned up if it fails
         return NULL;
@@ -107,11 +115,13 @@ vm_area_map_pages(struct vm_area *vm_area, void *base_vaddr, void *phys, size_t 
 }
 
 void *
-vm_area_map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys,
-                        size_t num_large_pages, uint8_t flags)
+vm_area_map_large_pages(
+    struct vm_area *vm_area, void *base_vaddr, void **phys,
+    size_t num_large_pages, uint8_t flags)
 {
     size_t num_pages = num_large_pages * PAGING_PAGE_TBL_ENTRIES;
-    void *free_extent = paging_find_free_extent(vm_area->page_directory, base_vaddr, num_pages);
+    void *free_extent =
+        paging_find_free_extent(vm_area->page_directory, base_vaddr, num_pages);
     if (!free_extent) {
         return NULL;
     }
@@ -134,7 +144,8 @@ vm_area_map_large_pages(struct vm_area *vm_area, void *base_vaddr, void **phys,
 void
 vm_area_unmap_page(struct vm_area *vm_area, void *vaddr)
 {
-    page_dir_entry_t page_dir_entry = page_dir_get_entry(vm_area->page_directory, vaddr);
+    page_dir_entry_t page_dir_entry =
+        page_dir_get_entry(vm_area->page_directory, vaddr);
     if (page_dir_entry == 0) {
         return;
     }
@@ -165,7 +176,8 @@ vm_area_unmap_pages(struct vm_area *vm_area, void *vaddr, size_t size)
 }
 
 void
-vm_area_unmap_large_pages(struct vm_area *vm_area, void **vaddrs, size_t num_large_pages)
+vm_area_unmap_large_pages(
+    struct vm_area *vm_area, void **vaddrs, size_t num_large_pages)
 {
     for (size_t i = 0; i < num_large_pages; i++) {
         vm_area_unmap_pages(vm_area, vaddrs[i], PAGING_LARGE_PAGE_SIZE);
@@ -173,19 +185,22 @@ vm_area_unmap_large_pages(struct vm_area *vm_area, void **vaddrs, size_t num_lar
 }
 
 int
-vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t flags)
+vm_area_map_page_to(
+    struct vm_area *vm_area, void *virt, void *phys, uint8_t flags)
 {
     if (!is_aligned(virt) || !is_aligned(phys)) {
         return -EINVAL;
     }
 
-    page_dir_entry_t page_dir_entry = page_dir_get_entry(vm_area->page_directory, virt);
+    page_dir_entry_t page_dir_entry =
+        page_dir_get_entry(vm_area->page_directory, virt);
 
     // Create new page directory entry if on doesn't exists
     if (page_dir_entry == 0) {
         page_tbl_t page_tbl = kalloc_get_phys_page();
-	memset(page_tbl, 0, PAGING_PAGE_SIZE);
-        page_dir_entry = page_dir_add_page_tbl(vm_area->page_directory, virt, page_tbl, flags);
+        memset(page_tbl, 0, PAGING_PAGE_SIZE);
+        page_dir_entry = page_dir_add_page_tbl(
+            vm_area->page_directory, virt, page_tbl, flags);
     }
 
     // Update flags if they are different
@@ -208,8 +223,9 @@ vm_area_map_page_to(struct vm_area *vm_area, void *virt, void *phys, uint8_t fla
 }
 
 int
-vm_area_map_page_range(struct vm_area *vm_area, void *virt, void *phys, size_t num_pages,
-                       uint8_t flags)
+vm_area_map_page_range(
+    struct vm_area *vm_area, void *virt, void *phys, size_t num_pages,
+    uint8_t flags)
 {
     if (!is_aligned(virt) || !is_aligned(phys)) {
         return -EINVAL;
@@ -229,7 +245,9 @@ vm_area_map_page_range(struct vm_area *vm_area, void *virt, void *phys, size_t n
 }
 
 int
-vm_area_map_pages_to(struct vm_area *vm_area, void *virt, void *phys, void *phys_end, uint8_t flags)
+vm_area_map_pages_to(
+    struct vm_area *vm_area, void *virt, void *phys, void *phys_end,
+    uint8_t flags)
 {
     if (!is_aligned(virt) || !is_aligned(phys) || !is_aligned(phys_end)) {
         return -EINVAL;

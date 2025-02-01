@@ -2,9 +2,9 @@
 
 #include "config.h"
 #include "errno.h"
-#include "term.h"
 #include "libk/memory.h"
 #include "libk/string.h"
+#include "term.h"
 #include "vfs.h"
 
 static char message_buffer[MSGBUF_BUFFER_SIZE] = {0};
@@ -63,7 +63,7 @@ msgbuf_write(const char *msg)
 {
     if (outfds_len == 0) {
         msgbuf_write_to_buf(msg);
-	term_write(msg);
+        term_write(msg);
     } else {
         msgbuf_write_to_fds(msg);
     }

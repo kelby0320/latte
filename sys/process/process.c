@@ -2,17 +2,17 @@
 
 #include "config.h"
 #include "errno.h"
+#include "fd.h"
 #include "gdt.h"
+#include "kalloc.h"
+#include "ld.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/memory.h"
 #include "libk/string.h"
-#include "kalloc.h"
-#include "vm.h"
-#include "fd.h"
-#include "ld.h"
 #include "proc/exit.h"
 #include "vfs.h"
+#include "vm.h"
 
 #include <stddef.h>
 
@@ -38,13 +38,15 @@ allocate_empty_args(struct process *process, struct thread *thread)
     memset(argv_segment, 0, PROCESS_ARGV_SIZE);
 
     // Map the page to the process's vm_area
-    void *virt = vm_area_map_user_pages(process->vm_area, argv_segment, PROCESS_ARGV_SIZE);
+    void *virt = vm_area_map_user_pages(
+        process->vm_area, argv_segment, PROCESS_ARGV_SIZE);
     if (!virt) {
         goto err_segment_alloc;
     }
 
     // Create a process allocation entry
-    struct process_allocation *palloc = kzalloc(sizeof(struct process_allocation));
+    struct process_allocation *palloc =
+        kzalloc(sizeof(struct process_allocation));
     if (!palloc) {
         goto err_segment_alloc;
     }
@@ -80,13 +82,15 @@ allocate_empty_environ(struct process *process, struct thread *thread)
     memset(envp_segment, 0, PROCESS_ENVP_SIZE);
 
     // Map the page to the process's vm_area
-    void *virt = vm_area_map_user_pages(process->vm_area, envp_segment, PROCESS_ENVP_SIZE);
+    void *virt = vm_area_map_user_pages(
+        process->vm_area, envp_segment, PROCESS_ENVP_SIZE);
     if (!virt) {
         goto err_segment_alloc;
     }
 
     // Create a process allocation entry
-    struct process_allocation *palloc = kzalloc(sizeof(struct process_allocation));
+    struct process_allocation *palloc =
+        kzalloc(sizeof(struct process_allocation));
     if (!palloc) {
         goto err_segment_alloc;
     }
@@ -111,7 +115,10 @@ err_segment_alloc:
 int
 process_free_threads(struct process *process)
 {
-    for_each_in_list(struct thread *, process->threads, tlist, thread) { thread_destroy(thread); }
+    for_each_in_list(struct thread *, process->threads, tlist, thread)
+    {
+        thread_destroy(thread);
+    }
 
     list_destroy(process->threads);
 
@@ -123,7 +130,8 @@ process_free_threads(struct process *process)
 int
 process_free_allocations(struct process *process)
 {
-    for_each_in_list(struct process_allocation *, process->allocations, alloc_list, alloc)
+    for_each_in_list(
+        struct process_allocation *, process->allocations, alloc_list, alloc)
     {
         kalloc_free_phys_pages(alloc->paddr);
         kfree(alloc);
@@ -215,7 +223,7 @@ process_add_thread(struct process *process)
 {
     int tid = thread_create(process);
     if (tid < 0) {
-	return tid;
+        return tid;
     }
 
     struct thread *thread = thread_get(tid);
@@ -229,14 +237,16 @@ process_add_thread(struct process *process)
 }
 
 int
-process_set_argv(struct process *process, struct thread *thread, const char *const *argv, size_t argv_len)
+process_set_argv(
+    struct process *process, struct thread *thread, const char *const *argv,
+    size_t argv_len)
 {
     if (argv_len == 0) {
-	thread->registers.ecx = 0;
-	thread->registers.edx = 0;
-	return 0;
+        thread->registers.ecx = 0;
+        thread->registers.edx = 0;
+        return 0;
     }
-    
+
     // Allocate 1 pages for argv
     char **argv_segment = (char **)kalloc_get_phys_pages(0);
     if (!argv_segment) {
@@ -247,26 +257,29 @@ process_set_argv(struct process *process, struct thread *thread, const char *con
     memset(argv_segment, 0, PROCESS_ARGV_SIZE);
 
     // Map the page to the process's vm_area
-    void *virt = vm_area_map_user_pages(process->vm_area, argv_segment, PROCESS_ARGV_SIZE);
+    void *virt = vm_area_map_user_pages(
+        process->vm_area, argv_segment, PROCESS_ARGV_SIZE);
     if (!virt) {
         goto err_segment_alloc;
     }
 
-    char *cur_arg = (char *)(argv_segment + argv_len); // First arg starts after char * ptrs
+    char *cur_arg =
+        (char *)(argv_segment + argv_len); // First arg starts after char * ptrs
     char *vcur_arg = (char *)(virt + (sizeof(char *) * argv_len));
-    
+
     for (size_t i = 0; i < argv_len; i++) {
-	int arg_len = strlen(argv[i]);
-	memcpy(cur_arg, argv[i], arg_len); // Copy arg to argv_segment
-	
-	argv_segment[i] = vcur_arg; // Set pointer
-	
-	cur_arg += arg_len + 1; // Next arg is right after the current arg
-	vcur_arg += arg_len + 1;
+        int arg_len = strlen(argv[i]);
+        memcpy(cur_arg, argv[i], arg_len); // Copy arg to argv_segment
+
+        argv_segment[i] = vcur_arg; // Set pointer
+
+        cur_arg += arg_len + 1; // Next arg is right after the current arg
+        vcur_arg += arg_len + 1;
     }
 
     // Create a process allocation entryy
-    struct process_allocation *palloc = kzalloc(sizeof(struct process_allocation));
+    struct process_allocation *palloc =
+        kzalloc(sizeof(struct process_allocation));
     if (!palloc) {
         goto err_segment_alloc;
     }

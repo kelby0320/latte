@@ -19,12 +19,12 @@
 #define PAGING_PAGE_TBL_MASK    0x003FF000
 #define PAGING_PAGE_OFFSET_MASK 0xFFFFF000
 
-#define PAGING_PAGE_SIZE            4096
-#define PAGING_PAGE_TBL_ENTRIES     1024
-#define PAGING_PAGE_DIR_ENTRIES     1024
-#define PAGING_LARGE_PAGE_SIZE      (PAGING_PAGE_SIZE * PAGING_PAGE_TBL_ENTRIES)
-#define PAGING_KERNEL_DIR_ENTRIES   256
-#define PAGING_KERNEL_DIR_OFFSET    768
+#define PAGING_PAGE_SIZE          4096
+#define PAGING_PAGE_TBL_ENTRIES   1024
+#define PAGING_PAGE_DIR_ENTRIES   1024
+#define PAGING_LARGE_PAGE_SIZE    (PAGING_PAGE_SIZE * PAGING_PAGE_TBL_ENTRIES)
+#define PAGING_KERNEL_DIR_ENTRIES 256
+#define PAGING_KERNEL_DIR_OFFSET  768
 
 #define is_aligned(addr) (((uint32_t)addr % PAGING_PAGE_SIZE) == 0)
 
@@ -53,13 +53,15 @@ paging_flush_tlb();
 /**
  * @brief   Copy kernel page directory entries to user page directory
  *
- * Copied entries are marked as supervisor and so are still inaccessable by user mode code
- * 
+ * Copied entries are marked as supervisor and so are still inaccessable by user
+ * mode code
+ *
  * @param kernel_page_dir   Kernel page directory
  * @param user_page_dir     User page directory
  */
 void
-paging_copy_kernel_pages_to_user(page_dir_t kernel_page_dir, page_dir_t user_page_dir);
+paging_copy_kernel_pages_to_user(
+    page_dir_t kernel_page_dir, page_dir_t user_page_dir);
 
 /**
  * @brief   Find a free page in the page directory
@@ -80,6 +82,7 @@ paging_find_free_page(page_dir_t page_dir, void *base_vaddr);
  * @return void*            The address of the free extent
  */
 void *
-paging_find_free_extent(page_dir_t page_dir, void *base_vaddr, size_t num_pages);
+paging_find_free_extent(
+    page_dir_t page_dir, void *base_vaddr, size_t num_pages);
 
 #endif

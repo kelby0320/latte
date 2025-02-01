@@ -5,8 +5,8 @@
 
 struct disk;
 
-#define PARTITION_TABLE_OFFSET 0x1be
-#define PARTITION_TABLE_SIZE   64
+#define PARTITION_TABLE_OFFSET    0x1be
+#define PARTITION_TABLE_SIZE      64
 #define PARTITION_ATTRIB_BOOTABLE 0x80
 
 /**
@@ -23,7 +23,7 @@ struct partition_table_entry {
 } __attribute__((packed));
 
 int
-partition_read_partition_table(struct disk *disk,
-			       struct partition_table_entry *partition_table);
+partition_read_partition_table(
+    struct disk *disk, struct partition_table_entry *partition_table);
 
 #endif

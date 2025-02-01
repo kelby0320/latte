@@ -1,9 +1,9 @@
 #ifndef DRIVERS_CONSOLE_H
 #define DRIVERS_CONSOLE_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
 
 #define CONSOLE_INPUT_BUFFER_SIZE 512
 
@@ -13,7 +13,7 @@ struct input_device;
 
 struct console_private {
     struct platform_device *console_device;
-    
+
     struct device *vga;
     uint16_t cur_col;
     uint16_t cur_row;
