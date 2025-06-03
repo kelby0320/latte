@@ -99,7 +99,7 @@ platform_add_devices()
     /* ATA0 Drive 0 */
     pdevices[0] = make_platform_device("ata0-0", "ata", 2, 0x1F0, 8, 0, 1);
     /* ATA0 Drive 1 */
-    pdevices[1] = make_platform_device("ata0-1", "ata", 2, 0X1F0, 8, 1, 1);
+    pdevices[1] = make_platform_device("ata0-1", "ata", 2, 0x1F0, 8, 1, 1);
     /* ATA1 Drive 0 */
     pdevices[2] = make_platform_device("ata1-0", "ata", 2, 0x170, 8, 0, 1);
     /* ATA1 Drive 1 */

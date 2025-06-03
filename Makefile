@@ -4,10 +4,10 @@ builddir = ./build
 CC = i686-elf-gcc
 AS = nasm
 
-CFLAGS = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+CFLAGS = -std=gnu99 -ffreestanding -Wall -Wextra
 ASFLAGS =  -f elf
 
-ifdef $(DEBUG)
+ifdef DEBUG
 CFLAGS += -g
 ASFLAGS += -g
 endif
@@ -24,6 +24,9 @@ bins:
 
 clean:
 	rm -r $(builddir)
+
+img:
+	./scripts/make_img.sh
 
 include sys/Makefile
 
