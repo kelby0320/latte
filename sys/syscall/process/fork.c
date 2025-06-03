@@ -1,8 +1,8 @@
 #include "syscall/process.h"
 
-#include "proc/mgmt/fork.h"
-#include "proc/process.h"
-#include "thread/thread.h"
+#include "proc/fork.h"
+#include "process.h"
+#include "thread.h"
 
 void
 do_fork(struct thread *current_thread)

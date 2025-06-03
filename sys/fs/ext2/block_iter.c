@@ -1,6 +1,6 @@
 #include "fs/ext2/block_iter.h"
 
-#include "block/buffered_reader.h"
+#include "buffered_reader.h"
 #include "config.h"
 #include "errno.h"
 #include "fs/ext2/common.h"
@@ -15,7 +15,8 @@
  * @return int          Status code
  */
 static int
-ext2_block_iterator_next_tpl(struct ext2_block_iterator *iter, struct ext2_private *fs_private)
+ext2_block_iterator_next_tpl(
+    struct ext2_block_iterator *iter, struct ext2_private *fs_private)
 {
     // TODO
     return 0;
@@ -29,7 +30,8 @@ ext2_block_iterator_next_tpl(struct ext2_block_iterator *iter, struct ext2_priva
  * @return int          Status code
  */
 static int
-ext2_block_iterator_next_dbl(struct ext2_block_iterator *iter, struct ext2_private *fs_private)
+ext2_block_iterator_next_dbl(
+    struct ext2_block_iterator *iter, struct ext2_private *fs_private)
 {
     // TODO
     return 0;
@@ -43,7 +45,8 @@ ext2_block_iterator_next_dbl(struct ext2_block_iterator *iter, struct ext2_priva
  * @return int          Status code
  */
 static int
-ext2_block_iterator_next_indirect(struct ext2_block_iterator *iter, struct ext2_private *fs_private)
+ext2_block_iterator_next_indirect(
+    struct ext2_block_iterator *iter, struct ext2_private *fs_private)
 {
     // TODO
     return 0;
@@ -57,15 +60,17 @@ ext2_block_iterator_next_indirect(struct ext2_block_iterator *iter, struct ext2_
  * @return int          Status code
  */
 static int
-ext2_block_iterator_convert_to_indirect(struct ext2_block_iterator *iter, struct ext2_private *fs_private)
+ext2_block_iterator_convert_to_indirect(
+    struct ext2_block_iterator *iter, struct ext2_private *fs_private)
 {
     // TODO
     return 0;
 }
 
 int
-ext2_block_iterator_init(struct ext2_block_iterator *iter,
-			 struct ext2_private *fs_private, const struct ext2_inode *inode)
+ext2_block_iterator_init(
+    struct ext2_block_iterator *iter, struct ext2_private *fs_private,
+    const struct ext2_inode *inode)
 {
     iter->inode = inode;
     iter->block_size = fs_private->block_size;
@@ -80,7 +85,8 @@ ext2_block_iterator_init(struct ext2_block_iterator *iter,
 }
 
 int
-ext2_block_iterator_skip_blocks(struct ext2_block_iterator *iter, uint32_t offset)
+ext2_block_iterator_skip_blocks(
+    struct ext2_block_iterator *iter, uint32_t offset)
 {
     if (offset > 12) {
         return -EIO; // Only support reading direct block pointers for now
@@ -91,7 +97,8 @@ ext2_block_iterator_skip_blocks(struct ext2_block_iterator *iter, uint32_t offse
 }
 
 int
-ext2_block_iterator_next(struct ext2_block_iterator *iter, struct ext2_private *fs_private)
+ext2_block_iterator_next(
+    struct ext2_block_iterator *iter, struct ext2_private *fs_private)
 {
     if (iter->tpl_indirect_blocks) {
         return ext2_block_iterator_next_tpl(iter, fs_private);

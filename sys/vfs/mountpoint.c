@@ -1,4 +1,4 @@
-#include "vfs/mountpoint.h"
+#include "mountpoint.h"
 
 #include "config.h"
 #include "errno.h"

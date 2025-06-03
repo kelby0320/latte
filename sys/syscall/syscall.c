@@ -1,21 +1,19 @@
-#include "syscall/syscall.h"
+#include "syscall.h"
 
 #include "config.h"
 #include "errno.h"
-#include "irq/isr.h"
-#include "sched/sched.h"
+#include "isr.h"
+#include "sched.h"
 #include "syscall/io.h"
 #include "syscall/mmap.h"
 #include "syscall/process.h"
-#include "thread/thread.h"
+#include "thread.h"
 
 typedef void (*syscall_t)();
 
 static syscall_t syscalls[] = {
-    do_open,   do_close, do_read,  do_write, do_mmap,
-    do_munmap, do_fork,  do_execv, do_wait,  do_exit,
-    do_opendir, do_closedir, do_readdir
-};
+    do_open,  do_close, do_read, do_write,   do_mmap,     do_munmap, do_fork,
+    do_execv, do_wait,  do_exit, do_opendir, do_closedir, do_readdir};
 
 void
 do_syscall(int syscall_no)

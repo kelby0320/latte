@@ -1,7 +1,6 @@
-#include "gdt/gdt.h"
-#include "mm/vm.h"
-
-#include "cpu/port.h"
+#include "gdt.h"
+#include "port.h"
+#include "vm.h"
 
 #include <stdint.h>
 
@@ -22,11 +21,11 @@ boot_enable_paging();
 extern void
 boot_load_page_directory(uint32_t *page_dir);
 
-__attribute__((aligned(4096)))
-uint32_t kernel_page_directory[PAGE_DIRECTORY_ENTRIES] = {0};
+__attribute__((aligned(
+    4096))) uint32_t kernel_page_directory[PAGE_DIRECTORY_ENTRIES] = {0};
 
-__attribute__((aligned(4096)))
-uint32_t kernel_page_tables[PAGE_DIRECTORY_ENTRIES][PAGE_TABLE_ENTRIES] = {0};
+__attribute__((aligned(4096))) uint32_t
+    kernel_page_tables[PAGE_DIRECTORY_ENTRIES][PAGE_TABLE_ENTRIES] = {0};
 
 /**
  * @brief Initialize a single kernel page table
@@ -86,7 +85,8 @@ map_kernel_directory()
     for (int i = 0; i < PAGE_DIRECTORY_ENTRIES - KERNEL_DIR_ENTRIES; i++) {
         /* The same conversion must be done to kernel_page_tables[i] */
         uint32_t *phys_kernel_page_table = to_paddr(kernel_page_tables[i]);
-        uint32_t dir_entry = (uint32_t)phys_kernel_page_table | PAGE_PRESENT | PAGE_WRITABLE;
+        uint32_t dir_entry =
+            (uint32_t)phys_kernel_page_table | PAGE_PRESENT | PAGE_WRITABLE;
 
         phys_kernel_page_directory[i] = dir_entry;
     }
@@ -94,7 +94,8 @@ map_kernel_directory()
     // Map the bottom 1GB to the top 1GB
     for (int i = 0; i < NUM_KERNEL_PAGE_TABLES; i++) {
         uint32_t *phys_kernel_page_table = to_paddr(kernel_page_tables[i]);
-        uint32_t dir_entry = (uint32_t)phys_kernel_page_table | PAGE_PRESENT | PAGE_WRITABLE;
+        uint32_t dir_entry =
+            (uint32_t)phys_kernel_page_table | PAGE_PRESENT | PAGE_WRITABLE;
 
         phys_kernel_page_directory[i + PAGING_KERNEL_DIR_OFFSET] = dir_entry;
     }

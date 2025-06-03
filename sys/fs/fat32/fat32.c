@@ -1,4 +1,4 @@
-#include "fs/fat32/fat32.h"
+#include "fs/fat32.h"
 
 struct filesystem *
 fat32_init()

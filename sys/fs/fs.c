@@ -1,17 +1,17 @@
-#include "fs/fs.h"
+#include "fs.h"
 
-#include "block/block.h"
+#include "block.h"
 #include "config.h"
 #include "errno.h"
-#include "fs/devfs/devfs.h"
-#include "fs/ext2/ext2.h"
-#include "fs/fat32/fat32.h"
-#include "fs/path.h"
-#include "kernel/kernel.h"
+#include "fs/devfs.h"
+#include "fs/ext2.h"
+#include "fs/fat32.h"
+#include "kernel.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 #include "libk/string.h"
-#include "vfs/mountpoint.h"
+#include "mountpoint.h"
+#include "path.h"
 
 static struct filesystem *filesystems[LATTE_MAX_FILESYSTEMS] = {0};
 static int filesystems_len = 0;
@@ -47,7 +47,7 @@ fs_load()
     int res = fs_insert_filesystem(ext2_init());
     if (res < 0) {
         printk("Failed to load ext2 filesystem driver\n");
-    }    
+    }
 
     res = fs_insert_filesystem(devfs_init());
     if (res < 0) {

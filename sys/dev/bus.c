@@ -1,9 +1,9 @@
-#include "dev/bus.h"
+#include "bus.h"
 
-#include "dev/device.h"
-#include "dev/platform/platform_device.h"
-#include "dev/input/input_device.h"
-#include "drivers/driver.h"
+#include "dev/input_device.h"
+#include "dev/platform_device.h"
+#include "device.h"
+#include "driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
@@ -33,7 +33,7 @@ bus_match_devices(const struct bus *bus)
 
             if (bus->match(dev, drv) == 0) {
                 dev->driver = drv;
-		printk("driver %s bound to device %s\n", drv->name, dev->name);
+                printk("driver %s bound to device %s\n", drv->name, dev->name);
                 break;
             }
         }
@@ -46,7 +46,8 @@ bus_probe_devices(const struct bus *bus)
     for_each_in_list(struct device *, bus->devices, list, dev)
     {
         if (dev->driver) {
-	    printk("driver %s probing device %s\n", dev->driver->name, dev->name);
+            printk(
+                "driver %s probing device %s\n", dev->driver->name, dev->name);
             bus->probe(dev);
         }
     }
@@ -66,10 +67,10 @@ bus_register(struct bus *bus)
 {
     int res = list_push_back(&bus_list, bus);
     if (res < 0) {
-	printk("Failed to register new bus, %s\n", bus->name);
-	return res;
+        printk("Failed to register new bus, %s\n", bus->name);
+        return res;
     }
-    
+
     printk("Registered new bus %s\n", bus->name);
     return 0;
 }

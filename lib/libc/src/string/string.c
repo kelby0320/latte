@@ -122,21 +122,20 @@ strlen(const char *str)
 static bool
 strtok_is_delim(char c, const char *delim)
 {
-
 }
 
 static char *
 strtok_next(const char *delim)
 {
     char *str_start = strtok_input;
-    
+
     while (*strtok_input && !strtok_is_delim(*strtok_input, delim)) {
-	strtok_input++;
+        strtok_input++;
     }
 
     while (*strtok_input && strtok_is_delim(*strtok_input, delim)) {
-	*strtok_input = 0;
-	strtok_input++;
+        *strtok_input = 0;
+        strtok_input++;
     }
 
     return str_start;
@@ -146,7 +145,7 @@ char *
 strtok(char *str, const char *delim)
 {
     if (!str) {
-	return strtok_next(delim);
+        return strtok_next(delim);
     }
 
     strtok_input = str;

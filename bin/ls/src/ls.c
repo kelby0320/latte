@@ -1,7 +1,7 @@
+#include "dirent.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "unistd.h"
-#include "dirent.h"
 
 static void
 print_help()
@@ -15,18 +15,18 @@ print_dir(char *dir_path)
 {
     DIR *dir = opendir(dir_path);
     if (!dir) {
-	printf("\"%s\": No such file or directory\n", dir_path);
-	return;
+        printf("\"%s\": No such file or directory\n", dir_path);
+        return;
     }
 
     struct dirent *entry = NULL;
     do {
-	entry = readdir(dir);
-	if (entry) {
-	    printf("%s\n", entry->d_name);
-	}
+        entry = readdir(dir);
+        if (entry) {
+            printf("%s\n", entry->d_name);
+        }
 
-	free(entry);
+        free(entry);
     } while (entry);
 }
 
@@ -34,14 +34,14 @@ int
 main(int argc, char **argv)
 {
     char *dir_path = "/";
-    
+
     if (argc > 1) {
-	print_help();
-	_exit(EXIT_FAILURE);
+        print_help();
+        _exit(EXIT_FAILURE);
     }
 
     if (argc == 1) {
-	dir_path = argv[0];
+        dir_path = argv[0];
     }
 
     print_dir(dir_path);

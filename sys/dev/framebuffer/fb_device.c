@@ -1,1 +1,1 @@
-#include "dev/framebuffer/fb.h"
+#include "dev/fb_device.h"

@@ -1,11 +1,11 @@
-#include "thread/userio.h"
+#include "userio.h"
 
 #include "errno.h"
-#include "kernel/kernel.h"
+#include "kalloc.h"
+#include "kernel.h"
 #include "libk/memory.h"
-#include "mm/kalloc.h"
-#include "mm/vm.h"
-#include "proc/process.h"
+#include "process.h"
+#include "vm.h"
 
 #include <stdint.h>
 
@@ -25,7 +25,8 @@ thread_get_stack_item(struct thread *thread, int index)
 }
 
 int
-thread_copy_from_user(struct thread *thread, void *user_buf, void *kernel_buf, size_t size)
+thread_copy_from_user(
+    struct thread *thread, void *user_buf, void *kernel_buf, size_t size)
 {
     int res = 0;
 
@@ -40,8 +41,8 @@ thread_copy_from_user(struct thread *thread, void *user_buf, void *kernel_buf, s
     memset(shared_buf, 0, shared_buf_size);
 
     // Map the shared buffer into user space
-    void *user_shared_buf =
-        vm_area_map_user_pages(thread->process->vm_area, shared_buf, shared_buf_size);
+    void *user_shared_buf = vm_area_map_user_pages(
+        thread->process->vm_area, shared_buf, shared_buf_size);
     if (!user_shared_buf) {
         res = -ENOMEM;
         goto err_out;
@@ -55,7 +56,8 @@ thread_copy_from_user(struct thread *thread, void *user_buf, void *kernel_buf, s
     switch_to_kernel_vm_area();
 
     // Unmap the shared buffer from user space
-    vm_area_unmap_pages(thread->process->vm_area, user_shared_buf, shared_buf_size);
+    vm_area_unmap_pages(
+        thread->process->vm_area, user_shared_buf, shared_buf_size);
 
     // Copy data from the shared buffer to buf
     memcpy(kernel_buf, shared_buf, size);
@@ -69,7 +71,8 @@ err_out:
 }
 
 int
-thread_copy_to_user(struct thread *thread, void *user_buf, void *kernel_buf, size_t size)
+thread_copy_to_user(
+    struct thread *thread, void *user_buf, void *kernel_buf, size_t size)
 {
     int res = 0;
 
@@ -84,8 +87,8 @@ thread_copy_to_user(struct thread *thread, void *user_buf, void *kernel_buf, siz
     memset(shared_buf, 0, shared_buf_size);
 
     // Map the shared buffer into user space
-    void *user_shared_buf =
-        vm_area_map_user_pages(thread->process->vm_area, shared_buf, shared_buf_size);
+    void *user_shared_buf = vm_area_map_user_pages(
+        thread->process->vm_area, shared_buf, shared_buf_size);
     if (!user_shared_buf) {
         res = -ENOMEM;
         goto err_out;
@@ -102,7 +105,8 @@ thread_copy_to_user(struct thread *thread, void *user_buf, void *kernel_buf, siz
     switch_to_kernel_vm_area();
 
     // Unmap the shared buffer from user space
-    vm_area_unmap_pages(thread->process->vm_area, user_shared_buf, shared_buf_size);
+    vm_area_unmap_pages(
+        thread->process->vm_area, user_shared_buf, shared_buf_size);
 
     res = size;
 

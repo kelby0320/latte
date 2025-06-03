@@ -1,8 +1,8 @@
-#include "irq/idt.h"
+#include "idt.h"
 
 #include "config.h"
 #include "errno.h"
-#include "irq/isr.h"
+#include "isr.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 
@@ -51,7 +51,7 @@ void
 idt_init()
 {
     printk("Init IDT at %d\n", (int)int_desc_tbl);
-    
+
     memset(int_desc_tbl, 0, sizeof(int_desc_tbl));
     idtr.size = sizeof(int_desc_tbl) - 1;
     idtr.offset = (uint32_t)int_desc_tbl;

@@ -1,4 +1,4 @@
-#include "fs/path.h"
+#include "path.h"
 
 #include "config.h"
 #include "errno.h"
@@ -52,7 +52,8 @@ static int
 get_element_from_path(char *path_buf, const char **path_str)
 {
     int i;
-    for (i = 0; is_path_char(**path_str) && i < LATTE_MAX_PATH_ELEM_SIZE - 1; i++) {
+    for (i = 0; is_path_char(**path_str) && i < LATTE_MAX_PATH_ELEM_SIZE - 1;
+         i++) {
         path_buf[i] = **path_str;
         *path_str += 1;
     }
@@ -75,8 +76,9 @@ get_element_from_path(char *path_buf, const char **path_str)
  * @return int          Element length
  */
 static int
-parse_next_element(struct path_element **next_element, struct path_element *prev_element,
-                   const char **path_str)
+parse_next_element(
+    struct path_element **next_element, struct path_element *prev_element,
+    const char **path_str)
 {
     struct path_element *element = kzalloc(sizeof(struct path_element));
     if (!element) {

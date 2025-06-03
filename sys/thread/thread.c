@@ -1,17 +1,17 @@
-#include "thread/thread.h"
+#include "thread.h"
 
 #include "config.h"
 #include "errno.h"
-#include "irq/isr.h"
+#include "isr.h"
+#include "kalloc.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/memory.h"
 #include "libk/print.h"
-#include "mm/kalloc.h"
-#include "mm/paging/paging.h"
-#include "mm/vm.h"
-#include "proc/process.h"
-#include "sched/sched.h"
+#include "paging.h"
+#include "process.h"
+#include "sched.h"
+#include "vm.h"
 
 #include <stddef.h>
 
@@ -57,9 +57,10 @@ thread_create(struct process *process)
 
     // Map the stack from the bottom up.
     // Note: We need to map one extra page to cover the top of stack address
-    res = vm_area_map_pages_to(process->vm_area, (void *)THREAD_STACK_VIRT_ADDR_BOTTOM, stack,
-                               stack + THREAD_STACK_SIZE + PAGING_PAGE_SIZE,
-                               PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
+    res = vm_area_map_pages_to(
+        process->vm_area, (void *)THREAD_STACK_VIRT_ADDR_BOTTOM, stack,
+        stack + THREAD_STACK_SIZE + PAGING_PAGE_SIZE,
+        PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
     if (res < 0) {
         goto err_map;
     }
@@ -129,9 +130,10 @@ thread_copy_to(const struct thread *thread, const struct process *child_process)
 
     memcpy(stack, thread->stack, THREAD_STACK_SIZE);
 
-    res = vm_area_map_pages_to(child_process->vm_area, (void *)THREAD_STACK_VIRT_ADDR_BOTTOM, stack,
-                               stack + THREAD_STACK_SIZE + PAGING_PAGE_SIZE,
-                               PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
+    res = vm_area_map_pages_to(
+        child_process->vm_area, (void *)THREAD_STACK_VIRT_ADDR_BOTTOM, stack,
+        stack + THREAD_STACK_SIZE + PAGING_PAGE_SIZE,
+        PAGING_PAGE_PRESENT | PAGING_PAGE_WRITABLE | PAGING_PAGE_USER);
     if (res < 0) {
         goto err_map;
     }
@@ -187,8 +189,9 @@ thread_set_return_value(struct thread *thread, uint32_t value)
 void
 thread_switch_and_return(struct thread *thread)
 {
-    paging_copy_kernel_pages_to_user(kernel_vm_area.page_directory,
-                                     thread->process->vm_area->page_directory);
+    paging_copy_kernel_pages_to_user(
+        kernel_vm_area.page_directory,
+        thread->process->vm_area->page_directory);
     process_switch_to_vm_area(thread->process);
     thread_return(&thread->registers);
 }

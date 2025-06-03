@@ -1,25 +1,28 @@
-#include "block/buffered_reader.h"
+#include "buffered_reader.h"
 
-#include "block/block.h"
-#include "block/disk.h"
-#include "dev/device.h"
+#include "block.h"
+#include "device.h"
+#include "disk.h"
 
 void
-block_buffered_reader_init(struct block_buffered_reader *reader, struct block *block)
+block_buffered_reader_init(
+    struct block_buffered_reader *reader, struct block *block)
 {
     reader->block = block;
     reader->offset = 0;
 }
 
 int
-block_buffered_reader_seek(struct block_buffered_reader *reader, unsigned int offset)
+block_buffered_reader_seek(
+    struct block_buffered_reader *reader, unsigned int offset)
 {
     reader->offset = offset;
     return 0;
 }
 
 int
-block_buffered_reader_read(struct block_buffered_reader *reader, char *out, unsigned int count)
+block_buffered_reader_read(
+    struct block_buffered_reader *reader, char *out, unsigned int count)
 {
     unsigned int start_offset = reader->block->lba_start * DISK_SECTOR_SIZE;
     unsigned int sector = (start_offset + reader->offset) / DISK_SECTOR_SIZE;

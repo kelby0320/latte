@@ -50,8 +50,9 @@ slab_append_slab(struct slab *slab_head, struct slab *new_slab)
 {
     struct slab *slab;
     struct slab *p;
-    for (p = NULL, slab = slab_head; slab != NULL; p = slab, slab = slab->next);
-    
+    for (p = NULL, slab = slab_head; slab != NULL; p = slab, slab = slab->next)
+        ;
+
     p->next = new_slab;
 }
 
@@ -135,7 +136,7 @@ slab_cache_alloc(struct slab_cache *cache)
 
     struct slab *new_slab = vzalloc(sizeof(struct slab));
     if (!new_slab) {
-	return NULL;
+        return NULL;
     }
 
     slab_init(new_slab, cache->obj_size);

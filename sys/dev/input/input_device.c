@@ -1,33 +1,32 @@
-#include "dev/input/input_device.h"
+#include "dev/input_device.h"
 
-#include "dev/bus.h"
-#include "drivers/driver.h"
+#include "bus.h"
+#include "driver.h"
 #include "errno.h"
 #include "libk/alloc.h"
 #include "libk/list.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 #include "libk/string.h"
-#include "libk/list.h"
-#include "errno.h"
 
 #include <stdbool.h>
 
 struct list_item *input_device_list = NULL;
 
 int
-input_device_init(struct input_device *idev, const char *name, input_device_type_t type)
+input_device_init(
+    struct input_device *idev, const char *name, input_device_type_t type)
 {
     if (type > INPUT_DEVICE_TYPE_MOUSE) {
-	return -EINVAL;
+        return -EINVAL;
     }
 
     idev->type = type;
-    
+
     int name_len = strlen(name);
     idev->name = kzalloc(name_len + 1);
     if (!idev->name) {
-	return -ENOMEM;
+        return -ENOMEM;
     }
 
     strcpy((char *)idev->name, name);
@@ -42,7 +41,8 @@ err_kbd:
 }
 
 int
-input_device_add_callback(struct input_device *idev, input_recv_callback_t callback)
+input_device_add_callback(
+    struct input_device *idev, input_recv_callback_t callback)
 {
     return list_push_back(&idev->input_recv_callbacks, callback);
 }
@@ -56,10 +56,11 @@ input_device_register(struct input_device *idev)
 struct input_device *
 input_device_find(const char *name)
 {
-    for_each_in_list(struct input_device *, input_device_list, list, idev) {
-	if (strcmp(idev->name, name) == 0) {
-	    return idev;
-	}
+    for_each_in_list(struct input_device *, input_device_list, list, idev)
+    {
+        if (strcmp(idev->name, name) == 0) {
+            return idev;
+        }
     }
 
     return NULL;
@@ -68,8 +69,10 @@ input_device_find(const char *name)
 int
 input_device_event(struct input_device *idev, struct input_event event)
 {
-    for_each_in_list(input_recv_callback_t, idev->input_recv_callbacks, list, callback) {
-	callback(idev, event);
+    for_each_in_list(
+        input_recv_callback_t, idev->input_recv_callbacks, list, callback)
+    {
+        callback(idev, event);
     }
 
     return 0;

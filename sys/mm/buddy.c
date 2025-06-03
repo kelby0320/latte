@@ -1,9 +1,9 @@
-#include "mm/buddy.h"
+#include "buddy.h"
 
 #include "errno.h"
 #include "libk/memory.h"
 
-#define order_to_size(order)  (BUDDY_BLOCK_MIN_SIZE * (1 << order))
+#define order_to_size(order) (BUDDY_BLOCK_MIN_SIZE * (1 << order))
 
 /**
  * @brief Initialize a block list
@@ -45,7 +45,8 @@ block_list_new_block(struct buddy_block *block_list)
  * @param block         The block to remove
  */
 static void
-block_list_remove_block(struct buddy_block *block_list, struct buddy_block *block)
+block_list_remove_block(
+    struct buddy_block *block_list, struct buddy_block *block)
 {
     for (int i = 0; i < BUDDY_BLOCK_LIST_LEN; i++) {
         if (&block_list[i] == block) {
@@ -106,7 +107,8 @@ split_block(struct buddy_allocator *allocator, struct buddy_block *block)
 {
     unsigned int new_order = block->order - 1;
 
-    struct buddy_block *buddy_block = block_list_new_block(allocator->buddy_block_list);
+    struct buddy_block *buddy_block =
+        block_list_new_block(allocator->buddy_block_list);
     if (!buddy_block) {
         return -ENOMEM;
     }
@@ -162,7 +164,8 @@ merge_block(struct buddy_allocator *allocator, struct buddy_block *block)
 static struct buddy_block *
 allocate_block_of_order(struct buddy_allocator *allocator, unsigned int order)
 {
-    struct buddy_block *block = block_list_find_free_block(allocator->buddy_block_list, order);
+    struct buddy_block *block =
+        block_list_find_free_block(allocator->buddy_block_list, order);
     if (!block) {
         // No free block was available
         // We are already at the highest order and cannot search further
@@ -240,7 +243,8 @@ buddy_allocator_malloc(struct buddy_allocator *allocator, unsigned int order)
 void
 buddy_allocator_free(struct buddy_allocator *allocator, void *addr)
 {
-    struct buddy_block *block = block_list_find_block(allocator->buddy_block_list, addr);
+    struct buddy_block *block =
+        block_list_find_block(allocator->buddy_block_list, addr);
     if (!block) {
         return;
     }

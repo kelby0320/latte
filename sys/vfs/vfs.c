@@ -1,19 +1,20 @@
-#include "vfs/vfs.h"
+#include "vfs.h"
 
-#include "dev/bus.h"
+#include "block.h"
+#include "bus.h"
 #include "config.h"
-#include "block/block.h"
-#include "dev/device.h"
+#include "device.h"
 #include "errno.h"
-#include "fs/fs.h"
-#include "fs/path.h"
-#include "kernel/kernel.h"
+#include "file_descriptor.h"
+#include "fs.h"
+#include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
 #include "libk/print.h"
 #include "libk/string.h"
-#include "vfs/file_descriptor.h"
-#include "vfs/mountpoint.h"
+#include "mountpoint.h"
+#include "path.h"
+
 #include <stdbool.h>
 
 /**
@@ -40,7 +41,7 @@ static bool
 is_devfs_block(struct block *block)
 {
     if (strncmp(block->name, "devfs", 5) == 0) {
-	return true;
+        return true;
     }
 
     return false;
@@ -58,7 +59,7 @@ vfs_find_and_mount(const char *mount_path, bool (*predicate)(struct block *))
 {
     struct block *block = block_find(predicate);
     if (!block) {
-	return -ENOENT;
+        return -ENOENT;
     }
 
     int res = vfs_mount(mount_path, block);
@@ -101,8 +102,9 @@ vfs_mount(const char *path, struct block *block)
         goto err_out;
     }
 
-    printk("Found %s filesystem on %s\n", mountpoint->filesystem->name,
-           mountpoint->block->name);
+    printk(
+        "Found %s filesystem on %s\n", mountpoint->filesystem->name,
+        mountpoint->block->name);
 
     res = mountpoint_add(mountpoint);
     if (res < 0) {
@@ -188,7 +190,7 @@ vfs_read(int fd, char *ptr, size_t count)
     }
 
     if (descriptor->type != FT_REGULAR_FILE) {
-	return -EINVAL;
+        return -EINVAL;
     }
 
     struct filesystem *filesystem = descriptor->mountpoint->filesystem;
@@ -262,12 +264,12 @@ vfs_opendir(const char *dirname)
 
     res = filesystem->opendir(fs_private, path, &descriptor->private);
     if (res < 0) {
-	goto err_opendir;
+        goto err_opendir;
     }
 
     descriptor->type = FT_DIRECTORY;
     descriptor->mountpoint = mountpoint;
-    
+
     path_free(path);
 
     return descriptor->index;
@@ -280,7 +282,6 @@ err_path:
     file_descriptor_free(descriptor);
 
     return res;
-    
 }
 
 int
@@ -298,7 +299,7 @@ vfs_readdir(int fd, struct dir_entry *entry)
     }
 
     if (descriptor->type != FT_DIRECTORY) {
-	return -EINVAL;
+        return -EINVAL;
     }
 
     struct filesystem *filesystem = descriptor->mountpoint->filesystem;
