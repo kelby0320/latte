@@ -1,5 +1,6 @@
 #include "kernel.h"
 
+#include "acpi.h"
 #include "bus.h"
 #include "config.h"
 #include "cpu.h"
@@ -55,8 +56,12 @@ switch_to_kernel_vm_area()
  * @param magic Multiboot magic number
  */
 void
-kernel_early_init(unsigned long magic)
-{
+kernel_early_init(unsigned long magic) {
+    /* int res = multiboot2_verify_magic_number(magic); */
+    /* if (!res) { */
+    /*     panic("Invalid multiboot magic number\n"); */
+    /* } */
+
     vm_area_kernel_init(&kernel_vm_area, (page_dir_t)&kernel_page_directory);
 
     // 512 MB heap size for now
@@ -65,10 +70,7 @@ kernel_early_init(unsigned long magic)
 
     libk_alloc_init();
 
-    // int res = multiboot2_verify_magic_number(magic);
-    // if (!res) {
-    //     panic("Invalid multiboot magic number\n");
-    // }
+    acpi_init();
 
     irq_init();
 
@@ -109,7 +111,7 @@ kernel_late_init()
  * @param magic Multiboot 2 magic number
  */
 void
-kernel_main(unsigned long magic)
+kernel_main(unsigned long magic, const void* multiboot_info_struct)
 {
     kernel_early_init(magic);
 
