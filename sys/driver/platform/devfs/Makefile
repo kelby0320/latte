@@ -9,4 +9,4 @@ driver_platform_devfs_mkdir:
 	mkdir -p $(driver_platform_devfs_builddir)
 
 $(filter %.o, $(driver_platform_devfs_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

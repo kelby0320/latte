@@ -11,7 +11,7 @@ mm_paging_mkdir:
 	mkdir -p $(mm_paging_builddir)
 
 $(filter %.o, $(mm_paging_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 $(filter %.asm.o, $(mm_paging_asmobjfiles)): %.asm.o: %.asm
 	$(AS) $(ASFLAGS) -o $(builddir)/$@ $<

@@ -11,7 +11,7 @@ irq_mkdir:
 	mkdir -p $(irq_builddir)
 
 $(filter %.o, $(irq_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 $(filter %.asm.o, $(irq_asmobjfiles)): %.asm.o: %.asm
 	$(AS) $(ASFLAGS) -o $(builddir)/$@ $<

@@ -11,7 +11,7 @@ gdt_mkdir:
 	mkdir -p $(gdt_builddir)
 
 $(filter %.o, $(gdt_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 $(filter %.asm.o, $(gdt_asmobjfiles)): %.asm.o: %.asm
 	$(AS) $(ASFLAGS) -o $(builddir)/$@ $<

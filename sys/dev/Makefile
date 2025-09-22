@@ -11,6 +11,6 @@ dev_mkdir:
 	mkdir -p $(dev_builddir)
 
 $(filter %.o, $(dev_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 include $(foreach dir, $(dev_subdirs), sys/dev/$(dir)/Makefile)

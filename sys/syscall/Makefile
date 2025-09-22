@@ -11,6 +11,6 @@ syscall_mkdir:
 	mkdir -p $(syscall_builddir)
 
 $(filter %.o, $(syscall_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 include $(foreach dir, $(syscall_subdirs), sys/syscall/$(dir)/Makefile)

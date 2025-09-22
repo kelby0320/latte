@@ -9,4 +9,4 @@ block_mkdir:
 	mkdir -p $(block_builddir)
 
 $(filter %.o, $(block_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

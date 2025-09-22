@@ -9,4 +9,4 @@ sched_mkdir:
 	mkdir -p $(sched_builddir)
 
 $(filter %.o, $(sched_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

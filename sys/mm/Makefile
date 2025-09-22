@@ -11,6 +11,6 @@ mm_mkdir:
 	mkdir -p $(mm_builddir)
 
 $(filter %.o, $(mm_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 include $(foreach dir, $(mm_subdirs), sys/mm/$(dir)/Makefile)

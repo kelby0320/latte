@@ -9,5 +9,5 @@ fs_ext2_mkdir:
 	mkdir -p $(fs_ext2_builddir)
 
 $(filter %.o, $(fs_ext2_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 

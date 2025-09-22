@@ -9,4 +9,4 @@ syscall_process_mkdir:
 	mkdir -p $(syscall_process_builddir)
 
 $(filter %.o, $(syscall_process_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

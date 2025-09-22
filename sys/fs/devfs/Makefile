@@ -9,5 +9,5 @@ fs_devfs_mkdir:
 	mkdir -p $(fs_devfs_builddir)
 
 $(filter %.o, $(fs_devfs_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 

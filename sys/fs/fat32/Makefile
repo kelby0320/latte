@@ -9,5 +9,5 @@ fs_fat32_mkdir:
 	mkdir -p $(fs_fat32_builddir)
 
 $(filter %.o, $(fs_fat32_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 

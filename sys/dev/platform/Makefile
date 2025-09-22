@@ -9,4 +9,4 @@ dev_platform_mkdir:
 	mkdir -p $(dev_platform_builddir)
 
 $(filter %.o, $(dev_platform_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

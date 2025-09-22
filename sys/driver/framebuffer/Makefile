@@ -9,4 +9,4 @@ driver_framebuffer_mkdir:
 	mkdir -p $(driver_framebuffer_builddir)
 
 $(filter %.o, $(driver_framebuffer_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

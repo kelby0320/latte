@@ -11,6 +11,6 @@ process_mkdir:
 	mkdir -p $(process_builddir)
 
 $(filter %.o, $(process_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 include $(foreach dir, $(process_subdirs), sys/process/$(dir)/Makefile)

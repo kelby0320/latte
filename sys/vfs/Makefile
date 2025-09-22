@@ -9,4 +9,4 @@ vfs_mkdir:
 	mkdir -p $(vfs_builddir)
 
 $(filter %.o, $(vfs_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

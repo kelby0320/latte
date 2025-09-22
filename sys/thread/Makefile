@@ -11,7 +11,7 @@ thread_mkdir:
 	mkdir -p $(thread_builddir)
 
 $(filter %.o, $(thread_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 $(filter %.asm.o, $(thread_asmobjfiles)): %.asm.o: %.asm
 	$(AS) $(ASFLAGS) -o $(builddir)/$@ $<

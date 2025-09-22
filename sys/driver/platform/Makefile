@@ -11,6 +11,6 @@ driver_platform_mkdir:
 	mkdir -p $(driver_platform_builddir)
 
 $(filter %.o, $(driver_platform_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 include $(foreach dir, $(driver_platform_subdirs), sys/driver/platform/$(dir)/Makefile)

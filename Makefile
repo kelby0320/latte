@@ -2,9 +2,11 @@ version = 0.1
 builddir = ./build
 
 CC = i686-elf-gcc
+CXX = i686-elf-g++
 AS = nasm
 
 CFLAGS = -std=gnu99 -ffreestanding -Wall -Wextra
+CXXFLAGS = -std=c++17 -ffreestanding -Wall -Wextra -fpermissive
 LDFLAGS = -T ./sys/linker.ld -ffreestanding -O2 -nostdlib -lgcc
 ASFLAGS =  -f elf
 

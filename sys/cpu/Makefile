@@ -11,7 +11,7 @@ cpu_mkdir:
 	mkdir -p $(cpu_builddir)
 
 $(filter %.o, $(cpu_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
 
 $(filter %.o, $(cpu_asmobjfiles)): %.asm.o: %.asm
 	$(AS) $(ASFLAGS) -o $(builddir)/$@ $<

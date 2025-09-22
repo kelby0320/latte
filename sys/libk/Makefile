@@ -9,4 +9,4 @@ libk_mkdir:
 	mkdir -p $(libk_builddir)
 
 $(filter %.o, $(libk_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

@@ -9,4 +9,4 @@ driver_platform_console_mkdir:
 	mkdir -p $(driver_platform_console_builddir)
 
 $(filter %.o, $(driver_platform_console_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

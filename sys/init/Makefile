@@ -9,4 +9,4 @@ init_mkdir:
 	mkdir -p $(init_builddir)
 
 $(filter %.o, $(init_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<

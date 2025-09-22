@@ -9,4 +9,4 @@ process_proc_mkdir:
 	mkdir -p $(process_proc_builddir)
 
 $(filter %.o, $(process_proc_objfiles)): %.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $(builddir)/$@ -c $<
