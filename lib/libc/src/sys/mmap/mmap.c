@@ -5,5 +5,5 @@
 void *
 mmap(size_t size)
 {
-    return do_syscall1(MMAP_SYSCALL_NO, size);
+    return (void *)do_syscall1(MMAP_SYSCALL_NO, size);
 }
