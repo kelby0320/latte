@@ -5,6 +5,7 @@ CC = i686-elf-gcc
 AS = nasm
 
 CFLAGS = -std=gnu99 -ffreestanding -Wall -Wextra
+LDFLAGS = -T ./sys/linker.ld -ffreestanding -O2 -nostdlib -lgcc
 ASFLAGS =  -f elf
 
 ifdef DEBUG
