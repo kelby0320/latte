@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 char *
 strcat(char *dest, const char *src);
 
@@ -49,4 +52,7 @@ toupper(char c);
 char
 tolower(char c);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -11,6 +11,9 @@ struct queue {
     struct _queue_item *tail;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 queue_enqueue(struct queue *queue, void *data);
 
@@ -23,4 +26,7 @@ queue_remove(struct queue *queue, void *data);
 void
 queue_destroy(struct queue *queue);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

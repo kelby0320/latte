@@ -15,6 +15,9 @@ struct kbd_private {
     struct input_device *idev;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 kbd_drv_init();
 
@@ -24,4 +27,7 @@ kbd_probe(struct platform_device *dev);
 int
 kbd_read(struct device *dev, char *buf, size_t len);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

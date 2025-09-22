@@ -3,6 +3,9 @@
 
 struct thread;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Execute the open system call
  *
@@ -49,4 +52,7 @@ do_closedir(struct thread *current_thread);
 void
 do_readdir(struct thread *current_thread);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

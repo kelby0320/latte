@@ -31,6 +31,9 @@ struct buddy_allocator {
     size_t mem_available;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Initialize a buddy allocator
  *
@@ -60,4 +63,7 @@ buddy_allocator_malloc(struct buddy_allocator *allocator, unsigned int order);
 void
 buddy_allocator_free(struct buddy_allocator *allocator, void *addr);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

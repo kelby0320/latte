@@ -111,7 +111,13 @@ enum {
     KEYCODE_NP_PERIOD
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 char
 keycode_to_ascii(unsigned int keycode, bool shift_enabled);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

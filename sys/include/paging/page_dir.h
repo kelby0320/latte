@@ -11,6 +11,9 @@ typedef uint32_t page_dir_entry_t;
 #define page_dir_starting_addr(page_dir)                                       \
     ((void *)((uint32_t)page_dir & 0xfffff000))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Retrieve a page directory entry from a page directory
  *
@@ -43,4 +46,7 @@ page_dir_entry_t
 page_dir_add_page_tbl(
     page_dir_t page_dir, void *vaddr, page_tbl_t page_tbl, uint8_t flags);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

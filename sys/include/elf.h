@@ -96,6 +96,9 @@ struct elf32_shdr {
     elf32_word sh_entsize;   /* Section table entry size */
 } __attribute__((packed));
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Validate the ELF header signature
  *
@@ -150,4 +153,7 @@ elf32_is_exec(struct elf32_ehdr *ehdr);
 int
 elf32_is_valid(struct elf32_ehdr *ehdr);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

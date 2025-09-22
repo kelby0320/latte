@@ -366,10 +366,16 @@ struct multiboot2_tag_load_base_addr {
     uint32_t load_base_addr;
 } __attribute__((packed));
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 multiboot2_verify_magic_number(unsigned long magic);
 
 int
 multiboot2_get_boot_device(void *addr, uint32_t *biosdev, uint32_t *part_no);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

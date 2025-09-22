@@ -13,6 +13,9 @@
 #define kalloc_order_to_size(order) (BUDDY_BLOCK_MIN_SIZE * (1 << order))
 #define kalloc_get_phys_page()      (kalloc_get_phys_pages(PHYS_PAGE_ORDER))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize physical memory allocator
  *
@@ -77,4 +80,7 @@ kalloc_get_next_contiguous_allocation(void *paddr);
 int
 kalloc_size_to_order(size_t size);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

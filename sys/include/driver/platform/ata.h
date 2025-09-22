@@ -48,6 +48,9 @@ struct ata_private {
     unsigned int drive_no;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 ata_drv_init();
 
@@ -64,4 +67,7 @@ int
 ata_write_sectors(
     struct device *dev, unsigned int lba, const char *buf, size_t count);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

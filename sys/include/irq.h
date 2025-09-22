@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Intialize the IRQ subsystem
  *
@@ -49,4 +52,7 @@ enable_interrupts();
 void
 disable_interrupts();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

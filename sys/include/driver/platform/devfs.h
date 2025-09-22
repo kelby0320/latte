@@ -6,6 +6,9 @@
 struct device;
 struct platform_device;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 devfs_drv_init();
 
@@ -16,4 +19,7 @@ int
 devfs_read_sectors(
     struct device *dev, unsigned int lba, char *buf, size_t count);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

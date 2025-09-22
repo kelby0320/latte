@@ -3,6 +3,9 @@
 
 #include <stdarg.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Write a formatted string to a buffer
  *
@@ -35,4 +38,7 @@ sprintk(char *buf, const char *fmt, ...);
 int
 printk(const char *fmt, ...);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

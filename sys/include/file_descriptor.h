@@ -32,6 +32,9 @@ struct dir_entry {
     char name[256];
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Retrieve a file descriptor
  *
@@ -58,4 +61,7 @@ file_descriptor_get_new(struct file_descriptor **desc_out);
 void
 file_descriptor_free(struct file_descriptor *descriptor);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

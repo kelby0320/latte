@@ -1,6 +1,9 @@
 #ifndef CPU_PORT_H
 #define CPU_PORT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Read byte from io port
  *
@@ -37,4 +40,7 @@ outb(unsigned short port, unsigned char val);
 void
 outw(unsigned short port, unsigned short val);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

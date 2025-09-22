@@ -5,6 +5,9 @@ struct device;
 struct file_operations;
 struct filesystem;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize a devfs filesystem
  *
@@ -23,4 +26,7 @@ devfs_init();
 int
 devfs_make_node(struct device *device, struct file_operations *fops);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

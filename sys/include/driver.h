@@ -25,6 +25,9 @@ struct file_operations {
     int (*seek)(struct device *dev, size_t offset, file_seek_mode_t seek_mode);
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 driver_init();
 
@@ -37,4 +40,7 @@ driver_find(const char *name);
 struct device_driver *
 driver_find_next(const struct device_driver *driver);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

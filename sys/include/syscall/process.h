@@ -3,6 +3,9 @@
 
 struct thread;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Execute the fork system call
  *
@@ -31,4 +34,7 @@ do_wait(struct thread *current_thread);
 void
 do_exit(struct thread *current_thread);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

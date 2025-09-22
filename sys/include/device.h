@@ -15,7 +15,13 @@ struct device {
     struct device_driver *driver;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 make_device(struct device *dev, const char *name);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -24,6 +24,9 @@ struct mountpoint {
     char path[LATTE_MAX_PATH_LEN];
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Add a mountpoint
  *
@@ -42,4 +45,7 @@ mountpoint_add(struct mountpoint *mountpoint);
 struct mountpoint *
 mountpoint_find(const char *filename);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

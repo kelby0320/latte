@@ -20,6 +20,9 @@ struct platform_device {
     struct list_item *resources;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 platform_bus_init();
 
@@ -41,4 +44,7 @@ platform_device_register(struct platform_device *pdev);
 struct platform_device *
 platform_device_find(const char *name);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

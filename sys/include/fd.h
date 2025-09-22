@@ -3,6 +3,9 @@
 
 struct process;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Add a global file descriptor to the process
  *
@@ -33,4 +36,7 @@ process_get_gfd(struct process *process, int pfd);
 int
 process_remove_pfd(struct process *process, int pfd);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

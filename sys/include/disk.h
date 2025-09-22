@@ -19,7 +19,13 @@ struct disk {
         struct device *dev, unsigned int lba, const char *buf, size_t count);
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 disk_register(struct disk *disk);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

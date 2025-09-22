@@ -5,6 +5,9 @@
 
 struct process;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Execute a new program.
  *
@@ -19,4 +22,7 @@ process_execv(
     struct process *process, const char *path, const char *const *argv,
     size_t argv_len);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

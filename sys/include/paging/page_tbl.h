@@ -11,6 +11,9 @@ typedef uint32_t page_tbl_entry_t;
 #define page_tbl_starting_addr(page_tbl)                                       \
     ((void *)((uint32_t)page_tbl & 0xfffff000))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Retrieve a page table entry from a page table
  *
@@ -32,4 +35,7 @@ void
 page_tbl_set_entry(
     page_tbl_t page_tbl, void *vaddr, page_tbl_entry_t page_tbl_entry);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

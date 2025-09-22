@@ -106,6 +106,9 @@ struct process {
     struct list_item *open_fds;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Get the next pid
  *
@@ -217,4 +220,7 @@ process_remove(struct process *process);
 void
 process_switch_to_vm_area(struct process *process);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

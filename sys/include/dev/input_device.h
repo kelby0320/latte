@@ -18,6 +18,9 @@ struct device_driver;
 struct input_device;
 struct input_event;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 typedef uint8_t input_device_type_t;
 typedef uint8_t input_event_type_t;
 typedef uint8_t input_device_button_state_t;
@@ -75,4 +78,7 @@ input_device_find(const char *name);
 int
 input_device_event(struct input_device *idev, struct input_event event);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

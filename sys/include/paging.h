@@ -28,6 +28,9 @@
 
 #define is_aligned(addr) (((uint32_t)addr % PAGING_PAGE_SIZE) == 0)
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Enable paging
  *
@@ -85,4 +88,7 @@ void *
 paging_find_free_extent(
     page_dir_t page_dir, void *base_vaddr, size_t num_pages);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -13,10 +13,16 @@ struct platform_driver {
     int (*probe)(struct platform_device *dev);
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 platform_driver_init();
 
 int
 platform_driver_register(struct platform_driver *driver);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

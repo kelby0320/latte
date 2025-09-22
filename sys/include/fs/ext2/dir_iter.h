@@ -29,6 +29,9 @@ struct ext2_dir_iter {
     uint32_t block_offset;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialze a directory iterator
  *
@@ -63,4 +66,7 @@ ext2_dir_iter_next(
     struct ext2_dir_iter *iter, struct ext2_private *fs_private,
     struct ext2_directory_entry *dir_entry_out);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

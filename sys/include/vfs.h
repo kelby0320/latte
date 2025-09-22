@@ -9,6 +9,9 @@
 struct block;
 struct dir_entry;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize Virtual File System
  *
@@ -113,4 +116,7 @@ vfs_readdir(int fd, struct dir_entry *entry);
 int
 vfs_mkdir(const char *path);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

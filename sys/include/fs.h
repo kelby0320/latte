@@ -82,6 +82,9 @@ struct filesystem {
     char name[FILESYSTEM_NAME_MAX_LEN];
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize the fileystem subsystem
  *
@@ -108,4 +111,7 @@ fs_resolve(struct mountpoint *mountpoint);
 file_mode_t
 fs_get_mode_from_string(const char *str);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

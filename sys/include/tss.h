@@ -35,6 +35,9 @@ struct tss {
     uint32_t iopb;
 } __attribute__((packed));
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize the TSS structure
  *
@@ -50,4 +53,7 @@ tss_init();
 void
 tss_load(int tss_segment);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

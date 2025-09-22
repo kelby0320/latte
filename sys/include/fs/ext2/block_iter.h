@@ -37,6 +37,9 @@ struct ext2_block_iterator {
     uint32_t *tpl_indirect_blocks;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize a block iterator
  *
@@ -81,4 +84,7 @@ ext2_block_iterator_next(
 int
 ext2_block_iterator_block_no(struct ext2_block_iterator *iter);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -29,6 +29,9 @@ struct console_private {
     bool capslock_enabled;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 console_drv_init();
 
@@ -44,4 +47,7 @@ console_read(struct device *dev, size_t offset, char *buf, size_t count);
 void
 console_clear_screen(struct device *dev);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

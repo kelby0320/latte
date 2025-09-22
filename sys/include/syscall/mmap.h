@@ -3,6 +3,9 @@
 
 struct thread;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Execute the mmap system call
  *
@@ -17,4 +20,7 @@ do_mmap(struct thread *current_thread);
 void
 do_munmap(struct thread *current_thread);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

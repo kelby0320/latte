@@ -52,6 +52,9 @@ struct vm_area {
     page_dir_t page_directory;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize the kernel's vm_area
  *
@@ -216,4 +219,7 @@ vm_area_map_pages_to(
     struct vm_area *vm_area, void *virt, void *phys, void *phys_end,
     uint8_t flags);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

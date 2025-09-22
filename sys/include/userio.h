@@ -5,6 +5,9 @@
 
 struct thread;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Get an item from a thread's stack
  *
@@ -41,4 +44,7 @@ int
 thread_copy_to_user(
     struct thread *thread, void *user_buf, void *kernel_buf, size_t size);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -30,6 +30,9 @@ struct elf_img_desc {
 struct process;
 struct vm_area;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize an ELF image from a file
  *
@@ -57,4 +60,7 @@ ld_free_image(struct elf_img_desc *img_desc);
 int
 ld_map_image_to_process(struct process *process);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

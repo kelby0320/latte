@@ -12,10 +12,16 @@ struct block {
     bool bootable;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 block_add(struct block *block);
 
 struct block *
 block_find(bool (*predicate)(struct block *));
 
+#ifdef __cplusplus
+}
+#endif
 #endif

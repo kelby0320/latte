@@ -3,6 +3,9 @@
 
 struct filesystem;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize an Ext2 filesystem
  *
@@ -11,4 +14,7 @@ struct filesystem;
 struct filesystem *
 ext2_init();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

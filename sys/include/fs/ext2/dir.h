@@ -8,6 +8,9 @@ struct ext2_inode;
 struct ext2_private;
 struct ext2_dir_iter;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Find an entry in a directory
  *
@@ -28,4 +31,7 @@ ext2_dir_next_entry(
     struct ext2_private *fs_private, const struct ext2_inode *dir_inode,
     struct ext2_dir_iter *dir_iter, struct dir_entry *dir_entry_out);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -5,10 +5,16 @@
 
 #define KALLOC_PADDR_START ((void *)0x4400000) // 68MB
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void
 panic(const char *str);
 
 void
 switch_to_kernel_vm_area();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

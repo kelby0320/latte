@@ -22,8 +22,14 @@ struct partition_table_entry {
     uint32_t sector_count;
 } __attribute__((packed));
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 partition_read_partition_table(
     struct disk *disk, struct partition_table_entry *partition_table);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -28,6 +28,9 @@ struct gdt {
     uint8_t base_24_31;
 } __attribute__((packed));
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize the Global Descriptor Table
  *
@@ -48,4 +51,8 @@ gdt_set_kernel_data_segment();
  */
 void
 gdt_set_user_data_segment();
+
+#ifdef __cplusplus
+}
+#endif
 #endif

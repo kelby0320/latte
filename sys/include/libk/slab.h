@@ -34,6 +34,9 @@ struct slab_cache {
     struct slab *slab_head;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Create a new slab cache
  *
@@ -70,4 +73,7 @@ slab_cache_alloc(struct slab_cache *cache);
 int
 slab_cache_free(struct slab_cache *cache, void *ptr);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

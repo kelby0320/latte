@@ -8,6 +8,9 @@ struct block_buffered_reader {
     unsigned int offset;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void
 block_buffered_reader_init(
     struct block_buffered_reader *reader, struct block *block);
@@ -20,4 +23,7 @@ int
 block_buffered_reader_read(
     struct block_buffered_reader *reader, char *out, unsigned int count);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

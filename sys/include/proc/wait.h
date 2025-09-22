@@ -3,6 +3,9 @@
 
 #include "process.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Wait for a process to exit.
  *
@@ -13,4 +16,7 @@
 pid_t
 process_wait(struct process *process, int *status);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

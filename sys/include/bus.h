@@ -23,6 +23,9 @@ struct bus {
     struct list_item *devices;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 bus_init();
 
@@ -35,4 +38,7 @@ bus_match();
 int
 bus_probe();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

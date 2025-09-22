@@ -3,6 +3,9 @@
 
 struct process;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Fork a new process.
  *
@@ -13,4 +16,7 @@ struct process;
 int
 process_fork(struct process *parent, struct process **child);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

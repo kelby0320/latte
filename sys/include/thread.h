@@ -64,6 +64,9 @@ struct thread {
     struct process *process;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Create a new thread
  *
@@ -127,4 +130,7 @@ thread_switch_and_return(struct thread *thread);
 void
 thread_save_state(struct thread *thread, struct isr_frame *irq_frame);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

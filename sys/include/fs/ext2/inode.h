@@ -7,6 +7,9 @@
 
 struct disk;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Read an inode structure
  *
@@ -36,4 +39,7 @@ ext2_read_inode_data(
     struct ext2_private *fs_private, const struct ext2_inode *inode, char *out,
     size_t count, unsigned int blk_offset, unsigned int byte_offset);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

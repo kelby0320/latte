@@ -36,6 +36,9 @@ struct vga_private {
     uint8_t cur_char_color;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int
 vga_drv_init();
 
@@ -69,4 +72,7 @@ vga_disable_cursor();
 void
 vga_set_cursor(struct device *dev, uint16_t row, uint16_t col);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

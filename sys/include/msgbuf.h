@@ -1,6 +1,9 @@
 #ifndef MSGBUF_H
 #define MSGBUF_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Write a message to the kernel message buffer
  *
@@ -22,4 +25,7 @@ msgbuf_add_output_fd(int fd);
 int
 msgbuf_flush();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -5,6 +5,9 @@
 
 struct process;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Terminate a running process
  *
@@ -15,4 +18,7 @@ struct process;
 int
 process_exit(struct process *process, uint8_t status_code);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

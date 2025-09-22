@@ -34,6 +34,9 @@ struct path {
     struct path_element *root;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Make a path from a path string
  *
@@ -52,4 +55,7 @@ path_from_str(struct path **path_out, const char *path_str);
 void
 path_free(struct path *path);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -14,6 +14,9 @@ struct list_item {
     struct list_item *next;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Add an item to the front of list
  *
@@ -92,4 +95,7 @@ list_empty(struct list_item *head);
 void
 list_destroy(struct list_item *head);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

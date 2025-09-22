@@ -5,6 +5,9 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void *
 process_mmap(
     struct process *process, void *addr, size_t length, int prot, int flags,
@@ -13,4 +16,7 @@ process_mmap(
 int
 process_munmap(struct process *process, void *addr, size_t length);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

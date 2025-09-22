@@ -3,6 +3,9 @@
 
 #include <stddef.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief   Initialize the libk allocators
  *
@@ -68,4 +71,7 @@ kzalloc(size_t size);
 void
 kfree(void *ptr);
 
+#ifdef __cplusplus
+}
+#endif
 #endif

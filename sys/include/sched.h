@@ -3,6 +3,9 @@
 
 struct thread;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Add a thread to the scheduler
  *
@@ -61,4 +64,7 @@ schedule_first_thread();
 void
 schedule();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -36,6 +36,9 @@ struct idt_entry {
     uint16_t offset2;
 } __attribute__((packed));
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 /**
  * @brief Initialize the Interrupt Descriptor Table
  *
@@ -43,4 +46,7 @@ struct idt_entry {
 void
 idt_init();
 
+#ifdef __cplusplus
+}
+#endif
 #endif

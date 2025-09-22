@@ -38,6 +38,9 @@ enum ps2_port { PS2_PORT1 = 1, PS2_PORT2 = 2 };
 
 typedef enum ps2_port ps2_port_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void
 ps2_write_cmd(uint8_t cmd);
 
@@ -47,4 +50,7 @@ ps2_write_data(uint8_t data);
 uint8_t
 ps2_read_data();
 
+#ifdef __cplusplus
+}
+#endif
 #endif
