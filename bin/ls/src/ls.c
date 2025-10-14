@@ -4,7 +4,7 @@
 #include "unistd.h"
 
 static void
-print_help()
+print_help(void)
 {
     printf("Usage: /bin/ls {DIRECTORY}\n");
     printf("List information about files and directories\n");

@@ -22,7 +22,7 @@ static const char buffer_overflow_msg[] = "Kernel Message Buffer Overflow!";
  *
  */
 static void
-msgbuf_buffer_overflow()
+msgbuf_buffer_overflow(void)
 {
     size_t msglen = strlen(buffer_overflow_msg);
     char *dest = message_buffer + (MSGBUF_BUFFER_SIZE - msglen);
@@ -87,7 +87,7 @@ msgbuf_add_output_fd(int fd)
 }
 
 int
-msgbuf_flush()
+msgbuf_flush(void)
 {
     if (msgbuf_len > 0) {
         msgbuf_write_to_fds(message_buffer);

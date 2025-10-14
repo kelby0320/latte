@@ -8,7 +8,7 @@
  *
  */
 void
-libk_alloc_init();
+libk_alloc_init(void);
 
 /**
  * @brief   Allocate a block of memory
@@ -40,7 +40,7 @@ vzalloc(size_t size);
  *
  */
 void
-vfree();
+vfree(void *ptr);
 
 /**
  * @brief   Allocate a block of memory

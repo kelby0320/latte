@@ -29,7 +29,7 @@ set_char(uint16_t row, uint16_t col, char c)
 }
 
 static void
-term_scroll()
+term_scroll(void)
 {
     uint16_t *fb = VGA_FRAMEBUFFER;
 
@@ -46,7 +46,7 @@ term_scroll()
 }
 
 static void
-term_newline()
+term_newline(void)
 {
     if (row == VGA_HEIGHT) {
         term_scroll();
@@ -75,13 +75,13 @@ term_put_char(char c)
 }
 
 void
-term_init()
+term_init(void)
 {
     term_clear_screen();
 }
 
 void
-term_clear_screen()
+term_clear_screen(void)
 {
     for (size_t y = 0; y < VGA_HEIGHT; y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {

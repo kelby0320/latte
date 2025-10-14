@@ -11,7 +11,7 @@
 #include <stddef.h>
 
 int
-platform_driver_init()
+platform_driver_init(void)
 {
     ata_drv_init();
     devfs_drv_init();

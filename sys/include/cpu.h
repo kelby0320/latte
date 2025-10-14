@@ -2,6 +2,6 @@
 #define CPU_H
 
 int
-cpu_init();
+cpu_init(void);
 
 #endif

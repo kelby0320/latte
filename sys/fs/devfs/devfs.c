@@ -309,7 +309,7 @@ err_reader_alloc:
 }
 
 struct filesystem *
-devfs_init()
+devfs_init(void)
 {
     struct filesystem *fs = kzalloc(sizeof(struct filesystem));
     if (!fs) {

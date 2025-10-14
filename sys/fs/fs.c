@@ -41,7 +41,7 @@ fs_insert_filesystem(struct filesystem *filesystem)
  *
  */
 static int
-fs_load()
+fs_load(void)
 {
     // fs_insert_filesystem(fat32_init());
     int res = fs_insert_filesystem(ext2_init());
@@ -58,7 +58,7 @@ fs_load()
 }
 
 int
-fs_init()
+fs_init(void)
 {
     return fs_load();
 }

@@ -33,7 +33,7 @@
  *
  */
 void
-paging_enable_paging();
+paging_enable_paging(void);
 
 /**
  * @brief Load a new page directory
@@ -48,7 +48,7 @@ paging_load_page_directory(page_dir_t page_dir);
  *
  */
 void
-paging_flush_tlb();
+paging_flush_tlb(void);
 
 /**
  * @brief   Copy kernel page directory entries to user page directory

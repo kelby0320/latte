@@ -45,6 +45,6 @@ void
 ps2_write_data(uint8_t data);
 
 uint8_t
-ps2_read_data();
+ps2_read_data(void);
 
 #endif

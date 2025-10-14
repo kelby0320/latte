@@ -11,7 +11,7 @@
 static struct heap heap;
 
 void *
-setup_fixture()
+setup_fixture(void)
 {
     void *heap_addr = malloc(HEAP_SIZE);
     heap_init(&heap, heap_addr);
@@ -19,7 +19,7 @@ setup_fixture()
 }
 
 void
-teardown_fixture()
+teardown_fixture(void)
 {
     free(heap.saddr);
 }
@@ -126,7 +126,7 @@ struct test_case test_cases[] = {
     {.name = 0, .test_function = 0, .setup_fixture = 0, .teardown_fixture = 0}};
 
 int
-main()
+main(void)
 {
     test_init();
     run_tests(test_cases);

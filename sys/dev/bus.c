@@ -54,7 +54,7 @@ bus_probe_devices(const struct bus *bus)
 }
 
 int
-bus_init()
+bus_init(void)
 {
     platform_bus_init();
     platform_add_devices();
@@ -76,7 +76,7 @@ bus_register(struct bus *bus)
 }
 
 int
-bus_match()
+bus_match(void)
 {
     for_each_in_list(const struct bus *, bus_list, list, bus)
     {
@@ -87,7 +87,7 @@ bus_match()
 }
 
 int
-bus_probe()
+bus_probe(void)
 {
     for_each_in_list(const struct bus *, bus_list, list, bus)
     {

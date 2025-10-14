@@ -13,7 +13,7 @@ struct tss tss;
 extern struct vm_area kernel_vm_area;
 
 static void
-tss_map_esp()
+tss_map_esp(void)
 {
     size_t order = kalloc_size_to_order(TSS_STACK_SIZE);
     void *tss_stack = kalloc_get_phys_pages(order);
@@ -34,7 +34,7 @@ tss_map_esp()
 }
 
 void
-tss_init()
+tss_init(void)
 {
     printk("Init TSS at %d\n", (int)&tss);
 

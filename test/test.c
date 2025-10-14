@@ -6,7 +6,7 @@
 struct test_case sentinal;
 
 void
-test_init()
+test_init(void)
 {
     memset(&sentinal, 0, sizeof(struct test_case));
 }

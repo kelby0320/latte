@@ -112,7 +112,7 @@ struct process {
  * @return uint32_t
  */
 uint32_t
-process_next_pid();
+process_next_pid(void);
 
 /**
  * @brief   Free all threads of a process

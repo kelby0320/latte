@@ -5,7 +5,7 @@
 #define BUF_SIZE 4096
 
 static void
-print_help()
+print_help(void)
 {
     printf("Usage: cat {FILE}\n");
     printf("Concatenate FILE(s) to standard output.\n");

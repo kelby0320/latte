@@ -14,7 +14,7 @@ struct platform_driver {
 };
 
 int
-platform_driver_init();
+platform_driver_init(void);
 
 int
 platform_driver_register(struct platform_driver *driver);

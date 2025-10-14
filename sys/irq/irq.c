@@ -8,7 +8,7 @@
 IRQ_HANDLER irq_handlers[LATTE_TOTAL_IDT_ENTRIES] = {0};
 
 void
-irq_init()
+irq_init(void)
 {
     idt_init();
 }

@@ -5,7 +5,7 @@ extern int stdout;
 extern int stderr;
 
 void
-libc_init()
+libc_init(void)
 {
     stdin = open("/dev/console", "r");
     stdout = open("/dev/console", "w");

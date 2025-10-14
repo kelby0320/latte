@@ -40,7 +40,7 @@ struct tss {
  *
  */
 void
-tss_init();
+tss_init(void);
 
 /**
  * @brief Load the TSS segment

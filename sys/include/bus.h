@@ -24,15 +24,15 @@ struct bus {
 };
 
 int
-bus_init();
+bus_init(void);
 
 int
 bus_register(struct bus *bus);
 
 int
-bus_match();
+bus_match(void);
 
 int
-bus_probe();
+bus_probe(void);
 
 #endif

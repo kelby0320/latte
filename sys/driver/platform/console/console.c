@@ -105,7 +105,7 @@ console_input_recv_callback(struct input_device *idev, struct input_event event)
 }
 
 int
-console_drv_init()
+console_drv_init(void)
 {
     platform_driver_register(&console_drv);
 

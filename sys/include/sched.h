@@ -45,20 +45,20 @@ sched_unblock_thread(struct thread *thread);
  * @return struct thread*
  */
 struct thread *
-sched_get_current();
+sched_get_current(void);
 
 /**
  * @brief Schedule the first thread to run
  *
  */
 void
-schedule_first_thread();
+schedule_first_thread(void);
 
 /**
  * @brief Schedule a new thread to run
  *
  */
 void
-schedule();
+schedule(void);
 
 #endif

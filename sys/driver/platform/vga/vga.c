@@ -31,7 +31,7 @@ vga_color(enum vga_color fg, enum vga_color bg)
 }
 
 int
-vga_drv_init()
+vga_drv_init(void)
 {
     platform_driver_register(&vga_drv);
 
@@ -102,7 +102,7 @@ vga_current_color(struct device *dev)
 }
 
 void
-vga_enable_cursor()
+vga_enable_cursor(void)
 {
     uint8_t cursor_start = 14;
     uint8_t cursor_end = 15;
@@ -115,7 +115,7 @@ vga_enable_cursor()
 }
 
 void
-vga_disable_cursor()
+vga_disable_cursor(void)
 {
     outb(0x3D4, 0x0A);
     outb(0x3D5, 0x20);

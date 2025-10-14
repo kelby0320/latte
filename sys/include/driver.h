@@ -26,7 +26,7 @@ struct file_operations {
 };
 
 int
-driver_init();
+driver_init(void);
 
 int
 driver_register(struct device_driver *driver);

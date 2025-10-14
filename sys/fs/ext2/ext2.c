@@ -12,6 +12,7 @@
 #include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "libk/string.h"
 #include "mountpoint.h"
 #include "path.h"
@@ -365,7 +366,7 @@ ext2_mkdir(void *fs_private, struct path *path)
 }
 
 struct filesystem *
-ext2_init()
+ext2_init(void)
 {
     struct filesystem *fs = kzalloc(sizeof(struct filesystem));
     if (!fs) {

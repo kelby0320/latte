@@ -48,7 +48,7 @@ idt_set_entry(int interrupt_no, void *isr)
 }
 
 void
-idt_init()
+idt_init(void)
 {
     printk("Init IDT at %d\n", (int)int_desc_tbl);
 

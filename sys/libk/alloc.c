@@ -93,7 +93,7 @@ err_out:
 }
 
 void
-libk_alloc_init()
+libk_alloc_init(void)
 {
     for (int i = 0; i < KMALLOC_SLAB_CACHES; i++) {
         int cache_size = KMALLOC_IDX_TO_CACHE_SIZE(i);
