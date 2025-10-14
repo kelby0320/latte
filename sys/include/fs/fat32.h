@@ -4,6 +4,6 @@
 #include "fs.h"
 
 struct filesystem *
-fat32_init();
+fat32_init(void);
 
 #endif

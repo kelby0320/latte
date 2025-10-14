@@ -15,7 +15,7 @@ struct dir_entry;
  * @return int  Status code
  */
 int
-vfs_init();
+vfs_init(void);
 
 /**
  * @brief Mount a partition

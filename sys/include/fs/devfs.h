@@ -11,7 +11,7 @@ struct filesystem;
  * @return struct filesystem*   Pointer to the filesystem
  */
 struct filesystem *
-devfs_init();
+devfs_init(void);
 
 /**
  * @brief Add a new node to devfs

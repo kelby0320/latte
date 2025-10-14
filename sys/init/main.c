@@ -41,7 +41,7 @@ panic(const char *str)
  *
  */
 void
-switch_to_kernel_vm_area()
+switch_to_kernel_vm_area(void)
 {
     gdt_set_kernel_data_segment();
     vm_area_switch_map(&kernel_vm_area);
@@ -84,7 +84,7 @@ kernel_early_init(unsigned long magic)
  *
  */
 void
-kernel_late_init()
+kernel_late_init(void)
 {
     bus_init();
 

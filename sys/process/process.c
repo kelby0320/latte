@@ -20,7 +20,7 @@ static struct list_item *process_list = NULL;
 static uint32_t next_pid = 1;
 
 uint32_t
-process_next_pid()
+process_next_pid(void)
 {
     return next_pid++;
 }

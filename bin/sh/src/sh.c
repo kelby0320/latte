@@ -13,14 +13,14 @@ char program_name[MAX_LINE_LENGTH] = {0};
 char *program_args[MAX_PROGRAM_ARGS] = {0};
 
 static void
-sh_help()
+sh_help(void)
 {
     printf("Usage sh:\n");
     printf("Latte interactive shell\n");
 }
 
 static int
-sh_init()
+sh_init(void)
 {
     // Initial current working directory
     strcpy(CWD, "/");
@@ -29,7 +29,7 @@ sh_init()
 }
 
 static int
-sh_reset_input()
+sh_reset_input(void)
 {
     memset(input_line, 0, MAX_LINE_LENGTH);
     memset(program_name, 0, MAX_LINE_LENGTH);
@@ -39,7 +39,7 @@ sh_reset_input()
 }
 
 static inline void
-sh_prompt()
+sh_prompt(void)
 {
     printf("sh:%s> ", CWD);
 }

@@ -13,7 +13,7 @@
 static struct list_item *driver_list = NULL;
 
 int
-driver_init()
+driver_init(void)
 {
     platform_driver_init();
 

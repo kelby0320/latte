@@ -9,6 +9,6 @@ struct filesystem;
  * @return struct filesystem* Pointer to filesystem
  */
 struct filesystem *
-ext2_init();
+ext2_init(void);
 
 #endif

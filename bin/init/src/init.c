@@ -4,7 +4,7 @@
 #include "unistd.h"
 
 int
-main()
+main(void)
 {
     while (1) {
         pid_t pid = fork();

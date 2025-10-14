@@ -7,7 +7,7 @@ int argc;
 char **argv;
 
 void
-program_entry()
+program_entry(void)
 {
     int res = main(argc, argv);
 

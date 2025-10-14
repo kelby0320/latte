@@ -49,7 +49,7 @@ struct ata_private {
 };
 
 int
-ata_drv_init();
+ata_drv_init(void);
 
 int
 ata_probe(struct platform_device *pdev);

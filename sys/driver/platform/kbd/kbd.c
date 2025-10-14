@@ -34,7 +34,7 @@ scancode_to_keycode(uint8_t scancode)
 }
 
 static void
-kbd_interrupt_handler()
+kbd_interrupt_handler(void)
 {
     uint8_t scancode = ps2_read_data();
     ps2_read_data();
@@ -59,7 +59,7 @@ kbd_interrupt_handler()
 }
 
 static int
-kbd_ps2_init()
+kbd_ps2_init(void)
 {
     /* Disable PS2 ports */
     ps2_write_cmd(PS2_CMD_DIS_PORT1);
@@ -113,7 +113,7 @@ kbd_ps2_init()
 }
 
 int
-kbd_drv_init()
+kbd_drv_init(void)
 {
     platform_driver_register(&kbd_drv);
 

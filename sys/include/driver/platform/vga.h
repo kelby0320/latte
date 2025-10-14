@@ -37,7 +37,7 @@ struct vga_private {
 };
 
 int
-vga_drv_init();
+vga_drv_init(void);
 
 int
 vga_probe(struct platform_device *pdev);
@@ -61,10 +61,10 @@ uint8_t
 vga_current_color(struct device *dev);
 
 void
-vga_enable_cursor();
+vga_enable_cursor(void);
 
 void
-vga_disable_cursor();
+vga_disable_cursor(void);
 
 void
 vga_set_cursor(struct device *dev, uint16_t row, uint16_t col);

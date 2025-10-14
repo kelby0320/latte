@@ -16,7 +16,7 @@ struct platform_driver ata_pdev = {
     .driver = {.name = "ata", .compat = "ata"}, .probe = ata_probe};
 
 int
-ata_drv_init()
+ata_drv_init(void)
 {
     platform_driver_register(&ata_pdev);
 

@@ -21,13 +21,13 @@ struct platform_device {
 };
 
 int
-platform_bus_init();
+platform_bus_init(void);
 
 struct bus *
-platform_bus_get_bus();
+platform_bus_get_bus(void);
 
 int
-platform_add_devices();
+platform_add_devices(void);
 
 int
 platform_match(struct device *dev, struct device_driver *drv);

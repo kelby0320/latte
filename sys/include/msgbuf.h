@@ -20,6 +20,6 @@ int
 msgbuf_add_output_fd(int fd);
 
 int
-msgbuf_flush();
+msgbuf_flush(void);
 
 #endif

@@ -16,7 +16,7 @@ struct kbd_private {
 };
 
 int
-kbd_drv_init();
+kbd_drv_init(void);
 
 int
 kbd_probe(struct platform_device *dev);

@@ -15,7 +15,7 @@ struct platform_driver devfs_pdev = {
     .driver = {.name = "devfs", .compat = "devfs"}, .probe = devfs_probe};
 
 int
-devfs_drv_init()
+devfs_drv_init(void)
 {
     platform_driver_register(&devfs_pdev);
 

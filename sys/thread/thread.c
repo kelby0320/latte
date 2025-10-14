@@ -26,7 +26,7 @@ static uint32_t next_tid = 1;
  * @return uint32_t
  */
 static inline uint32_t
-get_next_tid()
+get_next_tid(void)
 {
     return next_tid++;
 }

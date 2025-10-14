@@ -46,7 +46,7 @@ gdt_load(struct gdtr *gdtr);
  *
  */
 void
-gdt_fix_kernel_registers();
+gdt_fix_kernel_registers(void);
 
 /**
  * @brief Encode structure gdt as real gdt
@@ -99,7 +99,7 @@ gdt_structured_to_gdt(
 }
 
 void
-gdt_init()
+gdt_init(void)
 {
     memset(gdt, 0, sizeof(gdt));
     memset(&gdtr, 0, sizeof(struct gdtr));

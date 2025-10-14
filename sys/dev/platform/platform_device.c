@@ -76,7 +76,7 @@ err_exit:
 }
 
 int
-platform_bus_init()
+platform_bus_init(void)
 {
     int res = bus_register(&platform_bus);
     if (res < 0) {
@@ -87,13 +87,13 @@ platform_bus_init()
 }
 
 struct bus *
-platform_bus_get_bus()
+platform_bus_get_bus(void)
 {
     return &platform_bus;
 }
 
 int
-platform_add_devices()
+platform_add_devices(void)
 {
     struct platform_device *pdevices[STATIC_PLATFORM_DEVICE_COUNT];
     /* ATA0 Drive 0 */

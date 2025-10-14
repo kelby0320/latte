@@ -51,13 +51,13 @@ sched_unblock_thread(struct thread *thread)
 }
 
 struct thread *
-sched_get_current()
+sched_get_current(void)
 {
     return current_thread;
 }
 
 void
-schedule_first_thread()
+schedule_first_thread(void)
 {
     current_thread = queue_dequeue(&ready_queue);
     if (!current_thread) {
@@ -70,7 +70,7 @@ schedule_first_thread()
 }
 
 void
-schedule()
+schedule(void)
 {
     if (current_thread) {
         // Enqueue currently running thread

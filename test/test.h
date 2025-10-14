@@ -75,7 +75,7 @@ struct test_case {
     }
 
 void
-test_init();
+test_init(void);
 
 void
 run_tests(const struct test_case *tests);

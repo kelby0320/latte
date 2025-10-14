@@ -30,7 +30,7 @@ struct console_private {
 };
 
 int
-console_drv_init();
+console_drv_init(void);
 
 int
 console_probe(struct platform_device *dev);

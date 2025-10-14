@@ -25,13 +25,13 @@
 #define ICW4_SFNM       0x10 /* Special fully nested (not) */
 
 static inline void
-io_wait()
+io_wait(void)
 {
     outb(0x80, 0);
 }
 
 static int
-remap_pic()
+remap_pic(void)
 {
     printk("Remap PIC to 0x20\n");
 
@@ -74,7 +74,7 @@ remap_pic()
 }
 
 int
-cpu_init()
+cpu_init(void)
 {
     remap_pic();
 

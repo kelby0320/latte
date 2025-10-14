@@ -30,7 +30,7 @@ ps2_wait_for_input(uint8_t port)
  * @brief Wait for the PS2 output buffer to by full
  */
 static void
-ps2_wait_for_output()
+ps2_wait_for_output(void)
 {
     int i = 0;
     do {
@@ -57,7 +57,7 @@ ps2_write_data(uint8_t data)
 }
 
 uint8_t
-ps2_read_data()
+ps2_read_data(void)
 {
     ps2_wait_for_output();
     return insb(PS2_DATA_PORT);

@@ -16,7 +16,7 @@
 #define to_paddr(addr)           ((void *)((uint32_t)addr - KERNEL_HIGHER_HALF_START))
 
 extern void
-boot_enable_paging();
+boot_enable_paging(void);
 
 extern void
 boot_load_page_directory(uint32_t *page_dir);
@@ -56,7 +56,7 @@ init_page_table(uint32_t *page_table, uint32_t page_tbl_offset, uint8_t flags)
  *
  */
 __attribute__((section(".boot.text"))) static void
-init_kernel_page_tables()
+init_kernel_page_tables(void)
 {
     for (int i = 0; i < PAGE_DIRECTORY_ENTRIES - KERNEL_DIR_ENTRIES; i++) {
         uint32_t tbl_offset = i * PAGE_TABLE_ENTRIES * PAGE_SIZE;
@@ -71,7 +71,7 @@ init_kernel_page_tables()
  *
  */
 __attribute__((section(".boot.text"))) static void
-map_kernel_directory()
+map_kernel_directory(void)
 {
 
     /* kernel_page_directory is located in high memory (e.g above 0xC0100000).
@@ -106,7 +106,7 @@ map_kernel_directory()
  *
  */
 __attribute__((section(".boot.text"))) static void
-setup_kernel_memory_map()
+setup_kernel_memory_map(void)
 {
     init_kernel_page_tables();
     map_kernel_directory();
@@ -121,7 +121,7 @@ setup_kernel_memory_map()
  *
  */
 __attribute__((section(".boot.text"))) void
-early_init()
+early_init(void)
 {
     setup_kernel_memory_map();
     boot_load_page_directory(to_paddr(kernel_page_directory));
@@ -134,7 +134,7 @@ early_init()
  * Unmap low memory and setup a GDT
  */
 void
-late_init()
+late_init(void)
 {
     paging_flush_tlb();
     gdt_init();

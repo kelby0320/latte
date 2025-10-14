@@ -88,7 +88,7 @@ struct filesystem {
  * @return int  Status code
  */
 int
-fs_init();
+fs_init(void);
 
 /**
  * @brief Resolve a filesystem to a mountpoint

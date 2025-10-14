@@ -41,6 +41,6 @@ struct idt_entry {
  *
  */
 void
-idt_init();
+idt_init(void);
 
 #endif

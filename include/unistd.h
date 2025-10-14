@@ -19,7 +19,7 @@ int
 write(int fd, const char *ptr, size_t count);
 
 pid_t
-fork();
+fork(void);
 
 int
 execv(const char *path, char *const *argv);

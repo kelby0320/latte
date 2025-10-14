@@ -365,7 +365,7 @@ ext2_mkdir(void *fs_private, struct path *path)
 }
 
 struct filesystem *
-ext2_init()
+ext2_init(void)
 {
     struct filesystem *fs = kzalloc(sizeof(struct filesystem));
     if (!fs) {

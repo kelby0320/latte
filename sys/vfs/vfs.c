@@ -71,7 +71,7 @@ vfs_find_and_mount(const char *mount_path, bool (*predicate)(struct block *))
 }
 
 int
-vfs_init()
+vfs_init(void)
 {
     int res = vfs_find_and_mount("/", is_boot_block);
     if (res < 0) {

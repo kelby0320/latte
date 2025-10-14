@@ -8,13 +8,13 @@
  *
  */
 void
-irq_init();
+irq_init(void);
 
 /**
  * @brief Interrupt handler prototype definition
  *
  */
-typedef void (*IRQ_HANDLER)();
+typedef void (*IRQ_HANDLER)(void);
 
 /**
  * @brief Register an interrupt handler
@@ -40,13 +40,13 @@ do_irq(int interrupt_no);
  *
  */
 void
-enable_interrupts();
+enable_interrupts(void);
 
 /**
  * @brief Disable Interrupts
  *
  */
 void
-disable_interrupts();
+disable_interrupts(void);
 
 #endif
