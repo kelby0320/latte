@@ -9,7 +9,7 @@
 #include "syscall/process.h"
 #include "thread.h"
 
-typedef void (*syscall_t)(void);
+typedef void (*syscall_t)(struct thread *);
 
 static syscall_t syscalls[] = {
     do_open,  do_close, do_read, do_write,   do_mmap,     do_munmap, do_fork,

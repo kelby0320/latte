@@ -12,6 +12,7 @@
 #include "kernel.h"
 #include "libk/alloc.h"
 #include "libk/memory.h"
+#include "libk/print.h"
 #include "libk/string.h"
 #include "mountpoint.h"
 #include "path.h"
